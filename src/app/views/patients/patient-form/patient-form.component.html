@@ -1,0 +1,29 @@
+<section class="Form">
+  <app-form-view>
+    <ng-template #body let-fields="fields" let-results="results">
+      <div class="container h-100 d-flex align-items-center mb-5">
+        <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
+          <!-- <pre>{{ fields | json }}</pre> -->
+          <div class="row">
+            <div class="col-6">
+              <app-form-generator
+                [fields]="filterObject(fields, patientPersonalFields())"
+                (formValues)="handleFormValues($event)"
+              >
+              </app-form-generator>
+            </div>
+            <div class="col-6">
+              <app-form-generator
+                [fields]="filterObject(fields, patientAdditionalFields())"
+                (formValues)="handleFormValues($event)"
+              >
+              </app-form-generator>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </app-form-view>
+
+  <pre>{{ values | json }}</pre>
+</section>

@@ -1,0 +1,20 @@
+<div class="Card rounded-top shadow-sm rounded-bottom">
+  <header class="head rounded-top">
+    <div class="background-image w-100 h-100 rounded-top" [style.background-image]="'url('+ backgroundImage() +')'"></div>
+  </header>
+
+  <div class="content p-3">
+    <body class="body mb-3 fw-bold">
+      <ng-content
+      >
+      </ng-content>
+      <!-- <h5>Lorem ipsum</h5>
+      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio, impedit.</p> -->
+    </body>
+  
+    <footer class="footer d-flex justify-content-end">
+      <button mat-raised-button class="me-2" color="primary">Action 1</button>
+      <button mat-button>Action 2</button>
+    </footer>
+  </div>
+</div>

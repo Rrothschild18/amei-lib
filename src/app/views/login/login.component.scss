@@ -1,0 +1,22 @@
+.Login {
+  .background-image {
+    background-image: url("../../../assets/amei-login.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .login-form {
+    padding-top: 130px;
+  }
+
+  input {
+    width: 420px;
+    height: 40px;
+    background-color: #e6e6e6;
+  }
+
+  .logo {
+    min-width: 141px;
+  }
+}

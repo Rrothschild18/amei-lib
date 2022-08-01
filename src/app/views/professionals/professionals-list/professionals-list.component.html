@@ -1,0 +1,16 @@
+<div class="container">
+  <app-list-view entity="Professional">
+    <ng-template #header let-entity="entity">
+      <div class="d-flex justify-content-between align-items-center w-100 my-5">
+        <ul class="list-unstyled d-flex">
+          <li class="me-2">Home</li>
+        </ul>
+        <button mat-button class="bg-warning">Enviar</button>
+      </div>
+    </ng-template>
+
+    <ng-template #body let-fields="fields" let-results="results">
+      <pre>{{ fields | json }}</pre>
+    </ng-template>
+  </app-list-view>
+</div>

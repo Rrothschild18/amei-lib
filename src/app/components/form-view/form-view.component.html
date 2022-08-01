@@ -1,0 +1,26 @@
+<div class="FormView">
+  <div *ngIf="isFetching" class="">
+    <mat-spinner class="spinner"></mat-spinner>
+  </div>
+
+  <ng-template
+    *ngIf="hasHeaderSlot() && hasResults()"
+    [ngTemplateOutlet]="renderHeaderSlot()"
+    [ngTemplateOutletContext]="{ entity: 'Patients' }"
+  ></ng-template>
+
+  <ng-template
+    *ngIf="hasBodySlot() && hasResults()"
+    [ngTemplateOutlet]="renderBodySlot()"
+    [ngTemplateOutletContext]="{
+      fields: fields$,
+      result: result$
+    }"
+  ></ng-template>
+
+  <div *ngIf="!isFetching && !hasResults()">
+    <div>
+      <h6>Nenhum item encontrado.</h6>
+    </div>
+  </div>
+</div>

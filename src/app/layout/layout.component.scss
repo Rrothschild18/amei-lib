@@ -1,0 +1,40 @@
+.Layout {
+  .toolbar {
+    z-index: 99999;
+  }
+
+  .brand {
+    width: 150px;
+  }
+
+  .main-content {
+    padding-top: 64px;
+  }
+
+  .logo {
+    width: 72px;
+  }
+
+  .Navigation {
+    ul {
+      li {
+        button {
+          font-size: 20px;
+
+          .mat-button-wrapper {
+            display: flex;
+            align-items: center;
+
+            .fsize {
+              font-size: 20px;
+            }
+          }
+
+          .small {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}

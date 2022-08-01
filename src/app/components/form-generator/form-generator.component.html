@@ -1,0 +1,12 @@
+<form [formGroup]="form">
+  <div *ngIf="!!toArrayFields(fields).length">
+    <app-field
+      *ngFor="let field of toArrayFields(fields)"
+      [field]="field"
+      [form]="form"
+      (inputValue)="handleInputs($event)"
+    ></app-field>
+  </div>
+
+  <pre> {{ form.value | json }}</pre>
+</form>

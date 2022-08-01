@@ -1,0 +1,71 @@
+<section class="Home vh-100 vw-100">
+  <mat-toolbar color="primary">
+    <header class="header d-flex align-items-center w-100 h-100">
+      <div class="brand d-flex justify-content-between">
+        <button class="" mat-icon-button (click)="toggleDrawer()">
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <img class="logo" src="/assets/amei-logo2.svg" alt="Logo Amei" />
+      </div>
+
+      <nav class="Navigation w-100 h-100">
+        <div class="d-flex flex-wrap justify-content-center w-100 h-100">
+          <ul class="mb-0 h-100 d-flex flex-wrap px-0">
+            <li
+              class="me-4 d-flex align-items-center h-100"
+              *ngFor="let menuItem of menuItens"
+            >
+              <button
+                class="w-auto rounded-0 h-100 px-xxl-2 px-lg-2 px-sm-1"
+                mat-button
+                (click)="changeSideNavLinks()"
+              >
+                <mat-icon class="fsize">{{ menuItem.iconName }}</mat-icon>
+                <span class="small"> {{ menuItem.name }}</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="w-100 h-100 d-flex" [hasBackdrop]="false">
+    <mat-sidenav [(opened)]="isOpen">
+      <mat-form-field class="w-100" appearance="fill">
+        <mat-label>Favorite food</mat-label>
+        <input matInput placeholder="Ex. Pizza" value="Sushi" />
+      </mat-form-field>
+      <mat-nav-list>
+        <mat-list-item *ngFor="let link of links">
+          <a
+            matLine
+            class="d-flex align-items-center justify-content-center"
+            [routerLink]="link.linkTo"
+          >
+            <span>{{ link.pathName }}</span>
+          </a>
+        </mat-list-item>
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="vh-100 w-100 bg-primary">
+      <section class="main-content">
+        <ng-content select="[mainContent]"></ng-content>
+      </section>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</section>
+
+<!-- <ng-content #host></ng-content>
+
+
+
+@ContencChilg('host') host : templateRef
+
+
+btn = fct.createComponent(<MyButton>, {})
+
+
+host.embbedView(btn) -->
