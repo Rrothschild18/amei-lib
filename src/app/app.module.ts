@@ -23,6 +23,8 @@ import { LoginComponent } from './views/login/login.component';
 import { PatientFormComponent } from './views/patients/patient-form/patient-form.component';
 import { PatientsListComponent } from './views/patients/patients-list/patients-list.component';
 import { ProfessionalsListComponent } from './views/professionals/professionals-list/professionals-list.component';
+import { ListTestComponent } from './components/list-test/list-test.component';
+import { NgTemplateNameDirective } from './directives/ng-template-name.directive';
 
 @NgModule({
   declarations: [
@@ -33,6 +35,7 @@ import { ProfessionalsListComponent } from './views/professionals/professionals-
     CardComponent,
     CardTemplateComponent,
     CardBodyDirective,
+    NgTemplateNameDirective,
     FormGeneratorComponent,
     ListViewComponent,
     HeaderDirective,
@@ -41,6 +44,7 @@ import { ProfessionalsListComponent } from './views/professionals/professionals-
     FieldComponent,
     FormViewComponent,
     ProfessionalsListComponent,
+    ListTestComponent,
   ],
   imports: [
     BrowserModule,

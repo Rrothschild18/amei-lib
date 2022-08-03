@@ -1,9 +1,8 @@
 import { Directive, TemplateRef } from '@angular/core';
 
 @Directive({
-  selector: '[header]'
+  selector: '[header]',
 })
 export class HeaderDirective {
-
-  constructor(public templateRef: TemplateRef<unknown>) { }
+  constructor(public templateRef: TemplateRef<unknown>) {}
 }

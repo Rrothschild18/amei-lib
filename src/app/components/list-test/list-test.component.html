@@ -1,0 +1,17 @@
+<mat-list role="list">
+  <ng-container
+    *ngFor="let country of countries"
+    [ngTemplateOutlet]="getTemplateRefByName(country.name) || default"
+    [ngTemplateOutletContext]="{ $implicit: country }"
+  >
+    <ng-template #default>
+      <mat-list-item role="listitem">
+        <div class="d-flex justify-content-between w-100">
+          <span class="me-3">{{ country.name }}</span>
+          <span>{{ country.flag }}</span>
+        </div>
+      </mat-list-item>
+    </ng-template>
+  </ng-container>
+</mat-list>
+<ng-content></ng-content>
