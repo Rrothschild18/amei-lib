@@ -1,11 +1,14 @@
 <div [ngSwitch]="field.type" [formGroup]="form">
   <mat-form-field *ngSwitchCase="'text'" appearance="fill">
-    <mat-label>{{ field.name }}</mat-label>
+    <mat-label>{{ field.placeholder || field.name }}</mat-label>
     <input
       matInput
       [formControlName]="field.name"
       (ngModelChange)="handleInput({ fieldName: field.name })"
     />
+    <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
+      showError(form.get(field.name)?.errors)
+    }}</mat-error>
   </mat-form-field>
 
   <mat-form-field *ngSwitchCase="'select'" appearance="fill">

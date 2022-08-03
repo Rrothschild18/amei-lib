@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { ListViewService } from 'src/app/services/list-view.service';
 
@@ -60,5 +60,18 @@ export class PatientFormComponent implements OnInit {
 
   handleFormValues(event: any) {
     this.values = { ...this.values, ...event };
+  }
+
+  invalidateField(field: FormControl) {
+    console.log(field.disable());
+  }
+
+  validateField(field: FormControl) {
+    console.log(field.enable());
+  }
+
+  applyError(form: FormGroup) {
+    form.get('email')?.setErrors({ incorrect: true, message: 'erroowwww' });
+    form.get('email')?.markAsTouched();
   }
 }

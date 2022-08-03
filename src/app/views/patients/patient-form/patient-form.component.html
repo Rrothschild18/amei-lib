@@ -3,13 +3,51 @@
     <ng-template #body let-fields="fields" let-results="results">
       <div class="container h-100 d-flex align-items-center mb-5">
         <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
-          <!-- <pre>{{ fields | json }}</pre> -->
           <div class="row">
-            <div class="col-6">
+            <div class="col-12">
               <app-form-generator
                 [fields]="filterObject(fields, patientPersonalFields())"
                 (formValues)="handleFormValues($event)"
               >
+                <ng-template
+                  name="name"
+                  let-field="field"
+                  let-form="formRef"
+                  let-handle="handleInputs"
+                  let-fieldRef="fieldRef"
+                >
+                  <div
+                    class="d-flex w-100 justify-content-between align-items-center"
+                  >
+                    <app-field
+                      [field]="field"
+                      [form]="form"
+                      (inputValue)="(handle)"
+                    ></app-field>
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      (click)="validateField(fieldRef)"
+                    >
+                      Validate
+                    </button>
+                    <button
+                      mat-raised-button
+                      color="warn"
+                      (click)="invalidateField(fieldRef)"
+                    >
+                      Invalidade
+                    </button>
+                    <button
+                      mat-raised-button
+                      color="warn"
+                      (click)="applyError(form)"
+                    >
+                      ApplyError
+                    </button>
+                  </div>
+                </ng-template>
+                <ng-template name="lastname"> </ng-template>
               </app-form-generator>
             </div>
             <div class="col-6">
@@ -24,7 +62,6 @@
       </div>
     </ng-template>
   </app-form-view>
-  <!-- <h1></h1> -->
 
   <pre>{{ values | json }}</pre>
 </section>

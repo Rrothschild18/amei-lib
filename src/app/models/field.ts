@@ -2,6 +2,7 @@ export class Field {
   name: string;
   label: string;
   type: string;
+  placeholder?: string;
   required: boolean;
   options: { label: string; value: string }[];
 

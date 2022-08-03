@@ -6,8 +6,12 @@ import {
   Output,
   EventEmitter,
   SimpleChanges,
+  ContentChildren,
+  QueryList,
+  TemplateRef,
 } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
 import { Field } from 'src/app/models/field';
 
 @Component({
@@ -20,6 +24,9 @@ export class FormGeneratorComponent implements OnInit, OnChanges {
   form!: FormGroup;
   @Output() input: EventEmitter<any> = new EventEmitter();
   @Output() formValues: EventEmitter<any> = new EventEmitter();
+
+  @ContentChildren(NgTemplateNameDirective)
+  _templates!: QueryList<NgTemplateNameDirective>;
 
   constructor() {}
 
@@ -76,10 +83,6 @@ export class FormGeneratorComponent implements OnInit, OnChanges {
     this.formValues.emit(this.form.getRawValue());
   }
 
-  teste(event: any) {
-    console.log(`form`, event);
-  }
-
   validateAllFormFields(formGroup: FormGroup) {
     //{1}
     Object.keys(formGroup.controls).forEach((field) => {
@@ -93,5 +96,11 @@ export class FormGeneratorComponent implements OnInit, OnChanges {
         this.validateAllFormFields(control); //{6}
       }
     });
+  }
+
+  getTemplateRefByName(name: string): TemplateRef<any> | null {
+    const dir = this._templates.find((dir) => dir.name === name);
+
+    return dir ? dir.template : null;
   }
 }

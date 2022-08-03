@@ -36,4 +36,8 @@ export class FieldComponent implements OnInit {
       });
     });
   }
+
+  showError(error: any) {
+    return error.message || '';
+  }
 }

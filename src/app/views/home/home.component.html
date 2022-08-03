@@ -14,8 +14,7 @@
             </ng-template> -->
             <ng-template name="Portugal" let-country>
               <div class="d-flex justify-content-between">
-                <h1>{{ country.flag }}</h1>
-                <h1>{{ country.name }}</h1>
+                <pre>{{ country | json }}</pre>
               </div>
             </ng-template>
           </app-list-test>
