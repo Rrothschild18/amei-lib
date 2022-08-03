@@ -6,11 +6,17 @@
       <div class="col">
         <div class="d-flex justify-content-center bg-white p-5 rounded">
           <app-list-test>
-            <ng-template name="Brazil" let-country>
+            <!-- <ng-template name="Brazil" let-country>
               <pre>{{ country | json }}</pre>
             </ng-template>
             <ng-template name="Canada">
               <h1>CANADA OR BRAZIL? XD</h1>
+            </ng-template> -->
+            <ng-template name="Portugal" let-country>
+              <div class="d-flex justify-content-between">
+                <h1>{{ country.flag }}</h1>
+                <h1>{{ country.name }}</h1>
+              </div>
             </ng-template>
           </app-list-test>
         </div>
