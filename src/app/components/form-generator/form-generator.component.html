@@ -1,5 +1,5 @@
 <form [formGroup]="form">
-  <div *ngIf="!!toArrayFields(fields).length">
+  <div *ngIf="!!toArrayFields(fields).length" class="row">
     <ng-container
       *ngFor="let field of toArrayFields(fields)"
       [ngTemplateOutlet]="getTemplateRefByName(field.name) || default"
@@ -11,11 +11,13 @@
       }"
     >
       <ng-template #default>
-        <app-field
-          [field]="field"
-          [form]="form"
-          (inputValue)="handleInputs($event)"
-        ></app-field>
+        <div [class]="getFieldClass(field.name)">
+          <app-field
+            [field]="field"
+            [form]="form"
+            (inputValue)="handleInputs($event)"
+          ></app-field>
+        </div>
       </ng-template>
     </ng-container>
   </div>

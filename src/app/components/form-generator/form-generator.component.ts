@@ -21,10 +21,10 @@ import { Field } from 'src/app/models/field';
 })
 export class FormGeneratorComponent implements OnInit, OnChanges {
   @Input('fields') fields!: Field[];
+  @Input('columns') columns!: any;
   form!: FormGroup;
   @Output() input: EventEmitter<any> = new EventEmitter();
   @Output() formValues: EventEmitter<any> = new EventEmitter();
-
   @ContentChildren(NgTemplateNameDirective)
   _templates!: QueryList<NgTemplateNameDirective>;
 
@@ -102,5 +102,57 @@ export class FormGeneratorComponent implements OnInit, OnChanges {
     const dir = this._templates.find((dir) => dir.name === name);
 
     return dir ? dir.template : null;
+  }
+
+  breakpoint(columns: any) {
+    const classes = [];
+    const profiles: any = {
+      col: 'col',
+      xs: 'col-xs',
+      sm: 'col-sm',
+      md: 'col-md',
+      lg: 'col-lg',
+      xl: 'col-xl',
+    };
+    const { classes: renamedClasses, ...formattedColumns } = columns || {};
+
+    for (const key in formattedColumns) {
+      const value = formattedColumns[key];
+      classes.push(`${profiles[key]}-${value}`);
+    }
+
+    return [...classes];
+  }
+
+  getFieldClass(index: any) {
+    if (typeof this.columns === 'string') {
+      return `col-${this.columns}`;
+    }
+
+    return Array.isArray(this.columns)
+      ? this.handleColumnsByIndex(index)
+      : this.handleColumnsByField(index);
+  }
+
+  handleColumnsByField(index: any) {
+    return this.breakpoint(this.columns[index]);
+  }
+
+  handleColumnsByIndex(index: any) {
+    if (!Array.isArray(this.fields)) {
+      index = Object.keys(this.fields).findIndex((field) => field === index);
+    }
+
+    const length = this.columns.length;
+
+    if (!length) {
+      return this.setDefaultColumnClass();
+    }
+
+    return this.breakpoint(this.columns[index]);
+  }
+
+  setDefaultColumnClass() {
+    return 'col-6';
   }
 }

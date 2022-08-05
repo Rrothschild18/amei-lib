@@ -17,6 +17,44 @@ export class PatientFormComponent implements OnInit {
 
   constructor(private ls: ListViewService, private store: Store) {}
 
+  get patientAdditionalColumns() {
+    return {
+      phone: {
+        lg: 4,
+        md: 6,
+        sm: 12,
+      },
+      games: {
+        lg: 4,
+        md: 6,
+        sm: 12,
+      },
+      lang: {
+        lg: 4,
+        md: 6,
+        sm: 12,
+      },
+    };
+  }
+
+  get patientPersonalColumns() {
+    return {
+      name: {
+        col: 4,
+      },
+      lastname: {
+        col: 4,
+      },
+      email: {
+        col: 4,
+      },
+    };
+  }
+
+  get patientAdditionalFields(): string[] {
+    return ['phone', 'games', 'lang'];
+  }
+
   async ngOnInit(): Promise<any> {
     await this.getFields();
   }
@@ -52,10 +90,6 @@ export class PatientFormComponent implements OnInit {
 
   patientPersonalFields(): string[] {
     return ['name', 'lastname', 'email'];
-  }
-
-  patientAdditionalFields(): string[] {
-    return ['phone', 'games', 'lang'];
   }
 
   handleFormValues(event: any) {

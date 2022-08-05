@@ -7,6 +7,7 @@
             <div class="col-12">
               <app-form-generator
                 [fields]="filterObject(fields, patientPersonalFields())"
+                [columns]="patientPersonalColumns"
                 (formValues)="handleFormValues($event)"
               >
                 <ng-template
@@ -16,43 +17,20 @@
                   let-handle="handleInputs"
                   let-fieldRef="fieldRef"
                 >
-                  <div
-                    class="d-flex w-100 justify-content-between align-items-center"
-                  >
+                  <div class="col-4">
                     <app-field
                       [field]="field"
                       [form]="form"
                       (inputValue)="(handle)"
                     ></app-field>
-                    <button
-                      mat-raised-button
-                      color="primary"
-                      (click)="validateField(fieldRef)"
-                    >
-                      Validate
-                    </button>
-                    <button
-                      mat-raised-button
-                      color="warn"
-                      (click)="invalidateField(fieldRef)"
-                    >
-                      Invalidade
-                    </button>
-                    <button
-                      mat-raised-button
-                      color="warn"
-                      (click)="applyError(form)"
-                    >
-                      ApplyError
-                    </button>
                   </div>
                 </ng-template>
-                <ng-template name="lastname"> </ng-template>
               </app-form-generator>
             </div>
-            <div class="col-6">
+            <div class="col-12">
               <app-form-generator
-                [fields]="filterObject(fields, patientAdditionalFields())"
+                [fields]="filterObject(fields, patientAdditionalFields)"
+                [columns]="patientAdditionalColumns"
                 (formValues)="handleFormValues($event)"
               >
               </app-form-generator>

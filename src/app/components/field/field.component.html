@@ -1,5 +1,5 @@
 <div [ngSwitch]="field.type" [formGroup]="form">
-  <mat-form-field *ngSwitchCase="'text'" appearance="fill">
+  <mat-form-field class="w-100" *ngSwitchCase="'text'" appearance="fill">
     <mat-label>{{ field.placeholder || field.name }}</mat-label>
     <input
       matInput
@@ -11,7 +11,7 @@
     }}</mat-error>
   </mat-form-field>
 
-  <mat-form-field *ngSwitchCase="'select'" appearance="fill">
+  <mat-form-field class="w-100" *ngSwitchCase="'select'" appearance="fill">
     <mat-label>{{ field.name }}</mat-label>
     <mat-select
       [formControlName]="field.name"
@@ -23,7 +23,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field *ngSwitchCase="'textarea'" appearance="fill">
+  <mat-form-field class="w-100" *ngSwitchCase="'textarea'" appearance="fill">
     <mat-label>{{ field.name }}</mat-label>
     <textarea
       matInput
@@ -32,7 +32,7 @@
     ></textarea>
   </mat-form-field>
 
-  <div *ngSwitchCase="'checkbox'" [formGroupName]="field.name">
+  <div class="w-100" *ngSwitchCase="'checkbox'" [formGroupName]="field.name">
     <mat-checkbox
       labelPosition="before"
       *ngFor="let option of field.options"
@@ -44,7 +44,7 @@
     </mat-checkbox>
   </div>
 
-  <div *ngSwitchCase="'radio'">
+  <div class="w-100" *ngSwitchCase="'radio'">
     <mat-radio-group
       aria-label="Select an option"
       [formControlName]="field.name"
