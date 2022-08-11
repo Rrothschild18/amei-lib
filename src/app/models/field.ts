@@ -5,6 +5,9 @@ export class Field {
   placeholder?: string;
   required: boolean;
   options: { label: string; value: string }[];
+  children: {
+    [key: string]: Field;
+  };
 
   constructor(
     options: {
@@ -14,12 +17,14 @@ export class Field {
       type?: string;
       required?: boolean;
       options?: { label: string; value: string }[];
+      children?: { [key: string]: Field };
     } = {}
   ) {
     this.label = options.label || '';
     this.name = options.name || '';
     this.type = options.type || '';
     this.required = !!options.required;
+    this.children = {};
     this.options = options.options || [];
   }
 }

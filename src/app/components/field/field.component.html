@@ -1,61 +1,73 @@
 <div [ngSwitch]="field.type" [formGroup]="form">
-  <mat-form-field class="w-100" *ngSwitchCase="'text'" appearance="fill">
-    <mat-label>{{ field.placeholder || field.name }}</mat-label>
-    <input
-      matInput
-      [formControlName]="field.name"
-      (ngModelChange)="handleInput({ fieldName: field.name })"
-    />
-    <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
-      showError(form.get(field.name)?.errors)
-    }}</mat-error>
-  </mat-form-field>
+  <ng-container *ngSwitchCase="'text'">
+    <mat-form-field class="w-100" appearance="fill">
+      <mat-label>{{ field.placeholder || field.name }}</mat-label>
+      <input
+        matInput
+        [formControlName]="field.name"
+        (ngModelChange)="handleInput({ fieldName: field.name })"
+      />
+      <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
+        showError(form.get(field.name)?.errors)
+      }}</mat-error>
+    </mat-form-field>
+  </ng-container>
 
-  <mat-form-field class="w-100" *ngSwitchCase="'select'" appearance="fill">
-    <mat-label>{{ field.name }}</mat-label>
-    <mat-select
-      [formControlName]="field.name"
-      (ngModelChange)="handleInput({ fieldName: field.name })"
-    >
-      <mat-option *ngFor="let option of field.options" [value]="option.value">{{
-        option.label
-      }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field class="w-100" *ngSwitchCase="'textarea'" appearance="fill">
-    <mat-label>{{ field.name }}</mat-label>
-    <textarea
-      matInput
-      [formControlName]="field.name"
-      (ngModelChange)="handleInput({ fieldName: field.name })"
-    ></textarea>
-  </mat-form-field>
-
-  <div class="w-100" *ngSwitchCase="'checkbox'" [formGroupName]="field.name">
-    <mat-checkbox
-      labelPosition="before"
-      *ngFor="let option of field.options"
-      [indeterminate]="true"
-      (ngModelChange)="handleInput({ fieldName: field.name })"
-      [formControlName]="option.label"
-    >
-      {{ option.label }}
-    </mat-checkbox>
-  </div>
-
-  <div class="w-100" *ngSwitchCase="'radio'">
-    <mat-radio-group
-      aria-label="Select an option"
-      [formControlName]="field.name"
-      (ngModelChange)="handleInput({ fieldName: field.name })"
-    >
-      <mat-label>Select an option</mat-label>
-      <mat-radio-button
-        [value]="option.value"
-        *ngFor="let option of field.options"
-        >{{ option.label }}</mat-radio-button
+  <ng-container *ngSwitchCase="'select'">
+    <mat-form-field class="w-100" appearance="fill">
+      <mat-label>{{ field.name }}</mat-label>
+      <mat-select
+        [formControlName]="field.name"
+        (ngModelChange)="handleInput({ fieldName: field.name })"
       >
-    </mat-radio-group>
-  </div>
+        <mat-option
+          *ngFor="let option of field.options"
+          [value]="option.value"
+          >{{ option.label }}</mat-option
+        >
+      </mat-select>
+    </mat-form-field>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'textarea'">
+    <mat-form-field class="w-100" appearance="fill">
+      <mat-label>{{ field.name }}</mat-label>
+      <textarea
+        matInput
+        [formControlName]="field.name"
+        (ngModelChange)="handleInput({ fieldName: field.name })"
+      ></textarea>
+    </mat-form-field>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'checkbox'">
+    <div class="w-100" [formGroupName]="field.name">
+      <mat-checkbox
+        labelPosition="before"
+        *ngFor="let option of field.options"
+        [indeterminate]="true"
+        (ngModelChange)="handleInput({ fieldName: field.name })"
+        [formControlName]="option.label"
+      >
+        {{ option.label }}
+      </mat-checkbox>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'radio'">
+    <div class="w-100">
+      <mat-radio-group
+        aria-label="Select an option"
+        [formControlName]="field.name"
+        (ngModelChange)="handleInput({ fieldName: field.name })"
+      >
+        <mat-label>Select an option</mat-label>
+        <mat-radio-button
+          [value]="option.value"
+          *ngFor="let option of field.options"
+          >{{ option.label }}</mat-radio-button
+        >
+      </mat-radio-group>
+    </div>
+  </ng-container>
 </div>
