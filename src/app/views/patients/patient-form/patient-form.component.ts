@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
-import { Store } from '@ngxs/store';
-import { ListViewService } from 'src/app/services/list-view.service';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-patient-form',
@@ -11,11 +9,8 @@ import { ListViewService } from 'src/app/services/list-view.service';
 export class PatientFormComponent implements OnInit {
   form!: FormGroup;
   values: any;
-  arrayFields$: any;
 
-  // @Select(PatientState.fields) fields$!: Observable<any>;
-
-  constructor(private ls: ListViewService, private store: Store) {}
+  constructor() {}
 
   get patientAdditionalColumns() {
     return {
@@ -55,14 +50,18 @@ export class PatientFormComponent implements OnInit {
     return ['phone', 'games', 'lang'];
   }
 
-  async ngOnInit(): Promise<any> {
-    await this.getFields();
+  get patientPersonalFields(): string[] {
+    return ['name', 'lastname', 'email'];
   }
 
-  async getFields(): Promise<any> {
-    let { fields } = await this.ls.getPatientCreate();
-    this.arrayFields$ = fields;
+  async ngOnInit(): Promise<any> {
+    // await this.getFields();
   }
+
+  // async getFields(): Promise<any> {
+  //   let { fields } = await this.ls.getPatientCreate();
+  //   this.arrayFields$ = fields;
+  // }
 
   hasFields(fields: {}) {
     return !!Object.keys(fields).length;
@@ -88,24 +87,7 @@ export class PatientFormComponent implements OnInit {
     return object;
   }
 
-  patientPersonalFields(): string[] {
-    return ['name', 'lastname', 'email'];
-  }
-
   handleFormValues(event: any) {
     this.values = { ...this.values, ...event };
-  }
-
-  invalidateField(field: FormControl) {
-    console.log(field.disable());
-  }
-
-  validateField(field: FormControl) {
-    console.log(field.enable());
-  }
-
-  applyError(form: FormGroup) {
-    form.get('email')?.setErrors({ incorrect: true, message: 'erroowwww' });
-    form.get('email')?.markAsTouched();
   }
 }

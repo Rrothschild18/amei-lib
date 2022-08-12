@@ -69,16 +69,4 @@ export class ListViewComponent implements OnInit {
   renderBodySlot(): TemplateRef<unknown> {
     return this.body;
   }
-
-  // async fetchList() {
-  //   this.isFetching = true;
-
-  //   try {
-  //     this.fetchSuccess.emit({ results: this.results$, fields: this.fields$ });
-  //   } catch (e) {
-  //     this.fetchError.emit(e);
-  //   } finally {
-  //     this.isFetching = false;
-  //   }
-  // }
 }

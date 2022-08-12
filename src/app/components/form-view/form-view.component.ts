@@ -1,14 +1,16 @@
-import { Observable } from 'rxjs';
+import { first, Observable } from 'rxjs';
 import {
+  ApplicationRef,
   Component,
   ContentChild,
   EventEmitter,
+  Input,
   OnInit,
   Output,
   TemplateRef,
 } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { ListViewService } from 'src/app/services/list-view.service';
+import { Entities } from 'src/app/store/entities/entities.namespace';
 
 @Component({
   selector: 'app-form-view',
@@ -16,15 +18,9 @@ import { ListViewService } from 'src/app/services/list-view.service';
   styleUrls: ['./form-view.component.scss'],
 })
 export class FormViewComponent implements OnInit {
+  @Input('entity') entity!: string;
   @ContentChild('header') header!: TemplateRef<unknown>;
   @ContentChild('body') body!: TemplateRef<unknown>;
-  // @Input('url') url!: string;
-  // @Input('entity') entity!: string;
-
-  // @Select(PatientState.fields) fields$!: Observable<any>;
-  // @Select(PatientState.results) results$!: Observable<any>;
-  // results$ = this.store.select((state) => state.patient.results);
-  // fields$ = this.store.select((state) => state.patient.fields);
 
   result$!: Observable<any>;
   fields$!: Observable<any>;
@@ -35,10 +31,23 @@ export class FormViewComponent implements OnInit {
   @Output() fetchSuccess: EventEmitter<any> = new EventEmitter();
   @Output() fetchError: EventEmitter<any> = new EventEmitter();
 
-  constructor(private ls: ListViewService, private store: Store) {}
+  constructor(private store: Store, private appRef: ApplicationRef) {}
 
   ngOnInit(): void {
-    this.fetchForm();
+    this.fields$ = this.store.select((state: any) => {
+      return state[this.entity].fields;
+    });
+
+    this.result$ = this.store.select(
+      (state: any) => state[this.entity].results
+    );
+
+    this.appRef.isStable.pipe(first((stable) => stable)).subscribe(() => {
+      type EntityKey = keyof typeof Entities;
+      this.store.dispatch(
+        new Entities[this.entity as EntityKey].FetchAllEntities()
+      );
+    });
   }
 
   hasBodySlot(): boolean {
@@ -61,20 +70,20 @@ export class FormViewComponent implements OnInit {
     return this.body;
   }
 
-  async fetchForm() {
-    this.isFetching = true;
+  // async fetchForm() {
+  //   this.isFetching = true;
 
-    try {
-      let { fields, result } = await this.ls.getPatientCreate();
+  //   try {
+  //     let { fields, result } = await this.ls.getPatientCreate();
 
-      this.fields$ = fields;
-      this.result$ = result;
+  //     this.fields$ = fields;
+  //     this.result$ = result;
 
-      this.fetchSuccess.emit({ results: this.result$, fields: this.fields$ });
-    } catch (e) {
-      this.fetchError.emit(e);
-    } finally {
-      this.isFetching = false;
-    }
-  }
+  //     this.fetchSuccess.emit({ results: this.result$, fields: this.fields$ });
+  //   } catch (e) {
+  //     this.fetchError.emit(e);
+  //   } finally {
+  //     this.isFetching = false;
+  //   }
+  // }
 }

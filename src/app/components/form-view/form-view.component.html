@@ -13,8 +13,8 @@
     *ngIf="hasBodySlot() && hasResults()"
     [ngTemplateOutlet]="renderBodySlot()"
     [ngTemplateOutletContext]="{
-      fields: fields$,
-      result: result$
+      fields: fields$ | async,
+      result: result$ | async
     }"
   ></ng-template>
 

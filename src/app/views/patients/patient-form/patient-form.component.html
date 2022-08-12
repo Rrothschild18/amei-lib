@@ -1,36 +1,13 @@
 <section class="Form">
-  <app-form-view>
+  <app-form-view entity="Patient">
     <ng-template #body let-fields="fields" let-results="results">
       <div class="container h-100 d-flex align-items-center mb-5">
         <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
           <div class="row">
             <div class="col-12">
               <app-form-generator
-                [fields]="filterObject(fields, patientPersonalFields())"
-                [columns]="patientPersonalColumns"
-                (formValues)="handleFormValues($event)"
-              >
-                <ng-template
-                  name="name"
-                  let-field="field"
-                  let-form="formRef"
-                  let-handle="handleInputs"
-                  let-fieldRef="fieldRef"
-                >
-                  <div class="col-4">
-                    <app-field
-                      [field]="field"
-                      [form]="form"
-                      (inputValue)="(handle)"
-                    ></app-field>
-                  </div>
-                </ng-template>
-              </app-form-generator>
-            </div>
-            <div class="col-12">
-              <app-form-generator
-                [fields]="filterObject(fields, patientAdditionalFields)"
-                [columns]="patientAdditionalColumns"
+                [fields]="fields"
+                [columns]="{}"
                 (formValues)="handleFormValues($event)"
               >
               </app-form-generator>
