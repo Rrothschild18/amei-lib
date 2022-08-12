@@ -1,5 +1,5 @@
 <form [formGroup]="form">
-  <div *ngIf="!!toArrayFields(fields).length" class="row">
+  <div *ngIf="hasFields" class="row">
     <ng-container
       *ngFor="let field of toArrayFields(fields)"
       [ngTemplateOutlet]="getTemplateRefByName(field.name) || default"
@@ -22,5 +22,5 @@
     </ng-container>
   </div>
 
-  <pre> {{ form.value | json }}</pre>
+  <!-- <pre> {{ form.value | json }}</pre> -->
 </form>

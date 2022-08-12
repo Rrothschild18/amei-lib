@@ -19,8 +19,14 @@ import { Field } from 'src/app/models/field';
   templateUrl: './form-generator.component.html',
   styleUrls: ['./form-generator.component.scss'],
 })
-export class FormGeneratorComponent implements OnInit, OnChanges {
-  @Input('fields') fields!: Field[];
+export class FormGeneratorComponent implements OnInit {
+  fields: Field[] = [];
+
+  @Input('fields') set onFieldsChange(fields: Field[]) {
+    this.fields = fields;
+    this.toFormGroup(this.toArrayFields(this.fields));
+  }
+
   @Input('columns') columns!: any;
   form!: FormGroup;
   @Output() input: EventEmitter<any> = new EventEmitter();
@@ -32,11 +38,8 @@ export class FormGeneratorComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {}
 
-  ngOnChanges(changes: SimpleChanges): void {
-    //Remake this, probably a state problem
-    if (this.toArrayFields(changes['fields'].currentValue)) {
-      this.toFormGroup(this.toArrayFields(changes['fields'].currentValue));
-    }
+  get hasFields(): boolean {
+    return !!this.toArrayFields(this.fields).length;
   }
 
   toFormGroup(fields: Field[] = []) {
@@ -63,12 +66,6 @@ export class FormGeneratorComponent implements OnInit, OnChanges {
               : new FormControl(''))
         );
       }
-    }
-
-    try {
-      if (!!Object.values(this.form?.value).length) return;
-    } catch (e) {
-      console.log(e);
     }
 
     this.form = new FormGroup(group);
