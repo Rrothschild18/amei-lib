@@ -6,20 +6,20 @@
           <div class="row">
             <div class="col-12">
               <app-form-generator
-                [fields]="fields"
+                [fields]="filterObject(fields, patientPersonalFields)"
                 [columns]="{}"
                 (formValues)="handleFormValues($event)"
               >
               </app-form-generator>
             </div>
-            <!-- <div class="col-12">
+            <div class="col-12">
               <app-form-generator
                 [fields]="filterObject(fields, patientAdditionalFields)"
                 [columns]="patientAdditionalColumns"
                 (formValues)="handleFormValues($event)"
               >
               </app-form-generator>
-            </div> -->
+            </div>
           </div>
         </div>
       </div>

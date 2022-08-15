@@ -9,6 +9,7 @@ import {
   ContentChildren,
   QueryList,
   TemplateRef,
+  AfterViewInit,
 } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
@@ -19,7 +20,7 @@ import { Field } from 'src/app/models/field';
   templateUrl: './form-generator.component.html',
   styleUrls: ['./form-generator.component.scss'],
 })
-export class FormGeneratorComponent implements OnInit {
+export class FormGeneratorComponent implements OnInit, AfterViewInit {
   fields: Field[] = [];
 
   @Input('fields') set onFieldsChange(fields: Field[]) {
@@ -28,7 +29,7 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   @Input('columns') columns!: any;
-  form!: FormGroup;
+  form: FormGroup = new FormGroup({});
   @Output() input: EventEmitter<any> = new EventEmitter();
   @Output() formValues: EventEmitter<any> = new EventEmitter();
   @ContentChildren(NgTemplateNameDirective)
@@ -36,14 +37,30 @@ export class FormGeneratorComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngAfterViewInit(): void {
+    // this.toFormGroup(this.toArrayFields(this.fields));
+  }
+  ngOnInit(): void {
+    // this.toFormGroup(this.toArrayFields(this.fields));
+  }
 
   get hasFields(): boolean {
     return !!this.toArrayFields(this.fields).length;
   }
 
+  get hasFormValues(): boolean {
+    console.log({
+      // controls: this.form.controls,
+      values: this.form.touched,
+    });
+
+    return true;
+  }
+
   toFormGroup(fields: Field[] = []) {
     const group: any = {};
+    const hasValues: boolean = !!Object.values(this.form.value).length;
+    const formPivot: FormGroup = this.form.value;
 
     for (let field of fields) {
       if (field.type === 'checkbox') {
@@ -69,6 +86,7 @@ export class FormGeneratorComponent implements OnInit {
     }
 
     this.form = new FormGroup(group);
+    this.form.patchValue(formPivot);
   }
 
   toArrayFields(fields: {} = {}): Field[] {
