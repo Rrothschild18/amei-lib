@@ -1,17 +1,14 @@
 import {
   Component,
   OnInit,
-  OnChanges,
   Input,
   Output,
   EventEmitter,
-  SimpleChanges,
   ContentChildren,
   QueryList,
   TemplateRef,
-  AfterViewInit,
 } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, ValidatorFn } from '@angular/forms';
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
 import { Field } from 'src/app/models/field';
 
@@ -20,13 +17,17 @@ import { Field } from 'src/app/models/field';
   templateUrl: './form-generator.component.html',
   styleUrls: ['./form-generator.component.scss'],
 })
-export class FormGeneratorComponent implements OnInit, AfterViewInit {
+export class FormGeneratorComponent implements OnInit {
   fields: Field[] = [];
 
   @Input('fields') set onFieldsChange(fields: Field[]) {
     this.fields = fields;
     this.toFormGroup(this.toArrayFields(this.fields));
   }
+
+  @Input('fieldsValidators') fieldsValidators!: {
+    [key: string]: ValidatorFn[];
+  };
 
   @Input('columns') columns!: any;
   form: FormGroup = new FormGroup({});
@@ -37,39 +38,32 @@ export class FormGeneratorComponent implements OnInit, AfterViewInit {
 
   constructor() {}
 
-  ngAfterViewInit(): void {
-    // this.toFormGroup(this.toArrayFields(this.fields));
-  }
-  ngOnInit(): void {
-    // this.toFormGroup(this.toArrayFields(this.fields));
-  }
+  ngOnInit(): void {}
 
   get hasFields(): boolean {
-    return !!this.toArrayFields(this.fields).length;
+    return !!Object.keys(this.fields).length;
   }
 
   get hasFormValues(): boolean {
-    console.log({
-      // controls: this.form.controls,
-      values: this.form.touched,
-    });
+    const hasValues: boolean = !!Object.values(this.form.value).length;
 
-    return true;
+    return hasValues;
   }
 
   toFormGroup(fields: Field[] = []) {
     const group: any = {};
-    const hasValues: boolean = !!Object.values(this.form.value).length;
-    const formPivot: FormGroup = this.form.value;
+
+    const formPivot: FormGroup = this.form;
 
     for (let field of fields) {
       if (field.type === 'checkbox') {
         let checkBoxGroup: any = {};
 
         field.options.forEach((option: any) => {
-          checkBoxGroup[option.label] = field.required
-            ? new FormControl(false, Validators.required)
-            : new FormControl(false);
+          checkBoxGroup[option.label] = new FormControl(
+            false,
+            this.fieldsValidators[field.name]
+          );
         });
 
         group[field.name] = new FormGroup(checkBoxGroup);
@@ -78,13 +72,15 @@ export class FormGeneratorComponent implements OnInit, AfterViewInit {
       if (['text', 'select', 'textarea'].includes(field.type)) {
         fields.forEach(
           (field) =>
-            (group[field.name] = field.required
-              ? new FormControl('', Validators.required)
-              : new FormControl(''))
+            (group[field.name] = new FormControl(
+              '',
+              this.fieldsValidators[field.name]
+            ))
         );
       }
     }
 
+    if (this.hasFormValues) return;
     this.form = new FormGroup(group);
     this.form.patchValue(formPivot);
   }

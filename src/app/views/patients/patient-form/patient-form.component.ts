@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-patient-form',
@@ -29,6 +29,14 @@ export class PatientFormComponent implements OnInit {
         md: 6,
         sm: 12,
       },
+      season: {
+        lg: 12,
+      },
+      checkin: {
+        lg: 4,
+        md: 6,
+        sm: 12,
+      },
     };
   }
 
@@ -46,8 +54,26 @@ export class PatientFormComponent implements OnInit {
     };
   }
 
+  get patientPersonalValidators() {
+    return {
+      name: [Validators.required],
+      lastname: [Validators.required],
+      email: [Validators.required, Validators.email, Validators.maxLength(20)],
+    };
+  }
+
+  get patientAdditionalValidators() {
+    return {
+      phone: [Validators.required],
+      games: [Validators.required],
+      lang: [Validators.required],
+      season: [Validators.required],
+      checkin: [Validators.required],
+    };
+  }
+
   get patientAdditionalFields(): string[] {
-    return ['phone', 'games', 'lang'];
+    return ['phone', 'games', 'lang', 'checkin', 'season'];
   }
 
   get patientPersonalFields(): string[] {

@@ -41,6 +41,9 @@
           >{{ option.label }}</mat-option
         >
       </mat-select>
+      <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
+        showError(form.get(field.name)?.errors)
+      }}</mat-error>
     </mat-form-field>
   </ng-container>
 
@@ -83,6 +86,25 @@
           >{{ option.label }}</mat-radio-button
         >
       </mat-radio-group>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="'date'">
+    <div>
+      <mat-form-field appearance="fill" class="w-100">
+        <mat-label>{{ field.placeholder || field.name }}</mat-label>
+        <input
+          matInput
+          [formControlName]="field.name"
+          [matDatepicker]="picker"
+          (ngModelChange)="handleInput({ fieldName: field.name })"
+        />
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
+          showError(form.get(field.name)?.errors)
+        }}</mat-error>
+      </mat-form-field>
     </div>
   </ng-container>
 </div>

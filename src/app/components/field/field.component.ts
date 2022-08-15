@@ -38,6 +38,12 @@ export class FieldComponent implements OnInit {
   }
 
   showError(error: any) {
-    return error.message || '';
+    if (error.required) return 'Este campo é obrigatório';
+    if (error.email) return 'E-mail inválido';
+    if (error.max) return `Número máximo de caracteres é ${error.max.max}`;
+    if (error.maxlength)
+      return `Número máximo de caracteres é ${error.maxlength.requiredLength}, atual ${error.maxlength.actualLength}`;
+
+    return '';
   }
 }
