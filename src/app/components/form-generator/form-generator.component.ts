@@ -8,7 +8,13 @@ import {
   QueryList,
   TemplateRef,
 } from '@angular/core';
-import { FormGroup, FormControl, ValidatorFn } from '@angular/forms';
+import {
+  FormGroup,
+  FormControl,
+  ValidatorFn,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
 import { Field } from 'src/app/models/field';
 
@@ -36,7 +42,7 @@ export class FormGeneratorComponent implements OnInit {
   @ContentChildren(NgTemplateNameDirective)
   _templates!: QueryList<NgTemplateNameDirective>;
 
-  constructor() {}
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {}
 
@@ -51,8 +57,8 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   toFormGroup(fields: Field[] = []) {
-    const group: any = {};
-
+    const normalFields = ['text', 'select', 'textarea', 'date', 'radio'];
+    const form: any = {};
     const formPivot: FormGroup = this.form;
 
     for (let field of fields) {
@@ -60,28 +66,46 @@ export class FormGeneratorComponent implements OnInit {
         let checkBoxGroup: any = {};
 
         field.options.forEach((option: any) => {
-          checkBoxGroup[option.label] = new FormControl(
-            false,
-            this.fieldsValidators[field.name]
-          );
+          checkBoxGroup[option.label] = ['', this.handleValidators(field.name)];
         });
 
-        group[field.name] = new FormGroup(checkBoxGroup);
+        form[field.name] = this.fb.group(checkBoxGroup);
       }
 
-      if (['text', 'select', 'textarea'].includes(field.type)) {
-        fields.forEach(
-          (field) =>
-            (group[field.name] = new FormControl(
-              '',
-              this.fieldsValidators[field.name]
-            ))
-        );
+      if (normalFields.includes(field.type)) {
+        for (let { name: fieldName } of fields) {
+          form[fieldName] = ['', this.handleValidators(fieldName)];
+        }
+      }
+
+      if (field.type === 'nested') {
+        const { children } = field;
+
+        for (let nestedField of this.toArrayFields(children)) {
+          const nestedGroup: any = {};
+
+          if (normalFields.includes(nestedField.type)) {
+            for (let { name } of this.toArrayFields(children)) {
+              nestedGroup[name] = ['', Validators.nullValidator];
+            }
+          }
+
+          if (nestedField.type === 'checkbox') {
+            let checkBoxGroup: any = {};
+
+            nestedField.options.forEach((option: any) => {
+              checkBoxGroup[option.label] = ['', Validators.nullValidator];
+            });
+          }
+
+          form[field.name] = this.fb.array([{ ...nestedGroup }]);
+        }
       }
     }
 
     if (this.hasFormValues) return;
-    this.form = new FormGroup(group);
+
+    this.form = this.fb.group(form);
     this.form.patchValue(formPivot);
   }
 
@@ -161,6 +185,15 @@ export class FormGeneratorComponent implements OnInit {
     }
 
     return this.breakpoint(this.columns[index]);
+  }
+
+  handleValidators(fieldName: string): ValidatorFn[] {
+    const validators: ValidatorFn[] = this.fieldsValidators[fieldName] || [];
+    const hasNullByPass: boolean = validators.some(
+      (validator) => validator === Validators.nullValidator
+    );
+
+    return hasNullByPass ? validators : [Validators.required, ...validators];
   }
 
   setDefaultColumnClass() {

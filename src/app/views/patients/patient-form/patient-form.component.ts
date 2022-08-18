@@ -12,6 +12,8 @@ export class PatientFormComponent implements OnInit {
 
   constructor() {}
 
+  ngOnInit(): void {}
+
   get patientAdditionalColumns() {
     return {
       phone: {
@@ -24,7 +26,7 @@ export class PatientFormComponent implements OnInit {
         md: 6,
         sm: 12,
       },
-      lang: {
+      fruits: {
         lg: 4,
         md: 6,
         sm: 12,
@@ -33,6 +35,11 @@ export class PatientFormComponent implements OnInit {
         lg: 12,
       },
       checkin: {
+        lg: 4,
+        md: 6,
+        sm: 12,
+      },
+      convenios: {
         lg: 4,
         md: 6,
         sm: 12,
@@ -56,40 +63,31 @@ export class PatientFormComponent implements OnInit {
 
   get patientPersonalValidators() {
     return {
-      name: [Validators.required],
-      lastname: [Validators.required],
-      email: [Validators.required, Validators.email, Validators.maxLength(20)],
+      name: [],
+      lastname: [],
+      email: [Validators.email, Validators.maxLength(20)],
     };
   }
 
   get patientAdditionalValidators() {
     return {
-      phone: [Validators.required],
-      games: [Validators.required],
-      lang: [Validators.required],
-      season: [Validators.required],
-      checkin: [Validators.required],
+      phone: [Validators.nullValidator],
+      games: [],
+      checkin: [],
+      season: [],
+      fruits: [],
     };
-  }
-
-  get patientAdditionalFields(): string[] {
-    return ['phone', 'games', 'lang', 'checkin', 'season'];
   }
 
   get patientPersonalFields(): string[] {
     return ['name', 'lastname', 'email'];
   }
 
-  async ngOnInit(): Promise<any> {
-    // await this.getFields();
+  get patientAdditionalFields(): string[] {
+    return ['phone', 'games', 'checkin', 'season', 'fruits'];
   }
 
-  // async getFields(): Promise<any> {
-  //   let { fields } = await this.ls.getPatientCreate();
-  //   this.arrayFields$ = fields;
-  // }
-
-  hasFields(fields: {}) {
+  hasFields(fields: {}): boolean {
     return !!Object.keys(fields).length;
   }
 

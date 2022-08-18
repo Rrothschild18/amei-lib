@@ -1,7 +1,7 @@
 <div [ngSwitch]="field.type" [formGroup]="form">
   <ng-container *ngSwitchCase="'text'">
     <mat-form-field class="w-100" appearance="fill">
-      <mat-label>{{ field.placeholder || field.name }}</mat-label>
+      <mat-label>{{ field.placeholder || field.label }}</mat-label>
       <input
         matInput
         [formControlName]="field.name"
@@ -15,7 +15,7 @@
 
   <ng-container *ngSwitchCase="'email'">
     <mat-form-field class="w-100" appearance="fill">
-      <mat-label>{{ field.placeholder || field.name }}</mat-label>
+      <mat-label>{{ field.placeholder || field.label }}</mat-label>
       <input
         matInput
         [formControlName]="field.name"
@@ -58,20 +58,6 @@
     </mat-form-field>
   </ng-container>
 
-  <ng-container *ngSwitchCase="'checkbox'">
-    <div class="w-100" [formGroupName]="field.name">
-      <mat-checkbox
-        labelPosition="before"
-        *ngFor="let option of field.options"
-        [indeterminate]="true"
-        (ngModelChange)="handleInput({ fieldName: field.name })"
-        [formControlName]="option.label"
-      >
-        {{ option.label }}
-      </mat-checkbox>
-    </div>
-  </ng-container>
-
   <ng-container *ngSwitchCase="'radio'">
     <div class="w-100">
       <mat-radio-group
@@ -91,7 +77,7 @@
   <ng-container *ngSwitchCase="'date'">
     <div>
       <mat-form-field appearance="fill" class="w-100">
-        <mat-label>{{ field.placeholder || field.name }}</mat-label>
+        <mat-label>{{ field.placeholder || field.label }}</mat-label>
         <input
           matInput
           [formControlName]="field.name"
@@ -105,6 +91,41 @@
           showError(form.get(field.name)?.errors)
         }}</mat-error>
       </mat-form-field>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="'nested'">
+    <div>
+      <!-- <mat-form-field appearance="fill" class="w-100">
+        <mat-label>{{ field.placeholder || field.label }}</mat-label>
+        <input
+          matInput
+          [formControlName]="field.name"
+          [matDatepicker]="picker"
+          (ngModelChange)="handleInput({ fieldName: field.name })"
+        />
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
+          showError(form.get(field.name)?.errors)
+        }}</mat-error>
+      </mat-form-field> -->
+      nested
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'checkbox'">
+    <pre>{{ field.type }} === 'checkbox'</pre>
+    <div class="w-100" [formGroupName]="field.name">
+      <mat-checkbox
+        labelPosition="before"
+        *ngFor="let option of field.options"
+        [indeterminate]="true"
+        (ngModelChange)="handleInput({ fieldName: field.name })"
+        [formControlName]="option.label"
+      >
+        {{ option.label }}
+      </mat-checkbox>
     </div>
   </ng-container>
 </div>
