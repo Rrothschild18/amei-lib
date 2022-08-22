@@ -7,7 +7,7 @@
             <div class="col-12">
               <app-form-generator
                 [fields]="filterObject(fields, patientPersonalFields)"
-                [columns]="{}"
+                [columns]="patientPersonalColumns"
                 (formValues)="handleFormValues($event)"
                 [fieldsValidators]="patientPersonalValidators"
               >

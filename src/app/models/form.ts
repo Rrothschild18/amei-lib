@@ -12,4 +12,4 @@ export type FieldColumnConfigTypes = {
   [key in ColumTypes]?: string | number;
 };
 
-export type ColumTypes = 'col' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type ColumTypes = 'col' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | string;

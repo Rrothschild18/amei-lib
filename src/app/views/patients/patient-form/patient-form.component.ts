@@ -18,27 +18,19 @@ export class PatientFormComponent implements OnInit {
   get patientAdditionalColumns(): FieldsColumnsConfig {
     return {
       phone: {
-        lg: 4,
-        md: 6,
-        sm: 12,
+        col: 11,
       },
       games: {
-        lg: 4,
-        md: 6,
-        sm: 12,
-      },
-      fruits: {
-        lg: 4,
-        md: 6,
-        sm: 12,
-      },
-      season: {
-        lg: 12,
+        col: 1,
       },
       checkin: {
-        lg: 4,
-        md: 6,
-        sm: 12,
+        col: 10,
+      },
+      season: {
+        col: 2,
+      },
+      fruits: {
+        col: 12,
       },
     };
   }
@@ -46,13 +38,13 @@ export class PatientFormComponent implements OnInit {
   get patientPersonalColumns(): FieldsColumnsConfig {
     return {
       name: {
-        col: 4,
+        col: 6,
       },
       lastname: {
-        col: 4,
+        col: 6,
       },
       email: {
-        col: 4,
+        col: 6,
       },
     };
   }
@@ -65,7 +57,7 @@ export class PatientFormComponent implements OnInit {
 
   get patientAdditionalValidators(): FieldsValidatorsConfig {
     return {
-      phone: [Validators.nullValidator],
+      phone: [Validators.nullValidator, Validators.min(3)],
     };
   }
 

@@ -18,9 +18,7 @@ export class FieldComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {
-    // this.watchFormResponses();
-  }
+  ngOnInit(): void {}
 
   handleInput({ fieldName, event }: any): void {
     this.inputValue.emit({
@@ -37,13 +35,16 @@ export class FieldComponent implements OnInit {
     });
   }
 
+  //TODO map errors with an object, destruct arguments and accept custom errors messages
   showError(error: any) {
     if (error.required) return 'Este campo é obrigatório';
     if (error.email) return 'E-mail inválido';
     if (error.max) return `Número máximo de caracteres é ${error.max.max}`;
     if (error.maxlength)
       return `Número máximo de caracteres é ${error.maxlength.requiredLength}, atual ${error.maxlength.actualLength}`;
+    if (error.min)
+      return `Número minimo de caracteres é ${error.min.min}, atual ${error.min.actual}`;
 
-    return '';
+    return 'default error xD';
   }
 }

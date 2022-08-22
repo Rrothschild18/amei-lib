@@ -16,6 +16,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
+import { FieldColumnConfigTypes, FieldsColumnsConfig } from 'src/app/models';
 import { Field } from 'src/app/models/field';
 
 @Component({
@@ -31,11 +32,11 @@ export class FormGeneratorComponent implements OnInit {
     this.toFormGroup(this.toArrayFields(this.fields));
   }
 
-  @Input('fieldsValidators') fieldsValidators!: {
+  @Input('fieldsValidators') fieldsValidators: {
     [key: string]: ValidatorFn[];
-  };
+  } = {};
 
-  @Input('columns') columns!: any;
+  @Input('columns') columns: FieldsColumnsConfig = {};
   form: FormGroup = new FormGroup({});
   @Output() input: EventEmitter<any> = new EventEmitter();
   @Output() formValues: EventEmitter<any> = new EventEmitter();
@@ -119,6 +120,7 @@ export class FormGeneratorComponent implements OnInit {
     this.formValues.emit(this.form.getRawValue());
   }
 
+  //Todo validate all on submit
   validateAllFormFields(formGroup: FormGroup) {
     //{1}
     Object.keys(formGroup.controls).forEach((field) => {
@@ -140,7 +142,7 @@ export class FormGeneratorComponent implements OnInit {
     return dir ? dir.template : null;
   }
 
-  breakpoint(columns: any) {
+  breakpoint(columns: FieldColumnConfigTypes = {}) {
     const classes = [];
     const profiles: any = {
       col: 'col',
@@ -150,10 +152,9 @@ export class FormGeneratorComponent implements OnInit {
       lg: 'col-lg',
       xl: 'col-xl',
     };
-    const { classes: renamedClasses, ...formattedColumns } = columns || {};
 
-    for (const key in formattedColumns) {
-      const value = formattedColumns[key];
+    for (const key in columns) {
+      const value = columns[key];
       classes.push(`${profiles[key]}-${value}`);
     }
 
@@ -179,7 +180,7 @@ export class FormGeneratorComponent implements OnInit {
       index = Object.keys(this.fields).findIndex((field) => field === index);
     }
 
-    const length = this.columns.length;
+    const length = Object.values(this.columns).length;
 
     if (!length) {
       return this.setDefaultColumnClass();
