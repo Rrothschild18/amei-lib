@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators } from '@angular/forms';
+import { FieldsColumnsConfig, FieldsValidatorsConfig } from 'src/app/models';
 
 @Component({
   selector: 'app-patient-form',
@@ -14,7 +15,7 @@ export class PatientFormComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  get patientAdditionalColumns() {
+  get patientAdditionalColumns(): FieldsColumnsConfig {
     return {
       phone: {
         lg: 4,
@@ -39,15 +40,10 @@ export class PatientFormComponent implements OnInit {
         md: 6,
         sm: 12,
       },
-      convenios: {
-        lg: 4,
-        md: 6,
-        sm: 12,
-      },
     };
   }
 
-  get patientPersonalColumns() {
+  get patientPersonalColumns(): FieldsColumnsConfig {
     return {
       name: {
         col: 4,
@@ -61,21 +57,15 @@ export class PatientFormComponent implements OnInit {
     };
   }
 
-  get patientPersonalValidators() {
+  get patientPersonalValidators(): FieldsValidatorsConfig {
     return {
-      name: [],
-      lastname: [],
       email: [Validators.email, Validators.maxLength(20)],
     };
   }
 
-  get patientAdditionalValidators() {
+  get patientAdditionalValidators(): FieldsValidatorsConfig {
     return {
       phone: [Validators.nullValidator],
-      games: [],
-      checkin: [],
-      season: [],
-      fruits: [],
     };
   }
 

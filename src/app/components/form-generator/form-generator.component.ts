@@ -57,7 +57,7 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   toFormGroup(fields: Field[] = []) {
-    const normalFields = ['text', 'select', 'textarea', 'date', 'radio'];
+    const fieldsType = ['text', 'select', 'textarea', 'date', 'radio'];
     const form: any = {};
     const formPivot: FormGroup = this.form;
 
@@ -72,35 +72,36 @@ export class FormGeneratorComponent implements OnInit {
         form[field.name] = this.fb.group(checkBoxGroup);
       }
 
-      if (normalFields.includes(field.type)) {
+      if (fieldsType.includes(field.type)) {
         for (let { name: fieldName } of fields) {
           form[fieldName] = ['', this.handleValidators(fieldName)];
         }
       }
 
-      if (field.type === 'nested') {
-        const { children } = field;
+      // if (field.type === 'nested') {
+      //   //TODO create an way to pass nestedFields validators
+      //   const { children } = field;
 
-        for (let nestedField of this.toArrayFields(children)) {
-          const nestedGroup: any = {};
+      //   for (let nestedField of this.toArrayFields(children)) {
+      //     const nestedGroup: any = {};
 
-          if (normalFields.includes(nestedField.type)) {
-            for (let { name } of this.toArrayFields(children)) {
-              nestedGroup[name] = ['', Validators.nullValidator];
-            }
-          }
+      //     if (normalFields.includes(nestedField.type)) {
+      //       for (let { name } of this.toArrayFields(children)) {
+      //         nestedGroup[name] = ['', Validators.nullValidator];
+      //       }
+      //     }
 
-          if (nestedField.type === 'checkbox') {
-            let checkBoxGroup: any = {};
+      //     if (nestedField.type === 'checkbox') {
+      //       let checkBoxGroup: any = {};
 
-            nestedField.options.forEach((option: any) => {
-              checkBoxGroup[option.label] = ['', Validators.nullValidator];
-            });
-          }
+      //       nestedField.options.forEach((option: any) => {
+      //         checkBoxGroup[option.label] = ['', Validators.nullValidator];
+      //       });
+      //     }
 
-          form[field.name] = this.fb.array([{ ...nestedGroup }]);
-        }
-      }
+      //     form[field.name] = this.fb.array([{ ...nestedGroup }]);
+      //   }
+      // }
     }
 
     if (this.hasFormValues) return;
