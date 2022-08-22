@@ -11,6 +11,29 @@
                 (formValues)="handleFormValues($event)"
                 [fieldsValidators]="patientPersonalValidators"
               >
+                <ng-template
+                  name="name"
+                  let-field="field"
+                  let-form="formRef"
+                  let-handleInput="handleInput"
+                  let-handleForm="handleForm"
+                  let-fieldRef="fieldRef"
+                >
+                  <div class="col-6">
+                    <app-field
+                      [field]="field"
+                      [form]="form"
+                      (inputValue)="
+                        handle({
+                          event: $event,
+                          form: this.form,
+                          handleInput: this.handleInput,
+                          handleForm: this.handleForm
+                        })
+                      "
+                    ></app-field>
+                  </div>
+                </ng-template>
               </app-form-generator>
             </div>
             <div class="col-12">

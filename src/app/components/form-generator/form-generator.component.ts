@@ -115,9 +115,11 @@ export class FormGeneratorComponent implements OnInit {
     return Object.values(fields);
   }
 
+  //Todo change eventEmitters to Subjects
   handleInputs(event: any) {
-    this.input.emit(event);
-    this.formValues.emit(this.form.getRawValue());
+    debugger;
+    this?.input.emit(event);
+    this?.formValues.emit(this.form.value);
   }
 
   //Todo validate all on submit
