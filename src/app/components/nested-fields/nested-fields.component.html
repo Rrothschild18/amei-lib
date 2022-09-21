@@ -1,0 +1,27 @@
+<form [formGroup]="form">
+  <div *ngIf="hasFields" class="row">
+    <ng-container
+      *ngFor="let field of toArrayFields(fields)"
+      [ngTemplateOutlet]="getTemplateRefByName(field.name) || default"
+      [ngTemplateOutletContext]="{
+        field: field,
+        formRef: form,
+        handleInput: this.input,
+        handleForm: this.formValues,
+        fieldRef: form.get(field.name)
+      }"
+    >
+      <ng-template #default>
+        <div [class]="getFieldClass(field.name)">
+          <app-field
+            [field]="field"
+            [form]="form"
+            (inputValue)="handleInputs($event)"
+          ></app-field>
+        </div>
+      </ng-template>
+    </ng-container>
+  </div>
+
+  <pre> {{ form.value | json }}</pre>
+</form>

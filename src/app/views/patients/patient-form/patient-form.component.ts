@@ -95,7 +95,7 @@ export class PatientFormComponent implements OnInit {
 
   handleFormValues(event: any) {
     this.values = { ...this.values, ...event };
-    debugger;
+    // debugger;
   }
 
   handle(e: any) {

@@ -1,30 +1,33 @@
 import {
   Component,
-  OnInit,
-  Input,
-  Output,
-  EventEmitter,
   ContentChildren,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
   QueryList,
   TemplateRef,
 } from '@angular/core';
 import {
-  FormGroup,
-  FormControl,
   ValidatorFn,
+  FormGroup,
   FormBuilder,
+  FormControl,
   Validators,
 } from '@angular/forms';
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
-import { FieldColumnConfigTypes, FieldsColumnsConfig } from 'src/app/models';
-import { Field } from 'src/app/models/field';
+import {
+  Field,
+  FieldsColumnsConfig,
+  FieldColumnConfigTypes,
+} from 'src/app/models';
 
 @Component({
-  selector: 'app-form-generator',
-  templateUrl: './form-generator.component.html',
-  styleUrls: ['./form-generator.component.scss'],
+  selector: 'app-nested-fields',
+  templateUrl: './nested-fields.component.html',
+  styleUrls: ['./nested-fields.component.scss'],
 })
-export class FormGeneratorComponent implements OnInit {
+export class NestedFieldsComponent implements OnInit {
   fields: Field[] = [];
 
   @Input('fields') set onFieldsChange(fields: Field[]) {
@@ -78,6 +81,31 @@ export class FormGeneratorComponent implements OnInit {
           form[fieldName] = ['', this.handleValidators(fieldName)];
         }
       }
+
+      // if (field.type === 'nested') {
+      //   //TODO create an way to pass nestedFields validators
+      //   const { children } = field;
+
+      //   for (let nestedField of this.toArrayFields(children)) {
+      //     const nestedGroup: any = {};
+
+      //     if (normalFields.includes(nestedField.type)) {
+      //       for (let { name } of this.toArrayFields(children)) {
+      //         nestedGroup[name] = ['', Validators.nullValidator];
+      //       }
+      //     }
+
+      //     if (nestedField.type === 'checkbox') {
+      //       let checkBoxGroup: any = {};
+
+      //       nestedField.options.forEach((option: any) => {
+      //         checkBoxGroup[option.label] = ['', Validators.nullValidator];
+      //       });
+      //     }
+
+      //     form[field.name] = this.fb.array([{ ...nestedGroup }]);
+      //   }
+      // }
     }
 
     if (this.hasFormValues) return;
