@@ -5,6 +5,7 @@ import { HomeComponent } from './views/home/home.component';
 import { LoginComponent } from './views/login/login.component';
 import { PatientFormComponent } from './views/patients/patient-form/patient-form.component';
 import { PatientsListComponent } from './views/patients/patients-list/patients-list.component';
+import { ProfessionalFormComponent } from './views/professionals/professionals-form/professional-form.component';
 import { ProfessionalsListComponent } from './views/professionals/professionals-list/professionals-list.component';
 
 const routes: Routes = [
@@ -12,6 +13,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'patients', component: PatientsListComponent },
   { path: 'professionals', component: ProfessionalsListComponent },
+  { path: 'professionals/new', component: ProfessionalFormComponent },
   { path: 'patients/new', component: PatientFormComponent },
 ];
 

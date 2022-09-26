@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { Field } from 'src/app/models/field';
 
 @Component({
@@ -10,6 +10,7 @@ import { Field } from 'src/app/models/field';
 export class FieldComponent implements OnInit {
   @Input() field!: Field;
   @Input() form!: FormGroup;
+  @Input() fieldFormControl!: AbstractControl | null;
   @Output() inputValue: EventEmitter<any> = new EventEmitter();
 
   get isValid() {
@@ -21,17 +22,13 @@ export class FieldComponent implements OnInit {
   ngOnInit(): void {}
 
   handleInput({ fieldName, event }: any): void {
+    debugger;
+
+    console.log({ fc: this.fieldFormControl });
+
     this.inputValue.emit({
       fieldName,
       value: this.form.value[fieldName] || event,
-    });
-  }
-
-  watchFormResponses(): void {
-    this.form.valueChanges.subscribe((formValue: any) => {
-      this.inputValue.emit({
-        formValue,
-      });
     });
   }
 

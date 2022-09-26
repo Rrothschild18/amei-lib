@@ -15,6 +15,7 @@
         <div [class]="getFieldClass(field.name)">
           <app-field
             [field]="field"
+            [fieldFormControl]="form.get(field.name)"
             [form]="form"
             (inputValue)="handleInputs($event)"
           ></app-field>

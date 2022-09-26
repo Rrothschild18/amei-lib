@@ -1,4 +1,6 @@
 <div class="FormView">
+  <pre>{{ values$ | async | json }}</pre>
+  <pre>{{ values | json }}</pre>
   <div *ngIf="isFetching" class="">
     <mat-spinner class="spinner"></mat-spinner>
   </div>
@@ -14,7 +16,8 @@
     [ngTemplateOutlet]="renderBodySlot()"
     [ngTemplateOutletContext]="{
       fields: fields$ | async,
-      result: result$ | async
+      result: result$ | async,
+      formStore: formStoreChange
     }"
   ></ng-template>
 

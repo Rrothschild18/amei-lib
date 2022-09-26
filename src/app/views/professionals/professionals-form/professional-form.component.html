@@ -1,16 +1,13 @@
 <section class="Form">
-  <app-form-view entity="Patient">
-    <ng-template
-      #body
-      let-fields="fields"
-      let-results="results"
-      let-formStore="formStore"
-    >
+  <app-form-view entity="Professional">
+    <ng-template #body let-fields="fields" let-results="results">
       <div class="container h-100 d-flex align-items-center mb-5">
         <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
           <div class="row">
             <div class="col-12">
-              <app-form-generator
+              <pre>{{ fields | json }}</pre>
+              <pre>{{ results }}</pre>
+              <!-- <app-form-generator
                 [fields]="filterObject(fields, patientPersonalFields)"
                 [columns]="patientPersonalColumns"
                 (formValues)="handleFormValues($event)"
@@ -33,29 +30,17 @@
                           event: $event,
                           form: this.form,
                           handleInput: this.handleInput,
-                          handleForm: this.handleForm,
-                          formStore
+                          handleForm: this.handleForm
                         })
                       "
                     ></app-field>
                   </div>
                 </ng-template>
-              </app-form-generator>
-            </div>
-            <div class="col-12">
-              <app-form-generator
-                [fields]="filterObject(fields, patientAdditionalFields)"
-                [columns]="patientAdditionalColumns"
-                (formValues)="handleFormValues($event)"
-                [fieldsValidators]="patientAdditionalValidators"
-              >
-              </app-form-generator>
+              </app-form-generator> -->
             </div>
           </div>
         </div>
       </div>
     </ng-template>
   </app-form-view>
-
-  <pre>{{ values | json }}</pre>
 </section>

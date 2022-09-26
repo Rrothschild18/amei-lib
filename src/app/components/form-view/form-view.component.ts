@@ -1,4 +1,5 @@
-import { first, Observable } from 'rxjs';
+import { FormGeneratorComponent } from './../form-generator/form-generator.component';
+import { first, map, Observable, Subject } from 'rxjs';
 import {
   ApplicationRef,
   Component,
@@ -7,15 +8,19 @@ import {
   Input,
   OnInit,
   Output,
+  QueryList,
   TemplateRef,
+  ViewChildren,
 } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Entities } from 'src/app/store/entities/entities.namespace';
+import { FormValue, FormViewService } from './form-view.service';
 
 @Component({
   selector: 'app-form-view',
   templateUrl: './form-view.component.html',
   styleUrls: ['./form-view.component.scss'],
+  providers: [FormViewService],
 })
 export class FormViewComponent implements OnInit {
   @Input('entity') entity!: string;
@@ -27,11 +32,18 @@ export class FormViewComponent implements OnInit {
   isFetching: boolean = false;
 
   values: any = {};
+  values$: Observable<FormValue> = this.formView.formValues;
 
   @Output() fetchSuccess: EventEmitter<any> = new EventEmitter();
   @Output() fetchError: EventEmitter<any> = new EventEmitter();
+  @ViewChildren(FormGeneratorComponent)
+  formRefs!: QueryList<FormGeneratorComponent>;
 
-  constructor(private store: Store, private appRef: ApplicationRef) {}
+  constructor(
+    private store: Store,
+    private appRef: ApplicationRef,
+    private formView: FormViewService
+  ) {}
 
   ngOnInit(): void {
     this.fields$ = this.store.select((state: any) => {
@@ -48,6 +60,23 @@ export class FormViewComponent implements OnInit {
         new Entities[this.entity as EntityKey].FetchAllEntities()
       );
     });
+
+    this.values$.subscribe(({ fieldName, value }: FormValue) => {
+      debugger;
+      try {
+        if (fieldName && value) {
+          this.values = { ...this.values, [fieldName]: value };
+        }
+      } catch (e) {
+        throw new Error('Form Error');
+      }
+    });
+  }
+
+  ngOnDestroy() {}
+
+  get formStoreChange() {
+    return this.formView;
   }
 
   hasBodySlot(): boolean {

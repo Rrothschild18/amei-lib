@@ -1,5 +1,7 @@
+import { Subscription } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators } from '@angular/forms';
+import { FormViewService } from 'src/app/components/form-view/form-view.service';
 import { FieldsColumnsConfig, FieldsValidatorsConfig } from 'src/app/models';
 
 @Component({
@@ -10,10 +12,15 @@ import { FieldsColumnsConfig, FieldsValidatorsConfig } from 'src/app/models';
 export class PatientFormComponent implements OnInit {
   form!: FormGroup;
   values: any;
+  values$: Subscription = new Subscription();
 
-  constructor() {}
+  constructor(private formView: FormViewService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.values$ = this.formView.formValues.subscribe((formResponse) => {
+      this.values = { ...this.values, ...formResponse };
+    });
+  }
 
   get patientAdditionalColumns(): FieldsColumnsConfig {
     return {
@@ -95,12 +102,21 @@ export class PatientFormComponent implements OnInit {
 
   handleFormValues(event: any) {
     this.values = { ...this.values, ...event };
-    // debugger;
   }
 
   handle(e: any) {
+    // {
+    //   event: $event,
+    //   form: this.form,
+    //   handleInput: this.handleInput,
+    //   handleForm: this.handleForm
+    // }
     console.log(e);
-    e.handleInput.emit(e.event);
-    e.handleForm.emit(e.form.value);
+    e.formStore.onFormChanges(e.event);
+    // debugger;
+    // e.handleInput.emit(e.event);
+    // e.handleForm.emit(e.form.value);
+    // this.formView.onFormChanges(e.event);
+    // console.log('formvalues', this.formView.formValues);
   }
 }

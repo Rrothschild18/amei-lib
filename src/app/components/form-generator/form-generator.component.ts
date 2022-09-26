@@ -18,6 +18,7 @@ import {
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
 import { FieldColumnConfigTypes, FieldsColumnsConfig } from 'src/app/models';
 import { Field } from 'src/app/models/field';
+import { FormViewService } from '../form-view/form-view.service';
 
 @Component({
   selector: 'app-form-generator',
@@ -40,11 +41,15 @@ export class FormGeneratorComponent implements OnInit {
   form: FormGroup = new FormGroup({});
   @Output() input: EventEmitter<any> = new EventEmitter();
   @Output() formValues: EventEmitter<any> = new EventEmitter();
+
   @ContentChildren(NgTemplateNameDirective)
   _templates!: QueryList<NgTemplateNameDirective>;
 
-  constructor(private fb: FormBuilder) {}
-
+  constructor(private fb: FormBuilder, private formView: FormViewService) {
+    this.form.valueChanges.subscribe((changedValue) => {
+      console.log(changedValue);
+    });
+  }
   ngOnInit(): void {}
 
   get hasFields(): boolean {
@@ -92,9 +97,10 @@ export class FormGeneratorComponent implements OnInit {
 
   //Todo change eventEmitters to Subjects
   handleInputs(event: any) {
-    debugger;
-    this?.input.emit(event);
-    this?.formValues.emit(this.form.value);
+    if (event) {
+      debugger;
+      this.formView.onFormChanges(event);
+    }
   }
 
   //Todo validate all on submit

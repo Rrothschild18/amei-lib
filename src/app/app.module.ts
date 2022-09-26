@@ -26,6 +26,7 @@ import { ProfessionalsListComponent } from './views/professionals/professionals-
 import { ListTestComponent } from './components/list-test/list-test.component';
 import { NgTemplateNameDirective } from './directives/ng-template-name.directive';
 import { NestedFieldsComponent } from './components/nested-fields/nested-fields.component';
+import { ProfessionalFormComponent } from './views/professionals/professionals-form/professional-form.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { NestedFieldsComponent } from './components/nested-fields/nested-fields.
     ProfessionalsListComponent,
     ListTestComponent,
     NestedFieldsComponent,
+    ProfessionalFormComponent,
   ],
   imports: [
     BrowserModule,
