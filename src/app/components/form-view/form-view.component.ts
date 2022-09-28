@@ -32,7 +32,7 @@ export class FormViewComponent implements OnInit {
   isFetching: boolean = false;
 
   values: any = {};
-  values$: Observable<FormValue> = this.formView.formValues;
+  componentStore$: Observable<FormValue> = this.formView.formValues;
 
   @Output() fetchSuccess: EventEmitter<any> = new EventEmitter();
   @Output() fetchError: EventEmitter<any> = new EventEmitter();
@@ -61,8 +61,7 @@ export class FormViewComponent implements OnInit {
       );
     });
 
-    this.values$.subscribe(({ fieldName, value }: FormValue) => {
-      debugger;
+    this.componentStore$.subscribe(({ fieldName, value }: FormValue) => {
       try {
         if (fieldName && value) {
           this.values = { ...this.values, [fieldName]: value };

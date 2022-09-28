@@ -2,11 +2,7 @@
   <ng-container *ngSwitchCase="'text'">
     <mat-form-field class="w-100" appearance="fill">
       <mat-label>{{ field.placeholder || field.label }}</mat-label>
-      <input
-        matInput
-        [formControlName]="field.name"
-        (ngModelChange)="handleInput({ fieldName: field.name })"
-      />
+      <input matInput [formControlName]="field.name" />
       <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
         showError(form.get(field.name)?.errors)
       }}</mat-error>
@@ -16,12 +12,7 @@
   <ng-container *ngSwitchCase="'email'">
     <mat-form-field class="w-100" appearance="fill">
       <mat-label>{{ field.placeholder || field.label }}</mat-label>
-      <input
-        matInput
-        [formControlName]="field.name"
-        (ngModelChange)="handleInput({ fieldName: field.name })"
-        type="email"
-      />
+      <input matInput [formControlName]="field.name" type="email" />
       <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
         showError(form.get(field.name)?.errors)
       }}</mat-error>
@@ -31,10 +22,7 @@
   <ng-container *ngSwitchCase="'select'">
     <mat-form-field class="w-100" appearance="fill">
       <mat-label>{{ field.name }}</mat-label>
-      <mat-select
-        [formControlName]="field.name"
-        (ngModelChange)="handleInput({ fieldName: field.name })"
-      >
+      <mat-select [formControlName]="field.name">
         <mat-option
           *ngFor="let option of field.options"
           [value]="option.value"
@@ -50,11 +38,7 @@
   <ng-container *ngSwitchCase="'textarea'">
     <mat-form-field class="w-100" appearance="fill">
       <mat-label>{{ field.name }}</mat-label>
-      <textarea
-        matInput
-        [formControlName]="field.name"
-        (ngModelChange)="handleInput({ fieldName: field.name })"
-      ></textarea>
+      <textarea matInput [formControlName]="field.name"></textarea>
     </mat-form-field>
   </ng-container>
 
@@ -63,7 +47,6 @@
       <mat-radio-group
         aria-label="Select an option"
         [formControlName]="field.name"
-        (ngModelChange)="handleInput({ fieldName: field.name })"
       >
         <mat-label>Select an option</mat-label>
         <mat-radio-button
@@ -74,6 +57,7 @@
       </mat-radio-group>
     </div>
   </ng-container>
+
   <ng-container *ngSwitchCase="'date'">
     <div>
       <mat-form-field appearance="fill" class="w-100">
@@ -82,7 +66,6 @@
           matInput
           [formControlName]="field.name"
           [matDatepicker]="picker"
-          (ngModelChange)="handleInput({ fieldName: field.name })"
         />
         <mat-hint>MM/DD/YYYY</mat-hint>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -93,13 +76,13 @@
       </mat-form-field>
     </div>
   </ng-container>
+
   <ng-container *ngSwitchCase="'checkbox'">
     <div class="w-100" [formGroupName]="field.name">
       <mat-checkbox
         labelPosition="before"
         *ngFor="let option of field.options"
         [indeterminate]="true"
-        (ngModelChange)="handleInput({ fieldName: field.name })"
         [formControlName]="option.label"
       >
         {{ option.label }}

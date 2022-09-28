@@ -104,19 +104,11 @@ export class PatientFormComponent implements OnInit {
     this.values = { ...this.values, ...event };
   }
 
+  //Type this event
   handle(e: any) {
-    // {
-    //   event: $event,
-    //   form: this.form,
-    //   handleInput: this.handleInput,
-    //   handleForm: this.handleForm
-    // }
-    console.log(e);
-    e.formStore.onFormChanges(e.event);
-    // debugger;
-    // e.handleInput.emit(e.event);
-    // e.handleForm.emit(e.form.value);
-    // this.formView.onFormChanges(e.event);
-    // console.log('formvalues', this.formView.formValues);
+    e.formStore.onFormChanges({
+      fieldName: 'name',
+      value: e.form.get('name').value,
+    });
   }
 }

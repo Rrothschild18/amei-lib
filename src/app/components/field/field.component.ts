@@ -1,3 +1,4 @@
+import { FormViewService } from 'src/app/components/form-view/form-view.service';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Field } from 'src/app/models/field';
@@ -17,19 +18,21 @@ export class FieldComponent implements OnInit {
     return this.form.controls[this.field.name].valid;
   }
 
-  constructor() {}
+  constructor(private formService: FormViewService) {}
 
   ngOnInit(): void {}
 
-  handleInput({ fieldName, event }: any): void {
-    debugger;
-
-    console.log({ fc: this.fieldFormControl });
-
-    this.inputValue.emit({
-      fieldName,
-      value: this.form.value[fieldName] || event,
+  ngOnChanges() {
+    this.fieldFormControl?.valueChanges.subscribe((changedValue) => {
+      this.formService.onFormChanges({
+        fieldName: this.field.name,
+        value: changedValue,
+      });
     });
+  }
+
+  handleInput({ fieldName, event }: any): void {
+    console.log({ fc: this.fieldFormControl });
   }
 
   //TODO map errors with an object, destruct arguments and accept custom errors messages

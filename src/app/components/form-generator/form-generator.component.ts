@@ -1,3 +1,4 @@
+import { BehaviorSubject } from 'rxjs';
 import {
   Component,
   OnInit,
@@ -45,11 +46,7 @@ export class FormGeneratorComponent implements OnInit {
   @ContentChildren(NgTemplateNameDirective)
   _templates!: QueryList<NgTemplateNameDirective>;
 
-  constructor(private fb: FormBuilder, private formView: FormViewService) {
-    this.form.valueChanges.subscribe((changedValue) => {
-      console.log(changedValue);
-    });
-  }
+  constructor(private fb: FormBuilder, private formView: FormViewService) {}
   ngOnInit(): void {}
 
   get hasFields(): boolean {
@@ -57,12 +54,12 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   get hasFormValues(): boolean {
-    const hasValues: boolean = !!Object.values(this.form.value).length;
-
-    return hasValues;
+    return !!Object.values(this.form.value).length;
   }
 
   toFormGroup(fields: Field[] = []) {
+    if (this.hasFormValues) return;
+
     const fieldsType = ['text', 'select', 'textarea', 'date', 'radio'];
     const form: any = {};
     const formPivot: FormGroup = this.form;
@@ -98,7 +95,6 @@ export class FormGeneratorComponent implements OnInit {
   //Todo change eventEmitters to Subjects
   handleInputs(event: any) {
     if (event) {
-      debugger;
       this.formView.onFormChanges(event);
     }
   }
