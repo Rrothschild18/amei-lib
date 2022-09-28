@@ -18,7 +18,7 @@ import {
 } from '@angular/forms';
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
 import { FieldColumnConfigTypes, FieldsColumnsConfig } from 'src/app/models';
-import { Field } from 'src/app/models/field';
+import { Field, FormFieldContext } from 'src/app/models/field';
 import { FormViewService } from '../form-view/form-view.service';
 
 @Component({
@@ -28,6 +28,7 @@ import { FormViewService } from '../form-view/form-view.service';
 })
 export class FormGeneratorComponent implements OnInit {
   fields: Field[] = [];
+  form: FormGroup = new FormGroup({});
 
   @Input('fields') set onFieldsChange(fields: Field[]) {
     this.fields = fields;
@@ -39,9 +40,6 @@ export class FormGeneratorComponent implements OnInit {
   } = {};
 
   @Input('columns') columns: FieldsColumnsConfig = {};
-  form: FormGroup = new FormGroup({});
-  @Output() input: EventEmitter<any> = new EventEmitter();
-  @Output() formValues: EventEmitter<any> = new EventEmitter();
 
   @ContentChildren(NgTemplateNameDirective)
   _templates!: QueryList<NgTemplateNameDirective>;
@@ -55,6 +53,14 @@ export class FormGeneratorComponent implements OnInit {
 
   get hasFormValues(): boolean {
     return !!Object.values(this.form.value).length;
+  }
+
+  fieldContext(field: Field): FormFieldContext {
+    return {
+      field,
+      formGroupRef: this.form as FormGroup,
+      formControlRef: this.form.get(field.name) as FormControl,
+    };
   }
 
   toFormGroup(fields: Field[] = []) {

@@ -12,7 +12,6 @@ export class FieldComponent implements OnInit {
   @Input() field!: Field;
   @Input() form!: FormGroup;
   @Input() fieldFormControl!: AbstractControl | null;
-  @Output() inputValue: EventEmitter<any> = new EventEmitter();
 
   get isValid() {
     return this.form.controls[this.field.name].valid;
@@ -29,10 +28,6 @@ export class FieldComponent implements OnInit {
         value: changedValue,
       });
     });
-  }
-
-  handleInput({ fieldName, event }: any): void {
-    console.log({ fc: this.fieldFormControl });
   }
 
   //TODO map errors with an object, destruct arguments and accept custom errors messages
