@@ -1,5 +1,3 @@
-import { FormGroup, FormControl } from '@angular/forms';
-
 export class Field {
   name: string;
   label: string;
@@ -28,13 +26,7 @@ export class Field {
   }
 }
 
-export interface FormFieldContext {
-  field: Field;
-  formGroupRef: FormGroup;
-  formControlRef: FormControl | null;
-}
-
-type FieldTypes =
+export type FieldTypes =
   | 'text'
   | 'select'
   | 'textarea'

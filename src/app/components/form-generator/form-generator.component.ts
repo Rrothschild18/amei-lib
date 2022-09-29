@@ -17,8 +17,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
-import { FieldColumnConfigTypes, FieldsColumnsConfig } from 'src/app/models';
-import { Field, FormFieldContext } from 'src/app/models/field';
+import {
+  FieldColumnConfigTypes,
+  FieldsColumnsConfig,
+  FormFieldContext,
+} from 'src/app/models';
+import { Field } from 'src/app/models/field';
 import { FormViewService } from '../form-view/form-view.service';
 
 @Component({
