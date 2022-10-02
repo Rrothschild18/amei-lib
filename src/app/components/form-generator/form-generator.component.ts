@@ -1,13 +1,11 @@
-import { BehaviorSubject } from 'rxjs';
 import {
   Component,
   OnInit,
   Input,
-  Output,
-  EventEmitter,
   ContentChildren,
   QueryList,
   TemplateRef,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import {
   FormGroup,
@@ -20,35 +18,35 @@ import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.dir
 import {
   FieldColumnConfigTypes,
   FieldsColumnsConfig,
+  FieldsConfig,
+  FieldsValidatorsConfig,
   FormFieldContext,
 } from 'src/app/models';
 import { Field } from 'src/app/models/field';
-import { FormViewService } from '../form-view/form-view.service';
 
 @Component({
   selector: 'app-form-generator',
   templateUrl: './form-generator.component.html',
   styleUrls: ['./form-generator.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormGeneratorComponent implements OnInit {
-  fields: Field[] = [];
+  fields!: FieldsConfig;
   form: FormGroup = new FormGroup({});
 
-  @Input('fields') set onFieldsChange(fields: Field[]) {
+  @Input('fields') set onFieldsChange(fields: FieldsConfig) {
     this.fields = fields;
     this.toFormGroup(this.toArrayFields(this.fields));
   }
 
-  @Input('fieldsValidators') fieldsValidators: {
-    [key: string]: ValidatorFn[];
-  } = {};
+  @Input('fieldsValidators') fieldsValidators: FieldsValidatorsConfig = {};
 
   @Input('columns') columns: FieldsColumnsConfig = {};
 
   @ContentChildren(NgTemplateNameDirective)
   _templates!: QueryList<NgTemplateNameDirective>;
 
-  constructor(private fb: FormBuilder, private formView: FormViewService) {}
+  constructor(private fb: FormBuilder) {}
   ngOnInit(): void {}
 
   get hasFields(): boolean {
@@ -68,8 +66,7 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   toFormGroup(fields: Field[] = []) {
-    if (this.hasFormValues) return;
-
+    console.log('Render FieldControls');
     const fieldsType = ['text', 'select', 'textarea', 'date', 'radio'];
     const form: any = {};
     const formPivot: FormGroup = this.form;
@@ -92,21 +89,12 @@ export class FormGeneratorComponent implements OnInit {
       }
     }
 
-    if (this.hasFormValues) return;
-
     this.form = this.fb.group(form);
-    this.form.patchValue(formPivot);
+    this.form.patchValue(formPivot.value);
   }
 
   toArrayFields(fields: {} = {}): Field[] {
     return Object.values(fields);
-  }
-
-  //Todo change eventEmitters to Subjects
-  handleInputs(event: any) {
-    if (event) {
-      this.formView.onFormChanges(event);
-    }
   }
 
   //Todo validate all on submit

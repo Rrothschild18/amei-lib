@@ -1,19 +1,17 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 export interface FormValue {
   [key: string]: any;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class FormViewService {
-  private values$ = new BehaviorSubject<FormValue>({});
+  private values$: Subject<FormValue> = new BehaviorSubject<FormValue>({});
 
   constructor() {}
 
-  get formValues(): Observable<FormValue> {
+  get formValues(): Subject<FormValue> {
     return this.values$;
   }
 
@@ -22,7 +20,6 @@ export class FormViewService {
   }
 
   ngOnDestroy() {
-    console.log('destroy');
     this.values$.unsubscribe();
   }
 }

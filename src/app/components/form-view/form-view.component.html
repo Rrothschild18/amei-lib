@@ -1,18 +1,24 @@
 <div class="FormView">
-  <pre>{{ componentStore$ | async | json }}</pre>
-  <pre>{{ values | json }}</pre>
+  <pre>
+    <h6>FieldEventValue</h6>
+    {{ componentStore$ | async | json }}
+  </pre>
+  <pre>
+    <h6>FormViewValues</h6>
+    {{ values | json }}
+  </pre>
   <div *ngIf="isFetching" class="">
     <mat-spinner class="spinner"></mat-spinner>
   </div>
 
   <ng-template
-    *ngIf="hasHeaderSlot() && hasResults()"
+    *ngIf="hasHeaderSlot && hasResults"
     [ngTemplateOutlet]="renderHeaderSlot()"
     [ngTemplateOutletContext]="{ entity: 'Patients' }"
   ></ng-template>
 
   <ng-template
-    *ngIf="hasBodySlot() && hasResults()"
+    *ngIf="hasBodySlot && hasResults"
     [ngTemplateOutlet]="renderBodySlot()"
     [ngTemplateOutletContext]="{
       fields: fields$ | async,
@@ -21,7 +27,7 @@
     }"
   ></ng-template>
 
-  <div *ngIf="!isFetching && !hasResults()">
+  <div *ngIf="!isFetching && !hasResults">
     <div>
       <h6>Nenhum item encontrado.</h6>
     </div>

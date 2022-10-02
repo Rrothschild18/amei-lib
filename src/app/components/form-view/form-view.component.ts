@@ -20,7 +20,6 @@ import { FormValue, FormViewService } from './form-view.service';
   selector: 'app-form-view',
   templateUrl: './form-view.component.html',
   styleUrls: ['./form-view.component.scss'],
-  providers: [FormViewService],
 })
 export class FormViewComponent implements OnInit {
   @Input('entity') entity!: string;
@@ -32,7 +31,7 @@ export class FormViewComponent implements OnInit {
   isFetching: boolean = false;
 
   values: any = {};
-  componentStore$: Observable<FormValue> = this.formView.formValues;
+  componentStore$: Observable<FormValue> = this.formService.formValues;
 
   @Output() fetchSuccess: EventEmitter<any> = new EventEmitter();
   @Output() fetchError: EventEmitter<any> = new EventEmitter();
@@ -42,7 +41,7 @@ export class FormViewComponent implements OnInit {
   constructor(
     private store: Store,
     private appRef: ApplicationRef,
-    private formView: FormViewService
+    private formService: FormViewService
   ) {}
 
   ngOnInit(): void {
@@ -62,31 +61,29 @@ export class FormViewComponent implements OnInit {
     });
 
     this.componentStore$.subscribe(({ fieldName, value }: FormValue) => {
-      try {
-        if (fieldName && value) {
-          this.values = { ...this.values, [fieldName]: value };
-        }
-      } catch (e) {
-        throw new Error('Form Error');
+      if (!fieldName && !value) {
+        return {};
       }
+
+      return (this.values = { ...this.values, [fieldName]: value });
     });
   }
 
   ngOnDestroy() {}
 
   get formStoreChange() {
-    return this.formView;
+    return this.formService;
   }
 
-  hasBodySlot(): boolean {
+  get hasBodySlot(): boolean {
     return !!this.body;
   }
 
-  hasHeaderSlot(): boolean {
+  get hasHeaderSlot(): boolean {
     return !!this.header;
   }
 
-  hasResults() {
+  get hasResults() {
     return !!(this.result$ || []);
   }
 
@@ -97,21 +94,4 @@ export class FormViewComponent implements OnInit {
   renderBodySlot(): TemplateRef<unknown> {
     return this.body;
   }
-
-  // async fetchForm() {
-  //   this.isFetching = true;
-
-  //   try {
-  //     let { fields, result } = await this.ls.getPatientCreate();
-
-  //     this.fields$ = fields;
-  //     this.result$ = result;
-
-  //     this.fetchSuccess.emit({ results: this.result$, fields: this.fields$ });
-  //   } catch (e) {
-  //     this.fetchError.emit(e);
-  //   } finally {
-  //     this.isFetching = false;
-  //   }
-  // }
 }

@@ -1,4 +1,8 @@
 <section class="Form">
+  <pre>
+    <h6>PatientForm Values</h6>
+    {{ values | json }} 
+  </pre>
   <app-form-view entity="Patient">
     <ng-template
       #body
@@ -13,7 +17,6 @@
               <app-form-generator
                 [fields]="filterObject(fields, patientPersonalFields)"
                 [columns]="patientPersonalColumns"
-                (formValues)="handleFormValues($event)"
                 [fieldsValidators]="patientPersonalValidators"
               >
                 <ng-template
@@ -22,7 +25,7 @@
                   let-form="formGroupRef"
                   let-fieldRef="formControlRef"
                 >
-                  <div class="col-6">
+                  <div class="col-12">
                     <app-field
                       [field]="field"
                       [form]="form"
@@ -35,14 +38,31 @@
                       "
                     ></app-field>
                   </div>
+                  <button
+                    mat-flat-button
+                    color="primary"
+                    (click)="handleClick(fieldRef)"
+                  >
+                    Enviar
+                  </button>
                 </ng-template>
               </app-form-generator>
+            </div>
+          </div>
+        </div>
+        <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
+          <div class="row">
+            <div class="col-12">
+              <!-- <app-form-generator
+                [fields]="filterObject(fields, patientAdditionalFields)"
+                [columns]="patientAdditionalColumns"
+                [fieldsValidators]="patientAdditionalValidators"
+              >
+              </app-form-generator> -->
             </div>
           </div>
         </div>
       </div>
     </ng-template>
   </app-form-view>
-
-  <pre>{{ values | json }}</pre>
 </section>

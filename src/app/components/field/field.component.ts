@@ -1,5 +1,5 @@
 import { FormViewService } from 'src/app/components/form-view/form-view.service';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Field } from 'src/app/models/field';
 
@@ -23,7 +23,7 @@ export class FieldComponent implements OnInit {
 
   ngOnChanges() {
     this.fieldFormControl?.valueChanges.subscribe((changedValue) => {
-      this.formService.onFormChanges({
+      this.formService.formValues.next({
         fieldName: this.field.name,
         value: changedValue,
       });
