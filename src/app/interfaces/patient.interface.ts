@@ -14,4 +14,5 @@ export interface Patient {
   complement: string;
   city: string;
   state: string;
+  games: string;
 }

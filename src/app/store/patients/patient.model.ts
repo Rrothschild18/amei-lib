@@ -1,16 +1,26 @@
 import { EntityFields } from '../entities/entities.model';
 
 export interface Patient {
+  isActive: boolean;
   name: string;
-  lastname: string;
+  lastName: string;
+  civilStatus: string;
+  document: string;
+  birthDate: Date;
   phone: string;
   email: string;
-  document: string;
-  gender: string;
-  uuid: string;
+  cep: string;
+  address: string;
+  neighborhood: string;
+  streetNumber: number;
+  complement: string;
+  city: string;
+  state: string;
+  games: string;
 }
 
 export interface PatientStateModel {
   patients: Patient[];
   fields: EntityFields; //Entity fields type of Pacient
+  isLoading: boolean;
 }

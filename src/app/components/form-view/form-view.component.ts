@@ -1,13 +1,11 @@
 import { FormGeneratorComponent } from './../form-generator/form-generator.component';
-import { first, map, Observable, Subject } from 'rxjs';
+import { first, Observable } from 'rxjs';
 import {
   ApplicationRef,
   Component,
   ContentChild,
-  EventEmitter,
   Input,
   OnInit,
-  Output,
   QueryList,
   TemplateRef,
   ViewChildren,
@@ -33,8 +31,6 @@ export class FormViewComponent implements OnInit {
   values: any = {};
   componentStore$: Observable<FormValue> = this.formService.formValues;
 
-  @Output() fetchSuccess: EventEmitter<any> = new EventEmitter();
-  @Output() fetchError: EventEmitter<any> = new EventEmitter();
   @ViewChildren(FormGeneratorComponent)
   formRefs!: QueryList<FormGeneratorComponent>;
 

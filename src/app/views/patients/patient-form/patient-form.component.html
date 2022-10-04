@@ -10,7 +10,7 @@
       let-results="results"
       let-formStore="formStore"
     >
-      <div class="container h-100 d-flex align-items-center mb-5">
+      <div class="container h-100 d-flex flex-column align-items-center mb-5">
         <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
           <div class="row">
             <div class="col-12">
@@ -18,6 +18,7 @@
                 [fields]="filterObject(fields, patientPersonalFields)"
                 [columns]="patientPersonalColumns"
                 [fieldsValidators]="patientPersonalValidators"
+                #personalForm
               >
                 <ng-template
                   name="name"
@@ -25,10 +26,11 @@
                   let-form="formGroupRef"
                   let-fieldRef="formControlRef"
                 >
-                  <div class="col-12">
+                  <div class="w-100 row">
                     <app-field
                       [field]="field"
                       [form]="form"
+                      class="col-11"
                       (input)="
                         handle({
                           event: $event,
@@ -37,14 +39,16 @@
                         })
                       "
                     ></app-field>
+                    <div class="col">
+                      <button
+                        mat-flat-button
+                        color="primary"
+                        (click)="handleClick(fieldRef)"
+                      >
+                        Enviar
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    mat-flat-button
-                    color="primary"
-                    (click)="handleClick(fieldRef)"
-                  >
-                    Enviar
-                  </button>
                 </ng-template>
               </app-form-generator>
             </div>
@@ -53,12 +57,13 @@
         <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
           <div class="row">
             <div class="col-12">
-              <!-- <app-form-generator
+              <app-form-generator
                 [fields]="filterObject(fields, patientAdditionalFields)"
                 [columns]="patientAdditionalColumns"
                 [fieldsValidators]="patientAdditionalValidators"
+                #additionalForm
               >
-              </app-form-generator> -->
+              </app-form-generator>
             </div>
           </div>
         </div>

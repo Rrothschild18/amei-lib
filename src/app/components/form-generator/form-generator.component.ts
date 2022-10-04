@@ -66,7 +66,7 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   toFormGroup(fields: Field[] = []) {
-    console.log('Render FieldControls');
+    // console.log('Render FieldControls');
     const fieldsType = ['text', 'select', 'textarea', 'date', 'radio'];
     const form: any = {};
     const formPivot: FormGroup = this.form;

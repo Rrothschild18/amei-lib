@@ -1,4 +1,6 @@
+import { FieldsConfig } from './../../models/form';
 import { EntityPayload } from '../entities/entities.model';
+import { Patient } from './patient.model';
 
 export const PatientActions = {
   AddPatientSuccess: class AddPatientSuccess {
@@ -17,5 +19,18 @@ export const PatientActions = {
   FetchAllPatientsFailed: class FetchAllPatientsFailed {
     static readonly type = '[Patients List] Patients List Fetch Failed';
     constructor(public payload: { error: any }) {}
+  },
+
+  PatchPatientFields: class PatchPatientFields {
+    static readonly type = '[Patients Fields] Patients Fields Patched ';
+    constructor(public payload: { fields: FieldsConfig<Patient> }) {}
+  },
+
+  SetLoadingTrue: class SetLoadingTrue {
+    static readonly type = '[Patients Loading] Patients isLoading True ';
+  },
+
+  SetLoadingFalse: class SetLoadingFalse {
+    static readonly type = '[Patients Loading] Patients isLoading False ';
   },
 };

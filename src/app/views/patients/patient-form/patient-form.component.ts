@@ -1,7 +1,17 @@
+import { PatientStateModel } from './../../../store/patients/patient.model';
+import { Entities } from './../../../store/entities/entities.namespace';
+import { HttpClient } from '@angular/common/http';
 import { FieldsConfig } from './../../../models/form';
-import { Observable, tap } from 'rxjs';
-import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { filter, first, map, Observable, switchMap, take, tap } from 'rxjs';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 import {
   FormValue,
   FormViewService,
@@ -13,6 +23,7 @@ import {
 } from 'src/app/models';
 import { Patient } from 'src/app/interfaces';
 import { FormGeneratorComponent } from 'src/app/components/form-generator/form-generator.component';
+import { Select, Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-patient-form',
@@ -20,52 +31,88 @@ import { FormGeneratorComponent } from 'src/app/components/form-generator/form-g
   styleUrls: ['./patient-form.component.scss'],
   providers: [{ provide: FormViewService }],
 })
-export class PatientFormComponent implements OnInit {
-  form!: FormGroup;
+export class PatientFormComponent implements OnInit, AfterViewInit {
   values: any = {};
   componentStore$: Observable<FormValue> = this.formService.formValues;
 
-  @ViewChildren(FormGeneratorComponent)
+  @Select('Patient') patient$!: Observable<PatientStateModel>;
+
+  fields: any;
+
+  fetchingCep: boolean = false;
+
+  @ViewChildren('personalForm')
   personalForm!: QueryList<FormGeneratorComponent>;
 
-  constructor(public formService: FormViewService) {}
+  @ViewChildren('additionalForm')
+  additionalForm!: QueryList<FormGeneratorComponent>;
+
+  additionalFormValue$!: Observable<any>;
+
+  constructor(
+    public formService: FormViewService,
+    private cdRef: ChangeDetectorRef,
+    private http: HttpClient,
+    private store: Store
+  ) {}
 
   ngOnInit(): void {
-    this.componentStore$
-      .pipe(
-        tap((formValue) => {
-          console.log('FormValue', { formValue });
-        })
-      )
-      .subscribe(({ fieldName, value }: FormValue) => {
-        if (!fieldName && !value) {
-          return {};
-        }
+    this.componentStore$.subscribe(({ fieldName, value }: FormValue) => {
+      if (!fieldName && !value) {
+        return {};
+      }
 
-        return (this.values = { ...this.values, [fieldName]: value });
-      });
+      return (this.values = { ...this.values, [fieldName]: value });
+    });
+
+    this.fetchNewGamesOptions();
   }
 
   ngAfterViewInit() {
-    this.personalForm?.first?.form?.valueChanges.subscribe((value) => {
-      console.log('formValues', { value });
-    });
+    this.handleCepChange();
   }
 
   ngOnChanges() {}
 
+  get patientPersonalFields(): FieldsArrayName<Patient> {
+    return [
+      'isActive',
+      'name',
+      'lastName',
+      'email',
+      'document',
+      'phone',
+      'birthDate',
+      'games',
+    ];
+  }
+
   get patientPersonalColumns(): FieldsColumnsConfig<Patient> {
     return {
+      isActive: {
+        col: 12,
+      },
       name: {
         col: 12,
       },
       lastName: {
         md: 12,
-        lg: 4,
+        lg: 6,
+      },
+      document: {
+        col: 12,
+      },
+      phone: {
+        col: 6,
       },
       email: {
-        md: 3,
-        lg: 4,
+        lg: 6,
+      },
+      birthDate: {
+        lg: 6,
+      },
+      games: {
+        lg: 6,
       },
     };
   }
@@ -76,16 +123,39 @@ export class PatientFormComponent implements OnInit {
     };
   }
 
-  get patientPersonalFields(): FieldsArrayName<Patient> {
-    return ['name', 'lastName', 'email'];
+  get patientAdditionalFields(): FieldsArrayName<Patient> {
+    return [
+      'cep',
+      'state',
+      'city',
+      'neighborhood',
+      'address',
+      'streetNumber',
+      'complement',
+    ];
   }
 
   get patientAdditionalColumns(): FieldsColumnsConfig<Patient> {
     return {
-      address: {
-        col: 12,
+      cep: {
+        lg: 4,
       },
-      birthDate: {
+      state: {
+        col: 4,
+      },
+      city: {
+        col: 4,
+      },
+      address: {
+        col: 8,
+      },
+      neighborhood: {
+        col: 2,
+      },
+      streetNumber: {
+        col: 2,
+      },
+      complement: {
         col: 12,
       },
     };
@@ -95,10 +165,6 @@ export class PatientFormComponent implements OnInit {
     return {
       address: [Validators.email, Validators.maxLength(20)],
     };
-  }
-
-  get patientAdditionalFields(): FieldsArrayName<Patient> {
-    return ['address', 'birthDate'];
   }
 
   hasFields(fields: {}): boolean {
@@ -134,14 +200,14 @@ export class PatientFormComponent implements OnInit {
       value: e.form.get('name').value,
     });
 
+    e.form.get('name').disable();
+
     // e.form.valueChanges.subscribe((formValue: any) => {
     //   console.log('Form Value has changed at component', { formValue });
     // });
   }
 
   bondForm() {
-    this.personalForm;
-
     this.componentStore$.subscribe((formResponse) => {
       this.values = { ...this.values, ...formResponse };
     });
@@ -149,8 +215,74 @@ export class PatientFormComponent implements OnInit {
   }
 
   handleClick(fieldRef: FormControl) {
-    this.formService.formValues.asObservable().subscribe((v) => {
-      console.log(v);
+    const cepFieldRef = this.additionalForm?.last?.form.get('cep');
+    cepFieldRef?.valueChanges.subscribe((value) => {
+      console.log('cep changed', value);
     });
+    cepFieldRef?.updateValueAndValidity();
+    this.cdRef.detectChanges();
+  }
+
+  handleCepChange() {
+    this.componentStore$
+      .pipe(
+        tap(() => (this.fetchingCep = true)),
+        filter(
+          (fieldEvent: FormValue) =>
+            fieldEvent['fieldName'] === 'cep' &&
+            fieldEvent['value'].length === 8
+        ),
+        map((fieldEvent) => fieldEvent['value']),
+        switchMap((cepValue) =>
+          this.http.get(`https://viacep.com.br/ws/${cepValue}/json/`)
+        ),
+        tap((viaCepResponse) => console.log(viaCepResponse)),
+        map((viaCepResponse: any) => {
+          return {
+            cep: viaCepResponse['cep'],
+            city: viaCepResponse['localidade'],
+            state: viaCepResponse['uf'],
+            neighborhood: viaCepResponse['bairro'] || '',
+            address: viaCepResponse['logradouro'] || '',
+          };
+        }),
+        tap((parsedResult) =>
+          this.additionalForm.first.form.patchValue(parsedResult)
+        )
+      )
+      .subscribe((ofResponse) => {
+        this.disableCepFields();
+      });
+  }
+
+  disableCepFields() {
+    const cepFieldRef = this.additionalForm?.first?.form.get('cep');
+    const stateFieldRef = this.additionalForm?.first?.form.get('state');
+    const cityFieldRef = this.additionalForm?.first?.form.get('city');
+
+    cepFieldRef?.disable({ onlySelf: true, emitEvent: true });
+    stateFieldRef?.disable({ onlySelf: true, emitEvent: true });
+    cityFieldRef?.disable({ onlySelf: true, emitEvent: true });
+  }
+
+  fetchNewGamesOptions() {
+    this.patient$
+      .pipe(
+        first((patient) => !!Object.keys(patient.fields).length),
+        map((patient) => patient.isLoading),
+        filter((isLoading) => !isLoading)
+      )
+      .subscribe(() => this.fetchNewGames());
+  }
+
+  fetchNewGames() {
+    this.http
+      .get('http://localhost:3000/games')
+      .pipe(take(1))
+      .subscribe((games) => {
+        this.store.dispatch(
+          new Entities['Patient'].PatchPatientFields({ games: { ...games } })
+        );
+      });
   }
 }
