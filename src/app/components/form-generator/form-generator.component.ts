@@ -67,6 +67,8 @@ export class FormGeneratorComponent implements OnInit {
 
   toFormGroup(fields: Field[] = []) {
     // console.log('Render FieldControls');
+    if (this.hasFormValues) return;
+
     const fieldsType = ['text', 'select', 'textarea', 'date', 'radio'];
     const form: any = {};
     const formPivot: FormGroup = this.form;
@@ -98,17 +100,13 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   //Todo validate all on submit
-  validateAllFormFields(formGroup: FormGroup) {
-    //{1}
-    Object.keys(formGroup.controls).forEach((field) => {
-      //{2}
-      const control = formGroup.get(field); //{3}
+  validateAllFormFields(formGroup?: FormGroup) {
+    Object.keys(this.form.controls).forEach((field) => {
+      const control = this.form.get(field);
       if (control instanceof FormControl) {
-        //{4}
         control.markAsTouched({ onlySelf: true });
       } else if (control instanceof FormGroup) {
-        //{5}
-        this.validateAllFormFields(control); //{6}
+        // this.validateAllFormFields(control);
       }
     });
   }
@@ -171,7 +169,6 @@ export class FormGeneratorComponent implements OnInit {
     const hasNullByPass: boolean = validators.some(
       (validator) => validator === Validators.nullValidator
     );
-
     return hasNullByPass ? validators : [Validators.required, ...validators];
   }
 

@@ -4,6 +4,7 @@ export class Field {
   type: FieldTypes;
   placeholder?: string;
   options: { label: string; value: string }[];
+  loadingStatus: boolean;
   children: {
     [key: string]: Field;
   };
@@ -21,6 +22,7 @@ export class Field {
     this.label = options.label || '';
     this.name = options.name || '';
     this.type = options.type || 'text';
+    this.loadingStatus = false;
     this.children = {};
     this.options = options.options || [];
   }

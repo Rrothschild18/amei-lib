@@ -120,7 +120,6 @@ export class NestedFieldsComponent implements OnInit {
 
   //Todo change eventEmitters to Subjects
   handleInputs(event: any) {
-    debugger;
     this?.input.emit(event);
     this?.formValues.emit(this.form.value);
   }

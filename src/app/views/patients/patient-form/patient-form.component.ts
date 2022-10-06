@@ -2,7 +2,16 @@ import { PatientStateModel } from './../../../store/patients/patient.model';
 import { Entities } from './../../../store/entities/entities.namespace';
 import { HttpClient } from '@angular/common/http';
 import { FieldsConfig } from './../../../models/form';
-import { filter, first, map, Observable, switchMap, take, tap } from 'rxjs';
+import {
+  delay,
+  filter,
+  first,
+  map,
+  Observable,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -120,6 +129,7 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
   get patientPersonalValidators(): FieldsValidatorsConfig<Patient> {
     return {
       email: [Validators.email, Validators.maxLength(20)],
+      lastName: [Validators.nullValidator],
     };
   }
 
@@ -207,6 +217,17 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
     // });
   }
 
+  handle2(e: any) {
+    e.formStore.onFormChanges({
+      fieldName: 'cep',
+      value: e.form.get('cep').value,
+    });
+
+    // e.form.valueChanges.subscribe((formValue: any) => {
+    //   console.log('Form Value has changed at component', { formValue });
+    // });
+  }
+
   bondForm() {
     this.componentStore$.subscribe((formResponse) => {
       this.values = { ...this.values, ...formResponse };
@@ -226,12 +247,13 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
   handleCepChange() {
     this.componentStore$
       .pipe(
-        tap(() => (this.fetchingCep = true)),
         filter(
           (fieldEvent: FormValue) =>
             fieldEvent['fieldName'] === 'cep' &&
             fieldEvent['value'].length === 8
         ),
+        tap(() => (this.fetchingCep = true)),
+        delay(2000),
         map((fieldEvent) => fieldEvent['value']),
         switchMap((cepValue) =>
           this.http.get(`https://viacep.com.br/ws/${cepValue}/json/`)
@@ -246,9 +268,10 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
             address: viaCepResponse['logradouro'] || '',
           };
         }),
-        tap((parsedResult) =>
-          this.additionalForm.first.form.patchValue(parsedResult)
-        )
+        tap((parsedResult) => {
+          this.fetchingCep = false;
+          this.additionalForm.first.form.patchValue(parsedResult);
+        })
       )
       .subscribe((ofResponse) => {
         this.disableCepFields();
@@ -263,6 +286,8 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
     cepFieldRef?.disable({ onlySelf: true, emitEvent: true });
     stateFieldRef?.disable({ onlySelf: true, emitEvent: true });
     cityFieldRef?.disable({ onlySelf: true, emitEvent: true });
+
+    this.fetchingCep = false;
   }
 
   fetchNewGamesOptions() {
@@ -284,5 +309,26 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
           new Entities['Patient'].PatchPatientFields({ games: { ...games } })
         );
       });
+  }
+
+  showError(error: any) {
+    if (error.required) return 'Este campo é obrigatório';
+    if (error.email) return 'E-mail inválido';
+    if (error.max) return `Número máximo de caracteres é ${error.max.max}`;
+    if (error.maxlength)
+      return `Número máximo de caracteres é ${error.maxlength.requiredLength}, atual ${error.maxlength.actualLength}`;
+    if (error.min)
+      return `Número minimo de caracteres é ${error.min.min}, atual ${error.min.actual}`;
+
+    return 'default error xD';
+  }
+
+  onSaveChanges() {
+    this.personalForm.first.validateAllFormFields();
+    this.additionalForm.first.validateAllFormFields();
+  }
+  onResetChanges() {
+    this.personalForm.first.form.reset();
+    this.additionalForm.first.form.reset();
   }
 }
