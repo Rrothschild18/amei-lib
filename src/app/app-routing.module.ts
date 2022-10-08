@@ -15,6 +15,7 @@ const routes: Routes = [
   { path: 'professionals', component: ProfessionalsListComponent },
   { path: 'professionals/new', component: ProfessionalFormComponent },
   { path: 'patients/new', component: PatientFormComponent },
+  { path: 'patients/:id/edit', component: PatientFormComponent },
 ];
 
 @NgModule({

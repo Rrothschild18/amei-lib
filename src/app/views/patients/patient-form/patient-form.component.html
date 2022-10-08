@@ -24,36 +24,6 @@
                 [fieldsValidators]="patientPersonalValidators"
                 #personalForm
               >
-                <ng-template
-                  name="name"
-                  let-field="field"
-                  let-form="formGroupRef"
-                  let-fieldRef="formControlRef"
-                >
-                  <div class="w-100 row">
-                    <app-field
-                      [field]="field"
-                      [form]="form"
-                      class="col-11"
-                      (input)="
-                        handle({
-                          event: $event,
-                          form: this.form,
-                          formStore
-                        })
-                      "
-                    ></app-field>
-                    <div class="col">
-                      <button
-                        mat-flat-button
-                        color="primary"
-                        (click)="handleClick(fieldRef)"
-                      >
-                        Enviar
-                      </button>
-                    </div>
-                  </div>
-                </ng-template>
               </app-form-generator>
             </div>
           </div>

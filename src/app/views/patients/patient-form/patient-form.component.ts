@@ -103,6 +103,9 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
       },
       name: {
         col: 12,
+        lg: 4,
+        md: 6,
+        sm: 12,
       },
       lastName: {
         md: 12,
@@ -286,8 +289,6 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
     cepFieldRef?.disable({ onlySelf: true, emitEvent: true });
     stateFieldRef?.disable({ onlySelf: true, emitEvent: true });
     cityFieldRef?.disable({ onlySelf: true, emitEvent: true });
-
-    this.fetchingCep = false;
   }
 
   fetchNewGamesOptions() {
