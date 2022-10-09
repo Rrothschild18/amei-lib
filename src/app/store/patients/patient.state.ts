@@ -26,15 +26,6 @@ export class PatientState {
 
   @Action(Entities['Patient'].FetchAllEntities)
   fetchAll(ctx: StateContext<PatientStateModel>) {
-    const response: any = this.ls.FetchAllEntities(this.entityName);
-
-    const state = ctx.getState();
-
-    ctx.setState({
-      ...state,
-      ...response,
-    });
-
     return this.ls.FetchAllEntities(this.entityName).pipe(
       tap(() => new Entities['Patient'].SetLoadingTrue()),
       map((response: EntityPayload) => {
@@ -95,5 +86,54 @@ export class PatientState {
       ...action.payload,
       isLoading: false,
     });
+  }
+
+  @Action(Entities['Patient'].FetchPatientById)
+  FetchPatientById(ctx: StateContext<PatientStateModel>, action: any) {
+    const patientId = action.payload;
+    debugger;
+    return this.ls.FetchEntityById(this.entityName, patientId).pipe(
+      tap(() => new Entities['Patient'].SetLoadingTrue()),
+      map((response: EntityPayload) => {
+        const formattedPayload = {
+          fields: { ...response.fields },
+          results: response.results.find(
+            (result) => result['uuid'] === patientId
+          ),
+        } as EntityPayload;
+
+        debugger;
+
+        return ctx.dispatch(
+          new Entities['Patient'].FetchPatientByIdSuccess(formattedPayload)
+        );
+      }),
+      tap(() => {}),
+      catchError((error) => {
+        return of(
+          ctx.dispatch(
+            new Entities['Patient'].FetchAllPatientsFailed({ error })
+          )
+        );
+      }),
+      tap(() => new Entities['Patient'].SetLoadingFalse())
+    );
+  }
+
+  @Action(Entities['Patient'].FetchPatientByIdSuccess)
+  FetchPatientByIdSuccess(
+    ctx: StateContext<PatientStateModel>,
+    action: typeof Entities['Patient']['FetchPatientById']
+  ) {
+    const state = ctx.getState();
+
+    debugger;
+
+    ctx.setState({
+      ...state,
+      ...action.payload,
+    });
+
+    return new Entities['Patient'].SetLoadingFalse();
   }
 }

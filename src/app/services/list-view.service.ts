@@ -33,4 +33,8 @@ export class ListViewService {
   FetchAllEntities(entityName: string): Observable<any> {
     return this.http.get(`${this.baseURL}/${entityName}`);
   }
+
+  FetchEntityById(entityName: string, entityId: string): Observable<any> {
+    return this.http.get(`${this.baseURL}/${entityName}/${entityId}`);
+  }
 }

@@ -1,18 +1,25 @@
-import { FormGeneratorComponent } from './../form-generator/form-generator.component';
-import { first, Observable } from 'rxjs';
+import {
+  combineLatest,
+  first,
+  map,
+  Observable,
+  Subscription,
+  switchMap,
+} from 'rxjs';
 import {
   ApplicationRef,
   Component,
   ContentChild,
   Input,
   OnInit,
-  QueryList,
   TemplateRef,
-  ViewChildren,
 } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Entities } from 'src/app/store/entities/entities.namespace';
 import { FormValue, FormViewService } from './form-view.service';
+import { ActivatedRoute } from '@angular/router';
+
+type EntityKey = keyof typeof Entities;
 
 @Component({
   selector: 'app-form-view',
@@ -21,40 +28,46 @@ import { FormValue, FormViewService } from './form-view.service';
 })
 export class FormViewComponent implements OnInit {
   @Input('entity') entity!: string;
+  @Input('mode') mode: string = 'create';
   @ContentChild('header') header!: TemplateRef<unknown>;
   @ContentChild('body') body!: TemplateRef<unknown>;
 
-  result$!: Observable<any>;
-  fields$!: Observable<any>;
-  isFetching: boolean = false;
+  result$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].results
+  );
+
+  fields$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].fields
+  );
+
+  isLoading$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].isLoading
+  );
 
   values: any = {};
+
   componentStore$: Observable<FormValue> = this.formService.formValues;
 
-  @ViewChildren(FormGeneratorComponent)
-  formRefs!: QueryList<FormGeneratorComponent>;
+  onEditModeAction$!: Observable<any>;
+
+  formRefs!: Subscription;
 
   constructor(
     private store: Store,
     private appRef: ApplicationRef,
+    private route: ActivatedRoute,
     private formService: FormViewService
   ) {}
 
   ngOnInit(): void {
-    this.fields$ = this.store.select((state: any) => {
-      return state[this.entity].fields;
-    });
-
-    this.result$ = this.store.select(
-      (state: any) => state[this.entity].results
-    );
-
-    this.appRef.isStable.pipe(first((stable) => stable)).subscribe(() => {
-      type EntityKey = keyof typeof Entities;
-      this.store.dispatch(
-        new Entities[this.entity as EntityKey].FetchAllEntities()
-      );
-    });
+    this.appRef.isStable
+      .pipe(
+        first((stable) => stable),
+        map(() => {
+          this.isCreateMode ? this.setUpCreateMode() : this.setUpEditMode();
+        })
+      )
+      .subscribe();
 
     this.componentStore$.subscribe(({ fieldName, value }: FormValue) => {
       if (!fieldName && !value) {
@@ -63,9 +76,52 @@ export class FormViewComponent implements OnInit {
 
       return (this.values = { ...this.values, [fieldName]: value });
     });
+
+    this.onEditModeAction$ = combineLatest(
+      this.result$,
+      this.isLoading$,
+      this.formService.formRefs
+    ).pipe(
+      first(([result, isLoading]) => !!result && !isLoading),
+      map(([result, isLoading, forms]) => {
+        forms.forEach((form) => {
+          form.form.patchValue(result);
+        });
+      })
+    );
+
+    this.onEditModeAction$.subscribe();
   }
 
   ngOnDestroy() {}
+
+  setUpCreateMode() {
+    return this.store.dispatch(
+      new Entities[this.entity as EntityKey].FetchAllEntities()
+    );
+  }
+
+  setUpEditMode() {
+    //TODO create an combineLatest to routeParams and user UUID
+    this.route.params
+      .pipe(
+        map(({ id }) => id),
+        switchMap((entityId) =>
+          this.store.dispatch(
+            new Entities[this.entity as EntityKey].FetchPatientById(entityId)
+          )
+        )
+      )
+      .subscribe();
+  }
+
+  get isEditMode() {
+    return this.mode === 'edit';
+  }
+
+  get isCreateMode() {
+    return this.mode === 'create';
+  }
 
   get formStoreChange() {
     return this.formService;

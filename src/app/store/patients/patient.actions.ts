@@ -33,4 +33,18 @@ export const PatientActions = {
   SetLoadingFalse: class SetLoadingFalse {
     static readonly type = '[Patients Loading] Patients isLoading False ';
   },
+
+  FetchPatientById: class FetchPatientById {
+    static readonly type = '[Patient] Fetch Patient by Id';
+    constructor(public payload: string) {}
+  },
+
+  FetchPatientByIdSuccess: class FetchPatientByIdSuccess {
+    static readonly type = '[Patient] Fetch Patient by Id Success';
+    constructor(public payload: EntityPayload) {}
+  },
+
+  FetchPatientByIdError: class FetchPatientByIdError {
+    static readonly type = '[Patient] Fetch Patient by Id Error';
+  },
 };

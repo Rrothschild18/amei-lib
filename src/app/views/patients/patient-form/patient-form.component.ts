@@ -13,7 +13,6 @@ import {
   tap,
 } from 'rxjs';
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   OnInit,
@@ -40,7 +39,7 @@ import { Select, Store } from '@ngxs/store';
   styleUrls: ['./patient-form.component.scss'],
   providers: [{ provide: FormViewService }],
 })
-export class PatientFormComponent implements OnInit, AfterViewInit {
+export class PatientFormComponent implements OnInit {
   values: any = {};
   componentStore$: Observable<FormValue> = this.formService.formValues;
 
@@ -56,7 +55,8 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
   @ViewChildren('additionalForm')
   additionalForm!: QueryList<FormGeneratorComponent>;
 
-  additionalFormValue$!: Observable<any>;
+  @ViewChildren(FormGeneratorComponent)
+  formRefs!: QueryList<FormGeneratorComponent>;
 
   constructor(
     public formService: FormViewService,
@@ -79,6 +79,21 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.handleCepChange();
+  }
+
+  /* Bypass until i understand how to 
+    pickup formRefs with the service without 
+    explicit emit an change
+    **/
+  ngAfterViewChecked() {
+    const formsHasInitializedControls = !!Object.keys(
+      this.formRefs.first.form.controls
+    ).length;
+
+    if (formsHasInitializedControls) {
+      this.formService.setFormRefs(this.formRefs);
+      this.cdRef.detectChanges();
+    }
   }
 
   ngOnChanges() {}
@@ -312,6 +327,7 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
       });
   }
 
+  /* Create an helper at formService for error messages**/
   showError(error: any) {
     if (error.required) return 'Este campo é obrigatório';
     if (error.email) return 'E-mail inválido';
@@ -328,6 +344,7 @@ export class PatientFormComponent implements OnInit, AfterViewInit {
     this.personalForm.first.validateAllFormFields();
     this.additionalForm.first.validateAllFormFields();
   }
+
   onResetChanges() {
     this.personalForm.first.form.reset();
     this.additionalForm.first.form.reset();

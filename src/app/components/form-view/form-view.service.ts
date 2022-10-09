@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Injectable, QueryList, ViewChildren } from '@angular/core';
+import { BehaviorSubject, Subject, Observable } from 'rxjs';
+import { FormGeneratorComponent } from '../form-generator/form-generator.component';
 
 export interface FormValue {
   [key: string]: any;
@@ -7,7 +8,11 @@ export interface FormValue {
 
 @Injectable()
 export class FormViewService {
-  private values$: Subject<FormValue> = new BehaviorSubject<FormValue>({});
+  private values$: BehaviorSubject<FormValue> = new BehaviorSubject<FormValue>(
+    {}
+  );
+
+  private formRefs$ = new Subject<QueryList<FormGeneratorComponent>>();
 
   constructor() {}
 
@@ -15,8 +20,16 @@ export class FormViewService {
     return this.values$;
   }
 
+  get formRefs(): Observable<QueryList<FormGeneratorComponent>> {
+    return this.formRefs$.asObservable();
+  }
+
   onFormChanges(emittedFormValue: { [key: string]: any }) {
     this.values$.next(emittedFormValue);
+  }
+
+  setFormRefs(forms: QueryList<any>) {
+    this.formRefs$.next(forms);
   }
 
   ngOnDestroy() {

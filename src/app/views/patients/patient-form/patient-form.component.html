@@ -3,13 +3,14 @@
     <h6>PatientForm Values</h6>
     {{ values | json }} 
   </pre>
-  <app-form-view entity="Patient">
+  <app-form-view entity="Patient" mode="edit">
     <ng-template
       #body
       let-fields="fields"
       let-results="results"
       let-formStore="formStore"
     >
+      <pre> results : {{ results | json }}</pre>
       <div class="container h-100 d-flex flex-column align-items-center mb-5">
         <button mat-flat-button (click)="onSaveChanges()">SALVAR</button>
         <button mat-flat-button color="accent" (click)="onResetChanges()">

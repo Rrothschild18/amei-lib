@@ -7,7 +7,7 @@
     <h6>FormViewValues</h6>
     {{ values | json }}
   </pre>
-  <div *ngIf="isFetching" class="">
+  <div *ngIf="isLoading$ | async" class="">
     <mat-spinner class="spinner"></mat-spinner>
   </div>
 
@@ -27,7 +27,7 @@
     }"
   ></ng-template>
 
-  <div *ngIf="!isFetching && !hasResults">
+  <div *ngIf="!isLoading$ && !hasResults">
     <div>
       <h6>Nenhum item encontrado.</h6>
     </div>
