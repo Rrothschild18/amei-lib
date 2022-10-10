@@ -4,14 +4,14 @@ import { Action, State, StateContext, StateToken, Store } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { catchError, map, of, tap } from 'rxjs';
 import { EntityPayload } from '../entities/entities.model';
-import { PatientStateModel } from './patient.model';
+import { PatientStateModel, PatientApiSuccessResponse } from './patient.model';
 
 const PATIENTS_STATE_TOKEN = new StateToken<any>('Patient');
 
 @State<PatientStateModel>({
   name: PATIENTS_STATE_TOKEN,
   defaults: {
-    patients: [],
+    results: [],
     fields: {},
     isLoading: false,
   },
@@ -20,7 +20,7 @@ const PATIENTS_STATE_TOKEN = new StateToken<any>('Patient');
 export class PatientState {
   entityName: string;
 
-  constructor(private ls: ListViewService, private store: Store) {
+  constructor(private ls: ListViewService) {
     this.entityName = PATIENTS_STATE_TOKEN.getName();
   }
 
@@ -102,13 +102,11 @@ export class PatientState {
           ),
         } as EntityPayload;
 
-        debugger;
-
         return ctx.dispatch(
           new Entities['Patient'].FetchPatientByIdSuccess(formattedPayload)
         );
       }),
-      tap(() => {}),
+      tap(() => new Entities['Patient'].SetLoadingFalse()),
       catchError((error) => {
         return of(
           ctx.dispatch(
@@ -135,5 +133,37 @@ export class PatientState {
     });
 
     return new Entities['Patient'].SetLoadingFalse();
+  }
+
+  @Action(Entities['Patient'].CreateEntity)
+  AddPatient(ctx: StateContext<PatientStateModel>, action: any) {
+    const patientToAdd = action.payload;
+
+    return this.ls.CreateEntity(this.entityName, patientToAdd).pipe(
+      tap(() => new Entities['Patient'].SetLoadingTrue()),
+      map((response: PatientApiSuccessResponse) =>
+        ctx.dispatch(new Entities['Patient'].AddPatientSuccess(response))
+      ),
+      catchError((error) => {
+        return of(
+          ctx.dispatch(new Entities['Patient'].AddPatientError({ error }))
+        );
+      }),
+      tap(() => new Entities['Patient'].SetLoadingFalse())
+    );
+  }
+
+  @Action(Entities['Patient'].AddPatientSuccess)
+  AddPatientSuccess(ctx: StateContext<PatientStateModel>, action: any) {
+    const patient = action.payload;
+
+    const state = ctx.getState();
+
+    ctx.patchState({
+      ...state,
+      results: [...state.results, patient],
+    });
+
+    return of(patient);
   }
 }

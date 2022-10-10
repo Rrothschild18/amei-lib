@@ -1,10 +1,21 @@
 import { FieldsConfig } from './../../models/form';
 import { EntityPayload } from '../entities/entities.model';
-import { Patient } from './patient.model';
+import { Patient, PatientApiSuccessResponse } from './patient.model';
 
 export const PatientActions = {
+  CreateEntity: class AddPatient {
+    static readonly type = '[Patient] Add Patient';
+    constructor(public payload: Patient) {}
+  },
+
   AddPatientSuccess: class AddPatientSuccess {
     static readonly type = '[Patient] Add Patient Success';
+    constructor(public payload: PatientApiSuccessResponse) {}
+  },
+
+  AddPatientFailed: class AddPatientFailed {
+    static readonly type = '[Patient] Add Patient Failed';
+    constructor(public payload: { error: any }) {}
   },
 
   FetchAllEntities: class FetchAllEntities {

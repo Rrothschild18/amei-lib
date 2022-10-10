@@ -1,11 +1,4 @@
-import {
-  combineLatest,
-  first,
-  map,
-  Observable,
-  Subscription,
-  switchMap,
-} from 'rxjs';
+import { combineLatest, first, map, Observable, switchMap } from 'rxjs';
 import {
   ApplicationRef,
   Component,
@@ -29,6 +22,7 @@ type EntityKey = keyof typeof Entities;
 export class FormViewComponent implements OnInit {
   @Input('entity') entity!: string;
   @Input('mode') mode: string | null = 'create';
+  @Input('useActions') useActions: boolean = true;
   @ContentChild('header') header!: TemplateRef<unknown>;
   @ContentChild('body') body!: TemplateRef<unknown>;
 
@@ -49,8 +43,6 @@ export class FormViewComponent implements OnInit {
   componentStore$: Observable<FormValue> = this.formService.formValues;
 
   onEditModeAction$!: Observable<any>;
-
-  formRefs!: Subscription;
 
   constructor(
     private store: Store,
@@ -138,6 +130,25 @@ export class FormViewComponent implements OnInit {
   get hasResults() {
     return !!(this.result$ || []);
   }
+
+  onSaveChanges() {
+    if (this.isCreateMode) {
+      //TODO check all if forms are valid before submit
+      this.store
+        .dispatch(
+          new Entities[this.entity as EntityKey].CreateEntity(this.values)
+        )
+        .subscribe((v) => console.log({ patientFromStore: v }));
+
+      return;
+    }
+
+    if (this.isEditMode) {
+      return;
+    }
+  }
+
+  onCancel() {}
 
   renderHeaderSlot(): TemplateRef<unknown> {
     return this.header;
