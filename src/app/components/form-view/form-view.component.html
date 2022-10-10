@@ -1,12 +1,12 @@
 <div class="FormView">
-  <pre>
+  <!-- <pre>
     <h6>FieldEventValue</h6>
     {{ componentStore$ | async | json }}
   </pre>
   <pre>
     <h6>FormViewValues</h6>
     {{ values | json }}
-  </pre>
+  </pre> -->
   <div *ngIf="isLoading$ | async" class="">
     <mat-spinner class="spinner"></mat-spinner>
   </div>
@@ -22,7 +22,7 @@
     [ngTemplateOutlet]="renderBodySlot()"
     [ngTemplateOutletContext]="{
       fields: fields$ | async,
-      result: result$ | async,
+      results: result$ | async,
       formStore: formStoreChange
     }"
   ></ng-template>

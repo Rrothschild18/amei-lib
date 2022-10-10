@@ -1,21 +1,38 @@
-<section class="Form">
-  <pre>
+<section class="PatientForm">
+  <!-- <pre>
     <h6>PatientForm Values</h6>
     {{ values | json }} 
   </pre>
-  <app-form-view entity="Patient" mode="edit">
+  <pre>
+    <h6>URL</h6>
+    {{ mode | async }} 
+  </pre> -->
+  <app-form-view entity="Patient" [mode]="mode | async">
+    <ng-template #header>
+      <div class="container">
+        <div class="d-flex justify-content-between">
+          <h2>Some / Breadcrumb / Some / Breadcrumb</h2>
+          <div>
+            <button
+              mat-flat-button
+              color="accent"
+              class="me-3"
+              (click)="onResetChanges()"
+            >
+              RESET
+            </button>
+            <button mat-flat-button (click)="onSaveChanges()">SALVAR</button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
     <ng-template
       #body
       let-fields="fields"
       let-results="results"
       let-formStore="formStore"
     >
-      <pre> results : {{ results | json }}</pre>
       <div class="container h-100 d-flex flex-column align-items-center mb-5">
-        <button mat-flat-button (click)="onSaveChanges()">SALVAR</button>
-        <button mat-flat-button color="accent" (click)="onResetChanges()">
-          RESET
-        </button>
         <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
           <div class="row">
             <div class="col-12">

@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { PatientStateModel } from './../../../store/patients/patient.model';
 import { Entities } from './../../../store/entities/entities.namespace';
 import { HttpClient } from '@angular/common/http';
@@ -8,6 +9,7 @@ import {
   first,
   map,
   Observable,
+  of,
   switchMap,
   take,
   tap,
@@ -62,6 +64,7 @@ export class PatientFormComponent implements OnInit {
     public formService: FormViewService,
     private cdRef: ChangeDetectorRef,
     private http: HttpClient,
+    private route: ActivatedRoute,
     private store: Store
   ) {}
 
@@ -75,6 +78,14 @@ export class PatientFormComponent implements OnInit {
     });
 
     this.fetchNewGamesOptions();
+  }
+
+  get mode() {
+    return this.route.url.pipe(
+      tap((url) => console.log(url)),
+      map((url) => (url[url.length - 1].path === 'edit' ? 'edit' : 'create')),
+      switchMap((mode) => of(mode))
+    );
   }
 
   ngAfterViewInit() {

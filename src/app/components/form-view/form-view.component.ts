@@ -28,7 +28,7 @@ type EntityKey = keyof typeof Entities;
 })
 export class FormViewComponent implements OnInit {
   @Input('entity') entity!: string;
-  @Input('mode') mode: string = 'create';
+  @Input('mode') mode: string | null = 'create';
   @ContentChild('header') header!: TemplateRef<unknown>;
   @ContentChild('body') body!: TemplateRef<unknown>;
 
