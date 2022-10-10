@@ -82,7 +82,7 @@ export class PatientFormComponent implements OnInit {
 
   get mode() {
     return this.route.url.pipe(
-      tap((url) => console.log(url)),
+      // tap((url) => console.log(url)),
       map((url) => (url[url.length - 1].path === 'edit' ? 'edit' : 'create')),
       switchMap((mode) => of(mode))
     );
@@ -202,7 +202,7 @@ export class PatientFormComponent implements OnInit {
 
   get patientAdditionalValidators(): FieldsValidatorsConfig<Patient> {
     return {
-      address: [Validators.email, Validators.maxLength(20)],
+      address: [Validators.maxLength(20)],
     };
   }
 

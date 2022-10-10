@@ -37,4 +37,8 @@ export class ListViewService {
   FetchEntityById(entityName: string, entityId: string): Observable<any> {
     return this.http.get(`${this.baseURL}/${entityName}/${entityId}`);
   }
+
+  CreateEntity(entityName: string, entity: any): Observable<any> {
+    return this.http.post(`${this.baseURL}/${entityName}`, entity);
+  }
 }

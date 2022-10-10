@@ -19,8 +19,13 @@ export interface Patient {
   games: string;
 }
 
+export interface PatientApiSuccessResponse extends Patient {
+  uuid: string;
+  status?: string;
+}
+
 export interface PatientStateModel {
-  patients: Patient[];
+  results: Patient[];
   fields: EntityFields; //Entity fields type of Pacient
   isLoading: boolean;
 }
