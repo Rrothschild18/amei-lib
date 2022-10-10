@@ -27,6 +27,15 @@
     }"
   ></ng-template>
 
+  <ng-container *ngIf="useActions">
+    <div class="container d-flex justify-content-end">
+      <button mat-flat-button color="accent" class="me-3" (click)="onCancel()">
+        Cancelar
+      </button>
+      <button mat-flat-button (click)="onSaveChanges()">Salvar</button>
+    </div>
+  </ng-container>
+
   <div *ngIf="!isLoading$ && !hasResults">
     <div>
       <h6>Nenhum item encontrado.</h6>
