@@ -33,6 +33,7 @@ export class PatientState {
           new Entities['Patient'].FetchAllPatientsSuccess(response)
         );
       }),
+      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingFalse())),
       catchError((error) => {
         return of(
           ctx.dispatch(
@@ -51,8 +52,6 @@ export class PatientState {
       ...state,
       fields: { ...state.fields, ...action.payload.fields },
     });
-
-    return ctx.dispatch(new Entities['Patient'].SetLoadingFalse());
   }
 
   @Action(Entities['Patient'].PatchPatientFields)

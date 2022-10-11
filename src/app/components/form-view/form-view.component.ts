@@ -1,4 +1,14 @@
-import { combineLatest, first, map, Observable, switchMap, tap } from 'rxjs';
+import {
+  combineLatest,
+  first,
+  iif,
+  map,
+  mergeMap,
+  Observable,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import {
   ApplicationRef,
   Component,
@@ -32,11 +42,13 @@ export class FormViewComponent implements OnInit {
   result$: Observable<any> = this.store
     .select((state: any) => state[this.entity].results)
     .pipe(
-      map((results) => {
-        return this.isEditMode
-          ? results.find((result: any) => result.uuid === this.entityId)
-          : {};
-      })
+      mergeMap((results) =>
+        iif(
+          () => this.isEditMode,
+          of(results.find((result: any) => result.uuid === this.entityId)),
+          of({})
+        )
+      )
     );
 
   fields$: Observable<any> = this.store.select(
@@ -66,8 +78,10 @@ export class FormViewComponent implements OnInit {
     this.appRef.isStable
       .pipe(
         first((stable) => stable),
-        map(() => {
-          this.isCreateMode ? this.setUpCreateMode() : this.setUpEditMode();
+        switchMap(() => {
+          return this.isCreateMode
+            ? this.setUpCreateMode()
+            : this.setUpEditMode();
         })
       )
       .subscribe();
@@ -106,17 +120,15 @@ export class FormViewComponent implements OnInit {
 
   setUpEditMode() {
     //TODO create an combineLatest to routeParams and user UUID
-    this.route.params
-      .pipe(
-        tap(({ id }) => (this.entityId = id)),
-        map(({ id }) => id),
-        switchMap((entityId) =>
-          this.store.dispatch(
-            new Entities[this.entity as EntityKey].FetchPatientById(entityId)
-          )
+    return this.route.params.pipe(
+      tap(({ id }) => (this.entityId = id)),
+      map(({ id }) => id),
+      switchMap((entityId) =>
+        this.store.dispatch(
+          new Entities[this.entity as EntityKey].FetchPatientById(entityId)
         )
       )
-      .subscribe();
+    );
   }
 
   get isEditMode() {

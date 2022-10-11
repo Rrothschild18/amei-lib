@@ -16,4 +16,5 @@ export interface Patient {
   city: string;
   state: string;
   games: string;
+  country: string;
 }

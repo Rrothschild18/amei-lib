@@ -11,7 +11,6 @@ import {
   Observable,
   of,
   switchMap,
-  take,
   tap,
 } from 'rxjs';
 import {
@@ -78,6 +77,7 @@ export class PatientFormComponent implements OnInit {
     });
 
     this.fetchNewGamesOptions();
+    this.fetchNewCountryOptions();
   }
 
   get mode() {
@@ -120,6 +120,7 @@ export class PatientFormComponent implements OnInit {
       'phone',
       'birthDate',
       'games',
+      'country',
     ];
   }
 
@@ -151,6 +152,9 @@ export class PatientFormComponent implements OnInit {
         lg: 6,
       },
       games: {
+        lg: 6,
+      },
+      country: {
         lg: 6,
       },
     };
@@ -320,23 +324,30 @@ export class PatientFormComponent implements OnInit {
 
   fetchNewGamesOptions() {
     this.patient$
-      .pipe(
-        first((patient) => !!Object.keys(patient.fields).length),
-        map((patient) => patient.isLoading),
-        filter((isLoading) => !isLoading)
-      )
+      .pipe(first((patient) => patient.isLoading))
       .subscribe(() => this.fetchNewGames());
   }
 
   fetchNewGames() {
-    this.http
-      .get('http://localhost:3000/games')
-      .pipe(take(1))
-      .subscribe((games) => {
-        this.store.dispatch(
-          new Entities['Patient'].PatchPatientFields({ games: { ...games } })
-        );
-      });
+    this.http.get('http://localhost:3000/games').subscribe((games) => {
+      this.store.dispatch(
+        new Entities['Patient'].PatchPatientFields({ games: { ...games } })
+      );
+    });
+  }
+
+  fetchNewCountryOptions() {
+    this.patient$
+      .pipe(first((patient) => patient.isLoading))
+      .subscribe(() => this.fetchNewCountries());
+  }
+
+  fetchNewCountries() {
+    this.http.get('http://localhost:3000/country').subscribe((country) => {
+      this.store.dispatch(
+        new Entities['Patient'].PatchPatientFields({ country: { ...country } })
+      );
+    });
   }
 
   /* Create an helper at formService for error messages**/
