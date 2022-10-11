@@ -41,4 +41,12 @@ export class ListViewService {
   CreateEntity(entityName: string, entity: any): Observable<any> {
     return this.http.post(`${this.baseURL}/${entityName}`, entity);
   }
+
+  PatchEntity(
+    entityName: string,
+    entity: any,
+    entityId: string
+  ): Observable<any> {
+    return this.http.patch(`${this.baseURL}/${entityName}/${entityId}`, entity);
+  }
 }

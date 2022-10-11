@@ -22,7 +22,7 @@
     [ngTemplateOutlet]="renderBodySlot()"
     [ngTemplateOutletContext]="{
       fields: fields$ | async,
-      results: result$ | async,
+      result: result$ | async,
       formStore: formStoreChange
     }"
   ></ng-template>

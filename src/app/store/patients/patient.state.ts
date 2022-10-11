@@ -11,8 +11,8 @@ const PATIENTS_STATE_TOKEN = new StateToken<any>('Patient');
 @State<PatientStateModel>({
   name: PATIENTS_STATE_TOKEN,
   defaults: {
-    results: [],
     fields: {},
+    results: [],
     isLoading: false,
   },
 })
@@ -27,7 +27,7 @@ export class PatientState {
   @Action(Entities['Patient'].FetchAllEntities)
   fetchAll(ctx: StateContext<PatientStateModel>) {
     return this.ls.FetchAllEntities(this.entityName).pipe(
-      tap(() => new Entities['Patient'].SetLoadingTrue()),
+      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingTrue())),
       map((response: EntityPayload) => {
         return ctx.dispatch(
           new Entities['Patient'].FetchAllPatientsSuccess(response)
@@ -39,8 +39,7 @@ export class PatientState {
             new Entities['Patient'].FetchAllPatientsFailed({ error })
           )
         );
-      }),
-      tap(() => new Entities['Patient'].SetLoadingFalse())
+      })
     );
   }
 
@@ -50,10 +49,10 @@ export class PatientState {
 
     ctx.setState({
       ...state,
-      ...action.payload,
+      fields: { ...state.fields, ...action.payload.fields },
     });
 
-    return new Entities['Patient'].SetLoadingFalse();
+    return ctx.dispatch(new Entities['Patient'].SetLoadingFalse());
   }
 
   @Action(Entities['Patient'].PatchPatientFields)
@@ -67,23 +66,21 @@ export class PatientState {
   }
 
   @Action(Entities['Patient'].SetLoadingTrue)
-  SetLoadingTrue(ctx: StateContext<PatientStateModel>, action: any) {
+  SetLoadingTrue(ctx: StateContext<PatientStateModel>) {
     const state = ctx.getState();
 
-    ctx.setState({
+    ctx.patchState({
       ...state,
-      ...action.payload,
       isLoading: true,
     });
   }
 
   @Action(Entities['Patient'].SetLoadingFalse)
-  SetLoadingFalse(ctx: StateContext<PatientStateModel>, action: any) {
+  SetLoadingFalse(ctx: StateContext<PatientStateModel>) {
     const state = ctx.getState();
 
-    ctx.setState({
+    ctx.patchState({
       ...state,
-      ...action.payload,
       isLoading: false,
     });
   }
@@ -91,22 +88,24 @@ export class PatientState {
   @Action(Entities['Patient'].FetchPatientById)
   FetchPatientById(ctx: StateContext<PatientStateModel>, action: any) {
     const patientId = action.payload;
-    debugger;
+    const state = ctx.getState();
+
     return this.ls.FetchEntityById(this.entityName, patientId).pipe(
-      tap(() => new Entities['Patient'].SetLoadingTrue()),
+      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingTrue())),
       map((response: EntityPayload) => {
+        const patientById = response.results.find(
+          (result) => result['uuid'] === patientId
+        );
+
         const formattedPayload = {
           fields: { ...response.fields },
-          results: response.results.find(
-            (result) => result['uuid'] === patientId
-          ),
+          results: [...state.results, patientById],
         } as EntityPayload;
 
         return ctx.dispatch(
           new Entities['Patient'].FetchPatientByIdSuccess(formattedPayload)
         );
       }),
-      tap(() => new Entities['Patient'].SetLoadingFalse()),
       catchError((error) => {
         return of(
           ctx.dispatch(
@@ -114,7 +113,7 @@ export class PatientState {
           )
         );
       }),
-      tap(() => new Entities['Patient'].SetLoadingFalse())
+      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingFalse()))
     );
   }
 
@@ -132,7 +131,7 @@ export class PatientState {
       ...action.payload,
     });
 
-    return new Entities['Patient'].SetLoadingFalse();
+    return ctx.dispatch(new Entities['Patient'].SetLoadingFalse());
   }
 
   @Action(Entities['Patient'].CreateEntity)
@@ -140,7 +139,7 @@ export class PatientState {
     const patientToAdd = action.payload;
 
     return this.ls.CreateEntity(this.entityName, patientToAdd).pipe(
-      tap(() => new Entities['Patient'].SetLoadingTrue()),
+      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingTrue())),
       map((response: PatientApiSuccessResponse) =>
         ctx.dispatch(new Entities['Patient'].AddPatientSuccess(response))
       ),
@@ -149,7 +148,7 @@ export class PatientState {
           ctx.dispatch(new Entities['Patient'].AddPatientError({ error }))
         );
       }),
-      tap(() => new Entities['Patient'].SetLoadingFalse())
+      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingFalse()))
     );
   }
 
@@ -163,7 +162,49 @@ export class PatientState {
       ...state,
       results: [...state.results, patient],
     });
-
-    return of(patient);
   }
+
+  @Action(Entities['Patient'].PatchEntity)
+  PatchPatient(ctx: StateContext<PatientStateModel>, action: any) {
+    const patientToAdd = action.payload.entityPayload;
+    const uuid = action.payload.entityId;
+
+    return this.ls.PatchEntity(this.entityName, patientToAdd, uuid).pipe(
+      tap(() => new Entities['Patient'].SetLoadingTrue()),
+      map((response: PatientApiSuccessResponse) =>
+        ctx.dispatch(new Entities['Patient'].PatchPatientSuccess(patientToAdd))
+      ),
+      catchError((error) => {
+        return of(
+          ctx.dispatch(new Entities['Patient'].PatchPatientError({ error }))
+        );
+      }),
+      tap(() => new Entities['Patient'].SetLoadingFalse())
+    );
+  }
+
+  @Action(Entities['Patient'].PatchPatientSuccess)
+  PatchPatientSuccess(ctx: StateContext<PatientStateModel>, action: any) {
+    const updatedPatient = action.payload;
+    const state = ctx.getState();
+    debugger;
+
+    const patient = state.results.find(
+      (patient) => patient.uuid === updatedPatient.uuid
+    );
+
+    if (patient) {
+      const indexOf = state.results.indexOf(patient);
+      state.results.splice(indexOf, 1);
+    }
+    debugger;
+
+    ctx.patchState({
+      ...state,
+      results: [...state.results, updatedPatient],
+    });
+  }
+
+  @Action(Entities['Patient'].PatchPatientSuccess)
+  PatchPatientError(ctx: StateContext<PatientStateModel>, action: any) {}
 }

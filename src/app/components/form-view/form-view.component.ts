@@ -1,4 +1,4 @@
-import { combineLatest, first, map, Observable, switchMap } from 'rxjs';
+import { combineLatest, first, map, Observable, switchMap, tap } from 'rxjs';
 import {
   ApplicationRef,
   Component,
@@ -26,9 +26,18 @@ export class FormViewComponent implements OnInit {
   @ContentChild('header') header!: TemplateRef<unknown>;
   @ContentChild('body') body!: TemplateRef<unknown>;
 
-  result$: Observable<any> = this.store.select(
-    (state: any) => state[this.entity].results
-  );
+  /** Probably is possible to prevent this observable to Run at createMode
+   * once there`s no result do be displayed, but it needs to run at EditMode
+   */
+  result$: Observable<any> = this.store
+    .select((state: any) => state[this.entity].results)
+    .pipe(
+      map((results) => {
+        return this.isEditMode
+          ? results.find((result: any) => result.uuid === this.entityId)
+          : {};
+      })
+    );
 
   fields$: Observable<any> = this.store.select(
     (state: any) => state[this.entity].fields
@@ -37,6 +46,8 @@ export class FormViewComponent implements OnInit {
   isLoading$: Observable<any> = this.store.select(
     (state: any) => state[this.entity].isLoading
   );
+
+  entityId!: string;
 
   values: any = {};
 
@@ -97,6 +108,7 @@ export class FormViewComponent implements OnInit {
     //TODO create an combineLatest to routeParams and user UUID
     this.route.params
       .pipe(
+        tap(({ id }) => (this.entityId = id)),
         map(({ id }) => id),
         switchMap((entityId) =>
           this.store.dispatch(
@@ -134,16 +146,21 @@ export class FormViewComponent implements OnInit {
   onSaveChanges() {
     if (this.isCreateMode) {
       //TODO check all if forms are valid before submit
-      this.store
-        .dispatch(
-          new Entities[this.entity as EntityKey].CreateEntity(this.values)
-        )
-        .subscribe((v) => console.log({ patientFromStore: v }));
+      this.store.dispatch(
+        new Entities[this.entity as EntityKey].CreateEntity(this.values)
+      );
 
       return;
     }
 
     if (this.isEditMode) {
+      this.store.dispatch(
+        new Entities[this.entity as EntityKey].PatchEntity({
+          entityPayload: this.values,
+          entityId: this.entityId,
+        })
+      );
+
       return;
     }
   }

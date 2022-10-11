@@ -1,6 +1,7 @@
 import { EntityFields } from '../entities/entities.model';
 
 export interface Patient {
+  uuid: string;
   isActive: boolean;
   name: string;
   lastName: string;

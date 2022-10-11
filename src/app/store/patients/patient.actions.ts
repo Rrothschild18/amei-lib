@@ -18,6 +18,7 @@ export const PatientActions = {
     constructor(public payload: { error: any }) {}
   },
 
+  /* This actions might return only Fields at CreateMode **/
   FetchAllEntities: class FetchAllEntities {
     static readonly type = '[Patient List] Fetch All Patients';
   },
@@ -57,5 +58,22 @@ export const PatientActions = {
 
   FetchPatientByIdError: class FetchPatientByIdError {
     static readonly type = '[Patient] Fetch Patient by Id Error';
+  },
+
+  /** Patch patient */
+  PatchEntity: class PatchPatient {
+    static readonly type = '[Patient] Patch Patient';
+    constructor(
+      public payload: { entityPayload: EntityPayload; entityId: string }
+    ) {}
+  },
+
+  PatchPatientSuccess: class PatchPatientSuccess {
+    static readonly type = '[Patient] Patch Patient Success';
+    constructor(public payload: EntityPayload) {}
+  },
+
+  PatchPatientError: class PatchPatientError {
+    static readonly type = '[Patient] Patch Patient Error';
   },
 };

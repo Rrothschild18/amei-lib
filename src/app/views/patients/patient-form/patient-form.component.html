@@ -29,9 +29,10 @@
     <ng-template
       #body
       let-fields="fields"
-      let-results="results"
+      let-result="result"
       let-formStore="formStore"
     >
+      <pre>{{ result | json }}</pre>
       <div class="container h-100 d-flex flex-column align-items-center mb-5">
         <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
           <div class="row">

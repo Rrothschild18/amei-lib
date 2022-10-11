@@ -1,4 +1,5 @@
 export interface Patient {
+  uuid: string;
   isActive: boolean;
   name: string;
   lastName: string;

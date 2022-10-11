@@ -82,7 +82,7 @@ export class PatientFormComponent implements OnInit {
 
   get mode() {
     return this.route.url.pipe(
-      // tap((url) => console.log(url)),
+      // tap((url) => this.pageMode = url[url.length - 1].path === 'edit' ? 'edit' : 'create')),
       map((url) => (url[url.length - 1].path === 'edit' ? 'edit' : 'create')),
       switchMap((mode) => of(mode))
     );
@@ -111,6 +111,7 @@ export class PatientFormComponent implements OnInit {
 
   get patientPersonalFields(): FieldsArrayName<Patient> {
     return [
+      'uuid',
       'isActive',
       'name',
       'lastName',
