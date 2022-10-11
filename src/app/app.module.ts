@@ -27,6 +27,7 @@ import { ListTestComponent } from './components/list-test/list-test.component';
 import { NgTemplateNameDirective } from './directives/ng-template-name.directive';
 import { NestedFieldsComponent } from './components/nested-fields/nested-fields.component';
 import { ProfessionalFormComponent } from './views/professionals/professionals-form/professional-form.component';
+import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { ProfessionalFormComponent } from './views/professionals/professionals-f
     NgxsModule.forRoot([PatientState, ProfessionalState], {
       developmentMode: true,
     }),
+    NgxsLoggerPluginModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent],
