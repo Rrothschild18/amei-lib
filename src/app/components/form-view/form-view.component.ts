@@ -158,23 +158,17 @@ export class FormViewComponent implements OnInit {
   onSaveChanges() {
     if (this.isCreateMode) {
       //TODO check all if forms are valid before submit
-      this.store.dispatch(
+      return this.store.dispatch(
         new Entities[this.entity as EntityKey].CreateEntity(this.values)
       );
-
-      return;
     }
 
-    if (this.isEditMode) {
-      this.store.dispatch(
-        new Entities[this.entity as EntityKey].PatchEntity({
-          entityPayload: this.values,
-          entityId: this.entityId,
-        })
-      );
-
-      return;
-    }
+    return this.store.dispatch(
+      new Entities[this.entity as EntityKey].PatchEntity({
+        entityPayload: this.values,
+        entityId: this.entityId,
+      })
+    );
   }
 
   onCancel() {}

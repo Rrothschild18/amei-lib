@@ -2,7 +2,7 @@ import { Entities } from '../entities/entities.namespace';
 import { ListViewService } from './../../services/list-view.service';
 import { Action, State, StateContext, StateToken, Store } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, map, of, tap } from 'rxjs';
+import { catchError, delay, map, of, tap } from 'rxjs';
 import { EntityPayload } from '../entities/entities.model';
 import { PatientStateModel, PatientApiSuccessResponse } from './patient.model';
 
@@ -123,8 +123,6 @@ export class PatientState {
   ) {
     const state = ctx.getState();
 
-    debugger;
-
     ctx.setState({
       ...state,
       ...action.payload,
@@ -146,8 +144,7 @@ export class PatientState {
         return of(
           ctx.dispatch(new Entities['Patient'].AddPatientError({ error }))
         );
-      }),
-      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingFalse()))
+      })
     );
   }
 
@@ -161,15 +158,21 @@ export class PatientState {
       ...state,
       results: [...state.results, patient],
     });
+
+    ctx.dispatch(new Entities['Patient'].SetLoadingFalse());
+
+    return of(patient);
   }
 
   @Action(Entities['Patient'].PatchEntity)
   PatchPatient(ctx: StateContext<PatientStateModel>, action: any) {
+    ctx.dispatch(new Entities['Patient'].SetLoadingTrue());
+
     const patientToAdd = action.payload.entityPayload;
     const uuid = action.payload.entityId;
 
     return this.ls.PatchEntity(this.entityName, patientToAdd, uuid).pipe(
-      tap(() => new Entities['Patient'].SetLoadingTrue()),
+      delay(3000),
       map((response: PatientApiSuccessResponse) =>
         ctx.dispatch(new Entities['Patient'].PatchPatientSuccess(patientToAdd))
       ),
@@ -177,31 +180,38 @@ export class PatientState {
         return of(
           ctx.dispatch(new Entities['Patient'].PatchPatientError({ error }))
         );
-      }),
-      tap(() => new Entities['Patient'].SetLoadingFalse())
+      })
     );
   }
 
   @Action(Entities['Patient'].PatchPatientSuccess)
   PatchPatientSuccess(ctx: StateContext<PatientStateModel>, action: any) {
     const updatedPatient = action.payload;
-    const state = ctx.getState();
-    debugger;
+    const state = { ...ctx.getState() };
 
     const patient = state.results.find(
       (patient) => patient.uuid === updatedPatient.uuid
     );
 
-    if (patient) {
-      const indexOf = state.results.indexOf(patient);
-      state.results.splice(indexOf, 1);
-    }
-    debugger;
+    const beforeUpdateResults = state.results.filter(
+      (patient) => patient.uuid !== updatedPatient.uuid
+    );
 
-    ctx.patchState({
-      ...state,
-      results: [...state.results, updatedPatient],
-    });
+    if (patient) {
+      ctx.patchState({
+        ...state,
+        results: [...beforeUpdateResults, updatedPatient],
+      });
+    } else {
+      ctx.patchState({
+        ...state,
+        results: [...state.results, updatedPatient],
+      });
+    }
+
+    ctx.dispatch(new Entities['Patient'].SetLoadingFalse());
+
+    return of(patient);
   }
 
   @Action(Entities['Patient'].PatchPatientSuccess)
