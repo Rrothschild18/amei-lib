@@ -23,6 +23,7 @@ import { Store } from '@ngxs/store';
 import { Entities } from 'src/app/store/entities/entities.namespace';
 import { FormValue, FormViewService } from './form-view.service';
 import { ActivatedRoute } from '@angular/router';
+import { Dispatch } from '@ngxs-labs/dispatch-decorator';
 
 type EntityKey = keyof typeof Entities;
 
@@ -40,6 +41,12 @@ export class FormViewComponent implements OnInit {
   @Output('fetchSuccess') fetchSuccess = new EventEmitter<
     Observable<FormValue>
   >();
+
+  @Dispatch() protected DFieldsCreateMode = () =>
+    new Entities[this.entity as EntityKey].FetchEntityFieldsForCreateMode();
+
+  @Dispatch() protected DFieldsEditMode = (entityId: string) =>
+    new Entities[this.entity as EntityKey].FetchEntityById(entityId);
 
   // @Output('formValues') formValues = new EventEmitter<
   //   BehaviorSubject<FormValue>
@@ -87,11 +94,11 @@ export class FormViewComponent implements OnInit {
     this.appRef.isStable
       .pipe(
         first((stable) => stable),
-        switchMap(() => {
-          return this.isCreateMode
-            ? this.setUpCreateMode()
-            : this.setUpEditMode();
-        })
+        switchMap(() =>
+          this.isCreateMode
+            ? of(this.DFieldsCreateMode())
+            : this.setUpEditMode()
+        )
       )
       .subscribe();
 
@@ -121,11 +128,9 @@ export class FormViewComponent implements OnInit {
 
   ngOnDestroy() {}
 
-  setUpCreateMode() {
-    return this.store.dispatch(
-      new Entities[this.entity as EntityKey].FetchEntityFieldsForCreateMode()
-    );
-  }
+  // setUpCreateMode() {
+  //   return this.DFieldsCreateMode();
+  // }
 
   setUpEditMode() {
     //TODO create an combineLatest to routeParams and user UUID
@@ -133,11 +138,7 @@ export class FormViewComponent implements OnInit {
     return this.route.params.pipe(
       tap(({ id }) => (this.entityId = id)),
       map(({ id }) => id),
-      switchMap((entityId) =>
-        this.store.dispatch(
-          new Entities[this.entity as EntityKey].FetchPatientById(entityId)
-        )
-      )
+      switchMap((entityId) => of(this.DFieldsEditMode(entityId)))
     );
   }
 

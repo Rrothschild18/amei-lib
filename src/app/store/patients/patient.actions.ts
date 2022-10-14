@@ -3,7 +3,7 @@ import { EntityPayload } from '../entities/entities.model';
 import { Patient, PatientApiSuccessResponse } from './patient.model';
 
 export const PatientActions = {
-  CreateEntity: class AddPatient {
+  CreateEntity: class CreateEntity {
     static readonly type = '[Patient] Add Patient';
     constructor(public payload: Patient) {}
   },
@@ -40,20 +40,20 @@ export const PatientActions = {
   },
 
   SetLoadingTrue: class SetLoadingTrue {
-    static readonly type = '[Patients Loading] Patients isLoading True ';
+    static readonly type = '[Patient Loading] Patients isLoading True ';
   },
 
   SetLoadingFalse: class SetLoadingFalse {
-    static readonly type = '[Patients Loading] Patients isLoading False ';
+    static readonly type = '[Patient Loading] Patients isLoading False ';
   },
 
-  FetchPatientById: class FetchPatientById {
+  FetchEntityById: class FetchEntityById {
     static readonly type = '[Patient] Fetch Patient by Id';
     constructor(public payload: string) {}
   },
 
-  FetchPatientByIdSuccess: class FetchPatientByIdSuccess {
-    static readonly type = '[Patient] Fetch Patient by Id Success';
+  FetchEntityByIdSuccess: class FetchEntityByIdSuccess {
+    static readonly type = '[Patient Create] Get Patient by Id Success';
     constructor(public payload: EntityPayload) {}
   },
 

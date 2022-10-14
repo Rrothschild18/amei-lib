@@ -1,4 +1,4 @@
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PatientStateModel } from './../../../store/patients/patient.model';
 import { Entities } from './../../../store/entities/entities.namespace';
 import { HttpClient } from '@angular/common/http';
@@ -63,6 +63,7 @@ export class PatientFormComponent implements OnInit {
     private cdRef: ChangeDetectorRef,
     private http: HttpClient,
     private route: ActivatedRoute,
+    private router: Router,
     private store: Store,
     private actions$: Actions
   ) {}
@@ -327,10 +328,9 @@ export class PatientFormComponent implements OnInit {
   fetchAllNewOptions() {
     this.patient$
       .pipe(
-        map((v) => {
-          return v;
-        }),
         first((patient) => patient.isLoading),
+        /** Delay necessario para nao sobrescrever os dispatch dos Fields antes... */
+        delay(1000),
         switchMap(() => {
           return forkJoin({
             games: this.http.get('http://localhost:3000/games'),
@@ -407,6 +407,6 @@ export class PatientFormComponent implements OnInit {
   }
 
   onFetchSuccess(storeResponse: Observable<FormValue>) {
-    storeResponse.subscribe((v) => console.log({ v }));
+    storeResponse.pipe(tap(() => this.router.navigate(['/']))).subscribe();
   }
 }

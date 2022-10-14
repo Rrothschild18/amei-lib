@@ -2,7 +2,7 @@ import { Entities } from '../entities/entities.namespace';
 import { ListViewService } from './../../services/list-view.service';
 import { Action, State, StateContext, StateToken } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, map, of, tap } from 'rxjs';
+import { catchError, firstValueFrom, map, of, tap } from 'rxjs';
 import { EntityPayload } from '../entities/entities.model';
 import { PatientStateModel, PatientApiSuccessResponse } from './patient.model';
 
@@ -25,9 +25,10 @@ export class PatientState {
   }
 
   @Action(Entities['Patient'].FetchEntityFieldsForCreateMode)
-  fetchFields(ctx: StateContext<PatientStateModel>) {
+  fetchPatientFields(ctx: StateContext<PatientStateModel>) {
+    ctx.dispatch(new Entities['Patient'].SetLoadingTrue());
+
     return this.ls.FetchAllEntities(this.entityName).pipe(
-      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingTrue())),
       map((response: EntityPayload) => {
         return ctx.dispatch(
           new Entities['Patient'].FetchEntityFieldsSuccess(response)
@@ -84,13 +85,13 @@ export class PatientState {
     });
   }
 
-  @Action(Entities['Patient'].FetchPatientById)
+  @Action(Entities['Patient'].FetchEntityById)
   FetchPatientById(ctx: StateContext<PatientStateModel>, action: any) {
+    ctx.dispatch(new Entities['Patient'].SetLoadingTrue());
     const patientId = action.payload;
     const state = ctx.getState();
 
     return this.ls.FetchEntityById(this.entityName, patientId).pipe(
-      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingTrue())),
       map((response: EntityPayload) => {
         const patientById = response.results.find(
           (result) => result['uuid'] === patientId
@@ -101,10 +102,11 @@ export class PatientState {
           results: [...state.results, patientById],
         } as EntityPayload;
 
-        return ctx.dispatch(
-          new Entities['Patient'].FetchPatientByIdSuccess(formattedPayload)
-        );
+        return formattedPayload;
       }),
+      tap((response) =>
+        ctx.dispatch(new Entities['Patient'].FetchEntityByIdSuccess(response))
+      ),
       tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingFalse())),
       catchError((error) => {
         return of(
@@ -116,7 +118,7 @@ export class PatientState {
     );
   }
 
-  @Action(Entities['Patient'].FetchPatientByIdSuccess)
+  @Action(Entities['Patient'].FetchEntityByIdSuccess)
   FetchPatientByIdSuccess(
     ctx: StateContext<PatientStateModel>,
     action: typeof Entities['Patient']['FetchPatientById']
@@ -131,13 +133,15 @@ export class PatientState {
 
   @Action(Entities['Patient'].CreateEntity)
   AddPatient(ctx: StateContext<PatientStateModel>, action: any) {
+    ctx.dispatch(new Entities['Patient'].SetLoadingTrue());
+
     const patientToAdd = action.payload;
 
     return this.ls.CreateEntity(this.entityName, patientToAdd).pipe(
-      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingTrue())),
       map((response: PatientApiSuccessResponse) =>
         ctx.dispatch(new Entities['Patient'].AddPatientSuccess(response))
       ),
+      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingFalse())),
       catchError((error) => {
         return of(
           ctx.dispatch(new Entities['Patient'].AddPatientError({ error }))
