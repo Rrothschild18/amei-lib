@@ -13,8 +13,10 @@ import {
   ApplicationRef,
   Component,
   ContentChild,
+  EventEmitter,
   Input,
   OnInit,
+  Output,
   TemplateRef,
 } from '@angular/core';
 import { Store } from '@ngxs/store';
@@ -35,6 +37,13 @@ export class FormViewComponent implements OnInit {
   @Input('useActions') useActions: boolean = true;
   @ContentChild('header') header!: TemplateRef<unknown>;
   @ContentChild('body') body!: TemplateRef<unknown>;
+  @Output('fetchSuccess') fetchSuccess = new EventEmitter<
+    Observable<FormValue>
+  >();
+
+  // @Output('formValues') formValues = new EventEmitter<
+  //   BehaviorSubject<FormValue>
+  // >();
 
   /** Probably is possible to prevent this observable to Run at createMode
    * once there`s no result do be displayed, but it needs to run at EditMode
@@ -114,12 +123,13 @@ export class FormViewComponent implements OnInit {
 
   setUpCreateMode() {
     return this.store.dispatch(
-      new Entities[this.entity as EntityKey].FetchAllEntities()
+      new Entities[this.entity as EntityKey].FetchEntityFieldsForCreateMode()
     );
   }
 
   setUpEditMode() {
     //TODO create an combineLatest to routeParams and user UUID
+
     return this.route.params.pipe(
       tap(({ id }) => (this.entityId = id)),
       map(({ id }) => id),
@@ -158,17 +168,42 @@ export class FormViewComponent implements OnInit {
   onSaveChanges() {
     if (this.isCreateMode) {
       //TODO check all if forms are valid before submit
-      return this.store.dispatch(
-        new Entities[this.entity as EntityKey].CreateEntity(this.values)
+      this.fetchSuccess.next(
+        this.store
+          .dispatch(
+            new Entities[this.entity as EntityKey].CreateEntity(this.values)
+          )
+          .pipe(
+            map((storeEntity) =>
+              storeEntity[this.entity as EntityKey].results.find(
+                (result: any) => result.uuid === this.entityId
+              )
+            )
+          )
       );
+
+      return;
     }
 
-    return this.store.dispatch(
-      new Entities[this.entity as EntityKey].PatchEntity({
-        entityPayload: this.values,
-        entityId: this.entityId,
-      })
+    //TODO check all if forms are valid before submit
+    this.fetchSuccess.next(
+      this.store
+        .dispatch(
+          new Entities[this.entity as EntityKey].PatchEntity({
+            entityPayload: this.values,
+            entityId: this.entityId,
+          })
+        )
+        .pipe(
+          map((storeEntity) =>
+            storeEntity[this.entity as EntityKey].results.find(
+              (result: any) => result.uuid === this.entityId
+            )
+          )
+        )
     );
+
+    return;
   }
 
   onCancel() {}

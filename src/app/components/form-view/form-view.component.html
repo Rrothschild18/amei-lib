@@ -7,8 +7,11 @@
     <h6>FormViewValues</h6>
     {{ values | json }}
   </pre> -->
-  <div *ngIf="isLoading$ | async" class="">
-    <mat-spinner class="spinner"></mat-spinner>
+  <div
+    *ngIf="isLoading$ | async"
+    class="position-absolute top-50 start-50 translate-middle"
+  >
+    <mat-spinner class="spinner" diameter="100"></mat-spinner>
   </div>
 
   <ng-template

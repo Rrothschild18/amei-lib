@@ -7,6 +7,7 @@ import {
   delay,
   filter,
   first,
+  forkJoin,
   map,
   Observable,
   of,
@@ -32,7 +33,7 @@ import {
 } from 'src/app/models';
 import { Patient } from 'src/app/interfaces';
 import { FormGeneratorComponent } from 'src/app/components/form-generator/form-generator.component';
-import { Select, Store } from '@ngxs/store';
+import { Actions, Select, Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-patient-form',
@@ -45,8 +46,6 @@ export class PatientFormComponent implements OnInit {
   componentStore$: Observable<FormValue> = this.formService.formValues;
 
   @Select('Patient') patient$!: Observable<PatientStateModel>;
-
-  fields: any;
 
   fetchingCep: boolean = false;
 
@@ -64,7 +63,8 @@ export class PatientFormComponent implements OnInit {
     private cdRef: ChangeDetectorRef,
     private http: HttpClient,
     private route: ActivatedRoute,
-    private store: Store
+    private store: Store,
+    private actions$: Actions
   ) {}
 
   ngOnInit(): void {
@@ -76,8 +76,8 @@ export class PatientFormComponent implements OnInit {
       return (this.values = { ...this.values, [fieldName]: value });
     });
 
-    this.fetchNewGamesOptions();
-    this.fetchNewCountryOptions();
+    // this.fetchNewGamesOptions();
+    // this.fetchNewCountryOptions();
   }
 
   get mode() {
@@ -90,6 +90,7 @@ export class PatientFormComponent implements OnInit {
 
   ngAfterViewInit() {
     this.handleCepChange();
+    this.fetchAllNewOptions();
   }
 
   /* Bypass until i understand how to 
@@ -322,6 +323,37 @@ export class PatientFormComponent implements OnInit {
     cityFieldRef?.disable({ onlySelf: true, emitEvent: true });
   }
 
+  /** Jeito correto de bater as options aparentemente... */
+  fetchAllNewOptions() {
+    this.patient$
+      .pipe(
+        map((v) => {
+          return v;
+        }),
+        first((patient) => patient.isLoading),
+        switchMap(() => {
+          return forkJoin({
+            games: this.http.get('http://localhost:3000/games'),
+            country: this.http.get('http://localhost:3000/country'),
+          });
+        }),
+
+        map(({ games, country }) =>
+          this.store.dispatch([
+            new Entities['Patient'].PatchPatientFields({ games: { ...games } }),
+            new Entities['Patient'].PatchPatientFields({
+              country: { ...country },
+            }),
+          ])
+        )
+      )
+      .subscribe();
+  }
+
+  //  * Jeito antigo que batia as options, as actions disparadas podiam ter
+  //  * tempo de resposta diferente e isso bugava o form
+  //  *
+
   fetchNewGamesOptions() {
     this.patient$
       .pipe(first((patient) => patient.isLoading))
@@ -350,6 +382,7 @@ export class PatientFormComponent implements OnInit {
     });
   }
 
+  //TODO
   /* Create an helper at formService for error messages**/
   showError(error: any) {
     if (error.required) return 'Este campo é obrigatório';
@@ -371,5 +404,9 @@ export class PatientFormComponent implements OnInit {
   onResetChanges() {
     this.personalForm.first.form.reset();
     this.additionalForm.first.form.reset();
+  }
+
+  onFetchSuccess(storeResponse: Observable<FormValue>) {
+    storeResponse.subscribe((v) => console.log({ v }));
   }
 }

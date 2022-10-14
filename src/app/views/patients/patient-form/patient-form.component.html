@@ -7,7 +7,11 @@
     <h6>URL</h6>
     {{ mode | async }} 
   </pre> -->
-  <app-form-view entity="Patient" [mode]="mode | async">
+  <app-form-view
+    entity="Patient"
+    [mode]="mode | async"
+    (fetchSuccess)="onFetchSuccess($event)"
+  >
     <ng-template #header>
       <div class="container">
         <div class="d-flex justify-content-between">
@@ -32,7 +36,8 @@
       let-result="result"
       let-formStore="formStore"
     >
-      <pre>{{ result | json }}</pre>
+      <!-- <pre>{{ result | json }}</pre>
+      <pre>{{ fields | json }}</pre> -->
       <div class="container h-100 d-flex flex-column align-items-center mb-5">
         <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
           <div class="row">

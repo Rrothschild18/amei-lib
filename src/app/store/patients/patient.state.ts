@@ -1,8 +1,8 @@
 import { Entities } from '../entities/entities.namespace';
 import { ListViewService } from './../../services/list-view.service';
-import { Action, State, StateContext, StateToken, Store } from '@ngxs/store';
+import { Action, State, StateContext, StateToken } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, delay, map, of, tap } from 'rxjs';
+import { catchError, map, of, tap } from 'rxjs';
 import { EntityPayload } from '../entities/entities.model';
 import { PatientStateModel, PatientApiSuccessResponse } from './patient.model';
 
@@ -24,13 +24,13 @@ export class PatientState {
     this.entityName = PATIENTS_STATE_TOKEN.getName();
   }
 
-  @Action(Entities['Patient'].FetchAllEntities)
-  fetchAll(ctx: StateContext<PatientStateModel>) {
+  @Action(Entities['Patient'].FetchEntityFieldsForCreateMode)
+  fetchFields(ctx: StateContext<PatientStateModel>) {
     return this.ls.FetchAllEntities(this.entityName).pipe(
       tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingTrue())),
       map((response: EntityPayload) => {
         return ctx.dispatch(
-          new Entities['Patient'].FetchAllPatientsSuccess(response)
+          new Entities['Patient'].FetchEntityFieldsSuccess(response)
         );
       }),
       tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingFalse())),
@@ -44,8 +44,8 @@ export class PatientState {
     );
   }
 
-  @Action(Entities['Patient'].FetchAllPatientsSuccess)
-  FetchAllPatientsSuccess(ctx: StateContext<PatientStateModel>, action: any) {
+  @Action(Entities['Patient'].FetchEntityFieldsSuccess)
+  fetchPatientFieldsSuccess(ctx: StateContext<PatientStateModel>, action: any) {
     const state = ctx.getState();
 
     ctx.setState({
@@ -105,14 +105,14 @@ export class PatientState {
           new Entities['Patient'].FetchPatientByIdSuccess(formattedPayload)
         );
       }),
+      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingFalse())),
       catchError((error) => {
         return of(
           ctx.dispatch(
             new Entities['Patient'].FetchAllPatientsFailed({ error })
           )
         );
-      }),
-      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingFalse()))
+      })
     );
   }
 
@@ -127,8 +127,6 @@ export class PatientState {
       ...state,
       ...action.payload,
     });
-
-    return ctx.dispatch(new Entities['Patient'].SetLoadingFalse());
   }
 
   @Action(Entities['Patient'].CreateEntity)
@@ -172,7 +170,6 @@ export class PatientState {
     const uuid = action.payload.entityId;
 
     return this.ls.PatchEntity(this.entityName, patientToAdd, uuid).pipe(
-      delay(3000),
       map((response: PatientApiSuccessResponse) =>
         ctx.dispatch(new Entities['Patient'].PatchPatientSuccess(patientToAdd))
       ),

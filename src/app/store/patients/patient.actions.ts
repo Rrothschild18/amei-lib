@@ -19,12 +19,13 @@ export const PatientActions = {
   },
 
   /* This actions might return only Fields at CreateMode **/
-  FetchAllEntities: class FetchAllEntities {
-    static readonly type = '[Patient List] Fetch All Patients';
+  FetchEntityFieldsForCreateMode: class FetchEntityFieldsForCreateMode {
+    static readonly type = '[Patient Form Create] Fetch Patients Fields';
   },
 
-  FetchAllPatientsSuccess: class FetchAllPatientsSuccess {
-    static readonly type = '[Patients List] Patients List Fetch Success';
+  FetchEntityFieldsSuccess: class FetchEntityFieldsSuccess {
+    static readonly type =
+      '[Patients Form Create] Fetch Patient Fields Success';
     constructor(public payload: EntityPayload) {}
   },
 
