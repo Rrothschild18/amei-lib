@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-patients-list',
@@ -8,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 export class PatientsListComponent implements OnInit {
   displayedColumns!: string[];
 
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {}
 
@@ -18,14 +19,14 @@ export class PatientsListComponent implements OnInit {
 
   toArrayFields(fields: any = {}): string[] {
     console.log(Object.keys(fields));
-    return Object.keys(fields);
+    return ['name', 'lastName', 'email', 'phone'];
   }
 
   patientColumns(): string[] {
-    return ['name', 'lastname', 'email', 'phone', 'gender', 'document'];
+    return ['name', 'lastName', 'email', 'phone', 'actions'];
   }
 
-  redirectToSingle(): string[] {
-    return ['name', 'lastname', 'email', 'phone', 'gender', 'document'];
+  redirectToEdit(uuid: string): void {
+    this.router.navigate([`/patients/${uuid}/edit`]);
   }
 }
