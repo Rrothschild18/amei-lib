@@ -4,8 +4,6 @@ import {
   ContentChild,
   TemplateRef,
   Input,
-  Output,
-  EventEmitter,
   ApplicationRef,
 } from '@angular/core';
 import { Store } from '@ngxs/store';
@@ -39,7 +37,6 @@ export class ListViewComponent implements OnInit {
 
   constructor(private store: Store, private appRef: ApplicationRef) {
     this.appRef.isStable.pipe(first((stable) => stable)).subscribe(() => {
-      type EntityKey = keyof typeof Entities;
       this.store.dispatch(
         new Entities[this.entity as EntityKey].FetchAllEntities()
       );
@@ -48,11 +45,11 @@ export class ListViewComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  hasBodySlot(): boolean {
+  get hasBodySlot(): boolean {
     return !!this.body;
   }
 
-  hasHeaderSlot(): boolean {
+  get hasHeaderSlot(): boolean {
     return !!this.header;
   }
 
@@ -60,11 +57,11 @@ export class ListViewComponent implements OnInit {
   //   return !!(this.results$ || []);
   // }
 
-  renderHeaderSlot(): TemplateRef<unknown> {
+  get renderHeaderSlot(): TemplateRef<unknown> {
     return this.header;
   }
 
-  renderBodySlot(): TemplateRef<unknown> {
+  get renderBodySlot(): TemplateRef<unknown> {
     return this.body;
   }
 }

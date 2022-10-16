@@ -9,8 +9,18 @@
       </div>
     </ng-template>
 
-    <ng-template #body let-fields="fields" let-results="results">
-      <table mat-table [dataSource]="results" class="w-100">
+    <ng-template
+      #body
+      let-fields="fields"
+      let-results="results"
+      let-isLoading="isLoading"
+    >
+      <table
+        mat-table
+        [dataSource]="results"
+        class="w-100"
+        *ngIf="results.length && !isLoading"
+      >
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Name</th>
           <td mat-cell *matCellDef="let element">

@@ -91,15 +91,33 @@ export class PatientState {
     const patientId = action.payload;
     const state = ctx.getState();
 
+    const patientById = state.results.find(
+      (result) => result['uuid'] === patientId
+    );
+
+    if (patientById) {
+      ctx.dispatch(new Entities['Patient'].SetLoadingFalse());
+      return;
+    }
+
     return this.ls.FetchEntityById(this.entityName, patientId).pipe(
       map((response: EntityPayload) => {
+        //Bypass Json-server to get response from PUT
         const patientById = response.results.find(
+          (result) => result['uuid'] === patientId
+        );
+
+        const patientByIdList = state.results.find(
           (result) => result['uuid'] === patientId
         );
 
         const formattedPayload = {
           fields: { ...response.fields },
-          results: [...state.results, patientById],
+          results: patientByIdList
+            ? state.results.map((result) =>
+                result.uuid !== patientByIdList?.uuid ? result : patientById
+              )
+            : [...state.results, patientById],
         } as EntityPayload;
 
         return formattedPayload;

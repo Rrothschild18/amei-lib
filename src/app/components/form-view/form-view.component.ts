@@ -42,15 +42,11 @@ export class FormViewComponent implements OnInit {
     Observable<FormValue>
   >();
 
-  @Dispatch() protected DFieldsCreateMode = () =>
+  @Dispatch() protected FieldsCreateMode = () =>
     new Entities[this.entity as EntityKey].FetchEntityFieldsForCreateMode();
 
-  @Dispatch() protected DFieldsEditMode = (entityId: string) =>
+  @Dispatch() protected FieldsEditMode = (entityId: string) =>
     new Entities[this.entity as EntityKey].FetchEntityById(entityId);
-
-  // @Output('formValues') formValues = new EventEmitter<
-  //   BehaviorSubject<FormValue>
-  // >();
 
   /** Probably is possible to prevent this observable to Run at createMode
    * once there`s no result do be displayed, but it needs to run at EditMode
@@ -61,7 +57,15 @@ export class FormViewComponent implements OnInit {
       mergeMap((results) =>
         iif(
           () => this.isEditMode,
-          of(results.find((result: any) => result.uuid === this.entityId)),
+          combineLatest([this.route.params, this.isLoading$]).pipe(
+            first(([params, isLoading]) => params['id'] && !isLoading),
+            map(([params]) =>
+              results.find(
+                (result: any) =>
+                  result.uuid === this.entityId || result.uuid === params['id']
+              )
+            )
+          ),
           of({})
         )
       )
@@ -95,9 +99,7 @@ export class FormViewComponent implements OnInit {
       .pipe(
         first((stable) => stable),
         switchMap(() =>
-          this.isCreateMode
-            ? of(this.DFieldsCreateMode())
-            : this.setUpEditMode()
+          this.isCreateMode ? of(this.FieldsCreateMode()) : this.setUpEditMode()
         )
       )
       .subscribe();
@@ -116,7 +118,7 @@ export class FormViewComponent implements OnInit {
       this.formService.formRefs
     ).pipe(
       first(([result, isLoading]) => !!result && !isLoading),
-      map(([result, isLoading, forms]) => {
+      map(([result, _, forms]) => {
         forms.forEach((form) => {
           form.form.patchValue(result);
         });
@@ -128,17 +130,13 @@ export class FormViewComponent implements OnInit {
 
   ngOnDestroy() {}
 
-  // setUpCreateMode() {
-  //   return this.DFieldsCreateMode();
-  // }
-
   setUpEditMode() {
     //TODO create an combineLatest to routeParams and user UUID
 
     return this.route.params.pipe(
       tap(({ id }) => (this.entityId = id)),
       map(({ id }) => id),
-      switchMap((entityId) => of(this.DFieldsEditMode(entityId)))
+      switchMap((entityId) => of(this.FieldsEditMode(entityId)))
     );
   }
 

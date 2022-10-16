@@ -7,17 +7,18 @@
   </div>
 
   <ng-template
-    *ngIf="hasHeaderSlot()"
-    [ngTemplateOutlet]="renderHeaderSlot()"
+    *ngIf="hasHeaderSlot"
+    [ngTemplateOutlet]="renderHeaderSlot"
     [ngTemplateOutletContext]="{ entity: 'Patients' }"
   ></ng-template>
 
   <ng-template
-    *ngIf="hasBodySlot()"
-    [ngTemplateOutlet]="renderBodySlot()"
+    *ngIf="hasBodySlot"
+    [ngTemplateOutlet]="renderBodySlot"
     [ngTemplateOutletContext]="{
       fields: fields$ | async,
-      results: results$ | async
+      results: results$ | async,
+      isLoading: isLoading$ | async
     }"
   ></ng-template>
 
