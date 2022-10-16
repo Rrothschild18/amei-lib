@@ -35,34 +35,42 @@ export class LayoutComponent implements OnInit {
   menuItens = [
     {
       name: 'Agenda',
+      linkTo: '/',
       iconName: 'event_available',
     },
     {
       name: 'Sala de espera',
+      linkTo: '/',
       iconName: 'timelapse',
     },
     {
       name: 'Pacientes',
+      linkTo: '/patients',
       iconName: 'people_alt',
     },
     {
       name: 'Financeiro',
+      linkTo: '/',
       iconName: 'monetization_on',
     },
     {
       name: 'Convênios',
+      linkTo: '/',
       iconName: 'medical_services',
     },
     {
       name: 'Laboratórios',
+      linkTo: '/',
       iconName: 'monetization_on',
     },
     {
       name: 'Cadastros',
+      linkTo: '/',
       iconName: 'lightbulbn',
     },
     {
       name: 'Relatórios',
+      linkTo: '/',
       iconName: 'description',
     },
   ];

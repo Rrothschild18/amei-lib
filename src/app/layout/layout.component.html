@@ -20,6 +20,7 @@
                 class="w-auto rounded-0 h-100 px-xxl-2 px-lg-2 px-sm-1"
                 mat-button
                 (click)="changeSideNavLinks()"
+                [routerLink]="menuItem.linkTo"
               >
                 <mat-icon class="fsize">{{ menuItem.iconName }}</mat-icon>
                 <span class="small"> {{ menuItem.name }}</span>

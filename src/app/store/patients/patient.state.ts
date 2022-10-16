@@ -215,6 +215,35 @@ export class PatientState {
     return of(patient);
   }
 
-  @Action(Entities['Patient'].PatchPatientSuccess)
-  PatchPatientError(ctx: StateContext<PatientStateModel>, action: any) {}
+  @Action(Entities['Patient'].FetchAllEntities)
+  fetchEntities(ctx: StateContext<PatientStateModel>) {
+    ctx.dispatch(new Entities['Patient'].SetLoadingTrue());
+
+    return this.ls.FetchAllEntities(this.entityName).pipe(
+      map((response: EntityPayload) => {
+        return ctx.dispatch(
+          new Entities['Patient'].FetchAllEntitiesSuccess(response)
+        );
+      }),
+      tap(() => ctx.dispatch(new Entities['Patient'].SetLoadingFalse())),
+      catchError((error) => {
+        return of(
+          ctx.dispatch(new Entities['Patient'].FetchAllEntitiesError({ error }))
+        );
+      })
+    );
+  }
+
+  @Action(Entities['Patient'].FetchAllEntitiesError)
+  fetchListError(ctx: StateContext<PatientStateModel>, action: any) {}
+
+  @Action(Entities['Patient'].FetchAllEntitiesSuccess)
+  fetchListSuccess(ctx: StateContext<PatientStateModel>, action: any) {
+    const state = ctx.getState();
+
+    ctx.setState({
+      ...state,
+      ...action.payload,
+    });
+  }
 }

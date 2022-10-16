@@ -1,16 +1,19 @@
 <section class="List">
-  <div *ngIf="isFetching" class="">
-    <mat-spinner class="spinner"></mat-spinner>
+  <div
+    *ngIf="isLoading$ | async"
+    class="position-absolute top-50 start-50 translate-middle"
+  >
+    <mat-spinner class="spinner" diameter="100"></mat-spinner>
   </div>
 
   <ng-template
-    *ngIf="hasHeaderSlot() && hasResults()"
+    *ngIf="hasHeaderSlot()"
     [ngTemplateOutlet]="renderHeaderSlot()"
     [ngTemplateOutletContext]="{ entity: 'Patients' }"
   ></ng-template>
 
   <ng-template
-    *ngIf="hasBodySlot() && hasResults()"
+    *ngIf="hasBodySlot()"
     [ngTemplateOutlet]="renderBodySlot()"
     [ngTemplateOutletContext]="{
       fields: fields$ | async,
@@ -18,9 +21,9 @@
     }"
   ></ng-template>
 
-  <div *ngIf="!isFetching && !hasResults()">
+  <!-- <div *ngIf="!isFetching">
     <div>
       <h6>Nenhum item encontrado.</h6>
     </div>
-  </div>
+  </div> -->
 </section>

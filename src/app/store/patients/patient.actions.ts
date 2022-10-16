@@ -3,6 +3,7 @@ import { EntityPayload } from '../entities/entities.model';
 import { Patient, PatientApiSuccessResponse } from './patient.model';
 
 export const PatientActions = {
+  /** Start of Form Actions  */
   CreateEntity: class CreateEntity {
     static readonly type = '[Patient] Add Patient';
     constructor(public payload: Patient) {}
@@ -76,5 +77,21 @@ export const PatientActions = {
 
   PatchPatientError: class PatchPatientError {
     static readonly type = '[Patient] Patch Patient Error';
+  },
+
+  /** End of Form Actions  */
+
+  FetchAllEntities: class FetchAllEntities {
+    static readonly type = '[Patient List] Fetch All Entities';
+  },
+
+  FetchAllEntitiesSuccess: class FetchAllEntitiesSuccess {
+    static readonly type = '[Patient List] Fetch All Entities Success';
+    constructor(public payload: EntityPayload) {}
+  },
+
+  FetchAllEntitiesError: class FetchAllEntitiesError {
+    static readonly type = '[Patient List] Fetch All Entities Error';
+    constructor() {}
   },
 };

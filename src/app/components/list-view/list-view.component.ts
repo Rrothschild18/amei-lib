@@ -12,6 +12,8 @@ import { Store } from '@ngxs/store';
 import { Observable, first } from 'rxjs';
 import { Entities } from 'src/app/store/entities/entities.namespace';
 
+type EntityKey = keyof typeof Entities;
+
 @Component({
   selector: 'app-list-view',
   templateUrl: './list-view.component.html',
@@ -23,23 +25,19 @@ export class ListViewComponent implements OnInit {
   @Input('url') url!: string;
   @Input('entity') entity!: any;
 
-  fields$!: Observable<any>;
-  results$!: Observable<any>;
+  results$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].results
+  );
 
-  isFetching: boolean = false;
+  fields$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].fields
+  );
 
-  @Output() fetchSuccess: EventEmitter<any> = new EventEmitter();
-  @Output() fetchError: EventEmitter<any> = new EventEmitter();
+  isLoading$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].isLoading
+  );
 
   constructor(private store: Store, private appRef: ApplicationRef) {
-    this.fields$ = this.store.select((state: any) => {
-      return state[this.entity].fields;
-    });
-
-    this.results$ = this.store.select(
-      (state: any) => state[this.entity].results
-    );
-
     this.appRef.isStable.pipe(first((stable) => stable)).subscribe(() => {
       type EntityKey = keyof typeof Entities;
       this.store.dispatch(
@@ -58,9 +56,9 @@ export class ListViewComponent implements OnInit {
     return !!this.header;
   }
 
-  hasResults() {
-    return !!(this.results$ || []);
-  }
+  // hasResults() {
+  //   return !!(this.results$ || []);
+  // }
 
   renderHeaderSlot(): TemplateRef<unknown> {
     return this.header;
