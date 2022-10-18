@@ -7,6 +7,72 @@
         </ul>
         <button mat-button class="bg-warning">Enviar</button>
       </div>
+
+      <div class="row mb-5">
+        <div class="col-11">
+          <form>
+            <mat-form-field appearance="fill" class="w-100">
+              <mat-label>Search...</mat-label>
+              <input matInput placeholder="Search..." [value]="searchValue" />
+              <button
+                *ngIf="searchValue.length"
+                matSuffix
+                mat-icon-button
+                aria-label="Clear"
+                (click)="searchValue = ''"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-form-field>
+          </form>
+        </div>
+        <button
+          mat-button
+          [matMenuTriggerFor]="menu"
+          class="col-1 filter-button"
+        >
+          Filters
+          <mat-icon>filter_list</mat-icon>
+        </button>
+
+        <mat-menu #menu="matMenu" class="p-2">
+          <section [formGroup]="filters">
+            <div>
+              <mat-form-field
+                (click)="$event.stopPropagation()"
+                appearance="fill"
+                class="w-100"
+              >
+                <mat-label>E-mail</mat-label>
+                <input matInput placeholder="E-mail" formControlName="email" />
+              </mat-form-field>
+            </div>
+            <div>
+              <mat-form-field
+                (click)="$event.stopPropagation()"
+                appearance="fill"
+                class="w-100"
+              >
+                <mat-label>Phone</mat-label>
+                <input matInput placeholder="Phone" formControlName="phone" />
+              </mat-form-field>
+            </div>
+          </section>
+          <div class="d-flex justify-content-end">
+            <button
+              mat-stroked-button
+              (click)="clearFilters()"
+              color="primary"
+              class="me-2"
+            >
+              Clean
+            </button>
+            <button mat-flat-button (click)="handleFilter()" color="primary">
+              Filter
+            </button>
+          </div>
+        </mat-menu>
+      </div>
     </ng-template>
 
     <ng-template

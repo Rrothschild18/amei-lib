@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-patients-list',
@@ -8,8 +9,18 @@ import { Router } from '@angular/router';
 })
 export class PatientsListComponent implements OnInit {
   displayedColumns!: string[];
+  searchValue: string = '';
 
-  constructor(private router: Router) {}
+  filters: FormGroup = new FormGroup({
+    email: new FormControl(''),
+    phone: new FormControl(''),
+  });
+
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    private activeRoute: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {}
 
@@ -28,5 +39,20 @@ export class PatientsListComponent implements OnInit {
 
   redirectToEdit(uuid: string): void {
     this.router.navigate([`/patients/${uuid}/edit`]);
+  }
+
+  handleFilter() {
+    this.router.navigate([], {
+      queryParams: this.filters.value,
+      relativeTo: this.activeRoute,
+    });
+  }
+
+  clearFilters() {
+    this.router.navigate([], {
+      //Trim blank spaces and set them to undefined || delete key
+      queryParams: {},
+      relativeTo: this.activeRoute,
+    });
   }
 }

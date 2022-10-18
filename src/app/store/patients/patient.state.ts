@@ -2,7 +2,7 @@ import { Entities } from '../entities/entities.namespace';
 import { ListViewService } from './../../services/list-view.service';
 import { Action, State, StateContext, StateToken } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, firstValueFrom, map, of, tap } from 'rxjs';
+import { catchError, map, of, tap } from 'rxjs';
 import { EntityPayload } from '../entities/entities.model';
 import { PatientStateModel, PatientApiSuccessResponse } from './patient.model';
 

@@ -7,10 +7,16 @@
   </div>
 
   <ng-template
-    *ngIf="hasHeaderSlot"
+    *ngIf="hasHeaderSlot; else defaultHeader"
     [ngTemplateOutlet]="renderHeaderSlot"
     [ngTemplateOutletContext]="{ entity: 'Patients' }"
-  ></ng-template>
+    #headerSlot
+  >
+  </ng-template>
+
+  <ng-template #defaultHeader>
+    <h6>default header</h6>
+  </ng-template>
 
   <ng-template
     *ngIf="hasBodySlot"
