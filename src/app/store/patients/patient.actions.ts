@@ -83,6 +83,7 @@ export const PatientActions = {
 
   FetchAllEntities: class FetchAllEntities {
     static readonly type = '[Patient List] Fetch All Entities';
+    constructor(public payload: any) {}
   },
 
   FetchAllEntitiesSuccess: class FetchAllEntitiesSuccess {
@@ -93,5 +94,10 @@ export const PatientActions = {
   FetchAllEntitiesError: class FetchAllEntitiesError {
     static readonly type = '[Patient List] Fetch All Entities Error';
     constructor() {}
+  },
+
+  PatchEntityFilters: class PatchEntityFilters {
+    static readonly type = '[Patient Filters] Patch Entity Filters';
+    constructor(public payload: any) {}
   },
 };

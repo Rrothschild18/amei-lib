@@ -1,8 +1,9 @@
+import { PatientListService } from './../../services/patient-list.service';
 import { Entities } from '../entities/entities.namespace';
 import { ListViewService } from './../../services/list-view.service';
 import { Action, State, StateContext, StateToken } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, map, of, tap } from 'rxjs';
+import { catchError, map, of, switchMap, tap } from 'rxjs';
 import { EntityPayload } from '../entities/entities.model';
 import { PatientStateModel, PatientApiSuccessResponse } from './patient.model';
 
@@ -11,6 +12,7 @@ const PATIENTS_STATE_TOKEN = new StateToken<any>('Patient');
 @State<PatientStateModel>({
   name: PATIENTS_STATE_TOKEN,
   defaults: {
+    filters: {},
     fields: {},
     results: [],
     isLoading: false,
@@ -20,7 +22,7 @@ const PATIENTS_STATE_TOKEN = new StateToken<any>('Patient');
 export class PatientState {
   entityName: string;
 
-  constructor(private ls: ListViewService) {
+  constructor(private ls: ListViewService, private ps: PatientListService) {
     this.entityName = PATIENTS_STATE_TOKEN.getName();
   }
 
@@ -234,11 +236,13 @@ export class PatientState {
   }
 
   @Action(Entities['Patient'].FetchAllEntities)
-  fetchEntities(ctx: StateContext<PatientStateModel>) {
+  fetchEntities(ctx: StateContext<PatientStateModel>, action: any) {
+    const filters = ctx.getState().filters || {};
     ctx.dispatch(new Entities['Patient'].SetLoadingTrue());
 
-    return this.ls.FetchAllEntities(this.entityName).pipe(
-      map((response: EntityPayload) => {
+    debugger;
+    return this.ps.FetchAllEntities(filters).pipe(
+      switchMap((response: EntityPayload) => {
         return ctx.dispatch(
           new Entities['Patient'].FetchAllEntitiesSuccess(response)
         );
@@ -259,9 +263,22 @@ export class PatientState {
   fetchListSuccess(ctx: StateContext<PatientStateModel>, action: any) {
     const state = ctx.getState();
 
+    debugger;
     ctx.setState({
       ...state,
       ...action.payload,
     });
+  }
+
+  @Action(Entities['Patient'].PatchEntityFilters)
+  patchEntityFilters(ctx: StateContext<PatientStateModel>, action: any) {
+    const state = ctx.getState();
+
+    ctx.patchState({
+      ...state,
+      filters: { ...state.filters, ...action.payload },
+    });
+
+    return ctx.dispatch(new Entities['Patient'].FetchAllEntities());
   }
 }

@@ -26,6 +26,7 @@ export interface PatientApiSuccessResponse extends Patient {
 }
 
 export interface PatientStateModel {
+  filters: { [key: string]: any };
   results: Patient[];
   fields: EntityFields; //Entity fields type of Pacient
   isLoading: boolean;

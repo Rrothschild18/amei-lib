@@ -6,8 +6,9 @@ import {
   Input,
   ApplicationRef,
 } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { Observable, first } from 'rxjs';
+import { Observable, first, tap, switchMap, combineLatest } from 'rxjs';
 import { Entities } from 'src/app/store/entities/entities.namespace';
 
 type EntityKey = keyof typeof Entities;
@@ -35,15 +36,45 @@ export class ListViewComponent implements OnInit {
     (state: any) => state[this.entity].isLoading
   );
 
-  constructor(private store: Store, private appRef: ApplicationRef) {
-    this.appRef.isStable.pipe(first((stable) => stable)).subscribe(() => {
+  filters$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].filters
+  );
+
+  routeParams$: Observable<any> = this.activeRoute.queryParams;
+
+  onFirstLoad: Observable<any> = combineLatest([
+    this.filters$,
+    this.routeParams$,
+    this.isLoading$,
+  ]).pipe(
+    first(([, , isLoading]) => !isLoading),
+    tap(([filters, params]) => {
       this.store.dispatch(
-        new Entities[this.entity as EntityKey].FetchAllEntities()
+        new Entities[this.entity as EntityKey].PatchEntityFilters({
+          ...filters,
+          ...params,
+        })
       );
-    });
+    })
+  );
+
+  constructor(
+    private store: Store,
+    private appRef: ApplicationRef,
+    private router: Router,
+    private activeRoute: ActivatedRoute
+  ) {
+    this.appRef.isStable
+      .pipe(
+        first((stable) => stable),
+        switchMap(() => this.onFirstLoad)
+      )
+      .subscribe();
   }
 
   ngOnInit(): void {}
+
+  ngOnChanges() {}
 
   get hasBodySlot(): boolean {
     return !!this.body;

@@ -1,4 +1,10 @@
 <section class="List">
+  <div>
+    <h6>Route Params</h6>
+    <pre>{{ routeParams$ | async | json }}</pre>
+    <h6>Filters State</h6>
+    <pre>{{ filters$ | async | json }}</pre>
+  </div>
   <div
     *ngIf="isLoading$ | async"
     class="position-absolute top-50 start-50 translate-middle"
