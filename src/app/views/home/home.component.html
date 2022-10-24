@@ -3,24 +3,25 @@
     <h2>HOMErr</h2>
 
     <div class="row">
-      <div class="col">
+      <div class="col-6">
         <div class="d-flex justify-content-center bg-white p-5 rounded">
-          <app-list-test>
-            <!-- <ng-template name="Brazil" let-country>
-              <pre>{{ country | json }}</pre>
-            </ng-template>
-            <ng-template name="Canada">
-              <h1>CANADA OR BRAZIL? XD</h1>
-            </ng-template> -->
+          <!-- <app-list-test>
             <ng-template name="Portugal" let-country>
               <div class="d-flex justify-content-between">
                 <pre>{{ country | json }}</pre>
               </div>
             </ng-template>
-          </app-list-test>
+          </app-list-test> -->
+
+          <app-autocomplete
+            class="w-100"
+            #proceduresLimitAutocomplete
+            placeholder="Limitar Procedimentos"
+            [data]="proceduresList$ | async"
+          >
+          </app-autocomplete>
         </div>
       </div>
     </div>
   </div>
 </section>
-z

@@ -28,6 +28,7 @@ import { NgTemplateNameDirective } from './directives/ng-template-name.directive
 import { NestedFieldsComponent } from './components/nested-fields/nested-fields.component';
 import { ProfessionalFormComponent } from './views/professionals/professionals-form/professional-form.component';
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
+import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
     ListTestComponent,
     NestedFieldsComponent,
     ProfessionalFormComponent,
+    AutocompleteComponent,
   ],
   imports: [
     BrowserModule,
