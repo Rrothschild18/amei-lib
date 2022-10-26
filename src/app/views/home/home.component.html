@@ -18,9 +18,11 @@
             #proceduresLimitAutocomplete
             placeholder="Limitar Procedimentos"
             [data]="proceduresList$ | async"
+            (selectedOptions)="onSelectedOptions($event)"
           >
           </app-autocomplete>
         </div>
+        <pre>{{ selectedOptions$ | async | json }}</pre>
       </div>
     </div>
   </div>

@@ -16,10 +16,21 @@
 
 <mat-autocomplete #autoCompleteRef="matAutocomplete" class="w-100">
   <mat-option class="d-none"> </mat-option>
+  <mat-checkbox
+    class="checkbox"
+    [checked]="allSelected"
+    (click)="onSelectAll()"
+    *ngIf="selectAllOption"
+  >
+    Todos
+  </mat-checkbox>
 
   <div *ngFor="let option of filteredOptionsByUser$ | async; trackBy: trackBy">
-    <mat-checkbox class="checkbox"> Todos </mat-checkbox>
-    <mat-checkbox [checked]="false" class="checkbox">
+    <mat-checkbox
+      [checked]="false"
+      class="checkbox"
+      (click)="onAddOption(option.value)"
+    >
       {{ option.label }}
     </mat-checkbox>
   </div>

@@ -1,8 +1,8 @@
-import { AutocompleteData } from './../../components/autocomplete/multiselect-autocomplete.interface';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable, take, tap } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import {
+  AutocompleteOption,
   IExpertiseAreaFromApi,
   IProcedureFromApi,
 } from 'src/app/components/autocomplete/multiselect-autocomplete.interface';
@@ -75,10 +75,10 @@ export class HomeComponent implements OnInit {
 
   proceduresRoute = `https://amei-dev.amorsaude.com.br/api/v1/procedimentos`;
   headers = {
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJKb8OjbyBkYSBTaWx2YSIsImxvZ2dlZENsaW5pYyI6bnVsbCwicm9sZSI6IkFETUlOIiwicGVybWlzc2lvbnMiOltdLCJpYXQiOjE2NjY2MzU0NDUsImV4cCI6MTY2NjY2NDI0NX0.ulyDNjJJbymuXZdZBrVCNwBnRGKntwYpQN0vBWHeSo0`,
+    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJKb8OjbyBkYSBTaWx2YSIsImxvZ2dlZENsaW5pYyI6bnVsbCwicm9sZSI6IkFETUlOIiwicGVybWlzc2lvbnMiOltdLCJpYXQiOjE2NjY4MDYxOTYsImV4cCI6MTY2NjgzNDk5Nn0.SjLLlwX7fEY3Ll0H_kgmcnRXm_yvlvuURFbXVdbRVV4`,
   };
 
-  proceduresList$: Observable<AutocompleteData> = this.http
+  proceduresList$: Observable<AutocompleteOption[]> = this.http
     .get<IProcedureFromApi[]>(
       `https://amei-dev.amorsaude.com.br/api/v1/procedimentos/professional?professionalId=289`,
       {
@@ -87,12 +87,16 @@ export class HomeComponent implements OnInit {
     )
     .pipe(
       map((proceduresFromApi) =>
-        proceduresFromApi.map((procedure: IProcedureFromApi) => ({
-          label: procedure.nome,
-          value: procedure.id,
-        }))
+        proceduresFromApi
+          .map((procedure: IProcedureFromApi) => ({
+            label: procedure.nome,
+            value: procedure.id,
+          }))
+          .slice(0, 10)
       )
     );
+
+  selectedOptions$!: Observable<AutocompleteOption[]>;
 
   constructor(private http: HttpClient) {}
 
@@ -140,5 +144,9 @@ export class HomeComponent implements OnInit {
 
   getQuery(event: any) {
     console.log(event);
+  }
+
+  onSelectedOptions(event: Observable<AutocompleteOption[]>): void {
+    this.selectedOptions$ = event;
   }
 }

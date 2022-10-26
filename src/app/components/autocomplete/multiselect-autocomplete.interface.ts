@@ -1,8 +1,7 @@
-export type AutocompleteData = AutocompleteOption[];
-
 export type AutocompleteOption = {
   label: string;
   value: number;
+  selected?: boolean;
 };
 
 //IGNORE
