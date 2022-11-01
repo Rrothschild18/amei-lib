@@ -20,17 +20,17 @@
   <mat-checkbox
     class="checkbox"
     [checked]="allSelected$ | async"
-    (click)="onSelectAll()"
+    (change)="onSelectAll()"
     *ngIf="selectAllOption"
   >
     Todos
   </mat-checkbox>
 
-  <div *ngFor="let option of filteredOptionsByUser$ | async; trackBy: trackBy">
+  <div *ngFor="let option of currentOptions$ | async; trackBy: trackBy">
     <mat-checkbox
       [checked]="option.selected"
       class="checkbox"
-      (click)="onAddOption(option.value)"
+      (click)="onAddOption(option.value, $event)"
     >
       {{ option.label }}
     </mat-checkbox>
