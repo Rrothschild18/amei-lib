@@ -1,4 +1,14 @@
-import { debounceTime, map, tap, BehaviorSubject, first, of } from 'rxjs';
+import {
+  debounceTime,
+  map,
+  tap,
+  BehaviorSubject,
+  first,
+  of,
+  combineLatest,
+  combineLatestAll,
+  zip,
+} from 'rxjs';
 import { Observable, startWith } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { ChangeDetectionStrategy, EventEmitter, Output } from '@angular/core';
@@ -27,19 +37,38 @@ export class AutocompleteComponent implements OnInit {
   >();
 
   filteredOptionsByUser$!: Observable<AutocompleteOption[]>;
-  filteredOptionsByUser$$!: Observable<AutocompleteOption[]>;
   searchControl: FormControl = new FormControl('');
   lastSearchValue: string | null = null;
   isLoading: boolean = false;
 
-  // selectedData: BehaviorSubject<AutocompleteOption[]> = new BehaviorSubject<
-  //   AutocompleteOption[]
-  // >([]);
+  currentOptions$: BehaviorSubject<AutocompleteOption[]> = new BehaviorSubject<
+    AutocompleteOption[]
+  >([]);
+
+  currentSelectedOptions$: BehaviorSubject<AutocompleteOption[]> =
+    new BehaviorSubject<AutocompleteOption[]>([]);
 
   selectedData: AutocompleteOption[] = [];
   selectedDataIds: Array<string | number> = [];
   uniqueSelectedDataIds: Set<string | number> = new Set();
-  allSelected: boolean = false;
+
+  allSelected: Observable<boolean> = combineLatest([
+    this.currentSelectedOptions$,
+    this.currentOptions$,
+  ]).pipe(
+    map(([currentSelectedOptions, currentOptions]) => {
+      let currentOptionsIds = currentSelectedOptions.map(
+        (option) => option.value
+      );
+
+      if (!currentSelectedOptions.length) {
+        return false;
+      }
+      return currentOptions.every((currentOption) =>
+        currentOptionsIds.includes(currentOption.value)
+      );
+    })
+  );
 
   constructor() {}
 
@@ -60,16 +89,43 @@ export class AutocompleteComponent implements OnInit {
         return search ? this._filter(search as string) : this.data.slice();
       }),
 
-      tap(() => (this.isLoading = false))
+      tap((currentOptions) => {
+        this.currentOptions$.next(currentOptions);
+        this.isLoading = false;
+      })
     );
   }
 
-  get currentFilteredDataIds(): Array<number | string> {
-    return this.data.map((option: AutocompleteOption) => option.value);
+  get currentOptionsIds(): Array<number | string> {
+    return this.currentOptions$.value.map(
+      (option: AutocompleteOption) => option.value
+    );
   }
 
+  // get currentUserFilteredOptionsIds(): Array<number | string> {
+  //   return this.currentSelectedOptions$.value.map(
+  //     (option: AutocompleteOption) => option.value
+  //   );
+  // }
+
   get currentSelectedDataIds(): Array<number | string> {
-    return this.selectedData.map((option: AutocompleteOption) => option.value);
+    return this.currentSelectedOptions$.value.map(
+      (option: AutocompleteOption) => option.value
+    );
+  }
+
+  //Warning: edit mode maybe dont have those IDs at data
+  get updatedOptionsToEmit(): AutocompleteOption[] {
+    return this.data?.filter((option: any) =>
+      [...this.uniqueSelectedDataIds].find(
+        (selectedId) => selectedId === option.value
+      )
+    );
+  }
+
+  //Delete
+  get currentSelectedIdsHTML(): string {
+    return this.currentSelectedDataIds.map((v) => v).join(',');
   }
 
   ngOnChanges() {}
@@ -88,60 +144,70 @@ export class AutocompleteComponent implements OnInit {
 
   onAddOption(optionId: string | number) {
     if (this.uniqueSelectedDataIds.has(optionId)) {
+      //Always update the Set of IDs
       this.uniqueSelectedDataIds.delete(optionId);
 
-      this.selectedData = this.data?.filter((option: any) =>
-        [...this.uniqueSelectedDataIds].find(
-          (selectedId) => selectedId === option.value
-        )
-      );
+      this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
 
-      this.selectedOptions.next(of(this.selectedData));
+      //Event Emitter
+      this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
+
       return;
     }
 
+    //Always update the Set of IDs
     this.uniqueSelectedDataIds.add(optionId);
 
-    this.selectedData = this.data?.filter((option: any) =>
-      [...this.uniqueSelectedDataIds].find(
-        (selectedId) => selectedId === option.value
-      )
-    );
+    this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
 
-    this.selectedOptions.next(of(this.selectedData));
+    //Event Emitter
+    this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
 
     return;
   }
 
   onSelectAll() {
     if (this.allSelected) {
-      let newIds = this.symmetricDifference(
-        new Set(...new Array(this.currentFilteredDataIds)),
+      let newUniqueIds = this.symmetricDifference(
+        new Set(...[this.currentOptionsIds]),
         this.uniqueSelectedDataIds
       );
-
-      this.uniqueSelectedDataIds = newIds;
-
-      this.selectedData = [
-        ...this.data?.filter((option: any) =>
-          [...newIds].find((selectedId) => selectedId === option.value)
-        ),
-      ];
-
-      this.selectedOptions.next(of(this.selectedData));
-      this.allSelected = false;
       debugger;
+
+      //Set new ids
+      this.uniqueSelectedDataIds = newUniqueIds;
+
+      this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
+
+      //Event Emitter
+      this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
+
       return;
     }
 
+    /**
+     * If exist any filtered option by user thats not selected, it implies that he wants to select all.
+     *
+     * allSelected = false
+     */
+
     if (!this.allSelected) {
-      debugger;
-      this.selectedData = [...this.selectedData, ...this.data];
-      this.selectedOptions.next(of(this.selectedData));
+      const v = this.currentSelectedDataIds;
+      const vv = this.currentOptionsIds;
+      //Update array of IDs
       this.uniqueSelectedDataIds = new Set(
-        ...new Array(this.currentSelectedDataIds)
+        ...new Array([
+          ...this.currentSelectedDataIds,
+          ...this.currentOptionsIds,
+        ])
       );
-      this.allSelected = true;
+
+      debugger;
+      //Updates selected options
+      this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
+
+      //Event Emitter
+      this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
     }
   }
 
@@ -159,6 +225,24 @@ export class AutocompleteComponent implements OnInit {
     debugger;
 
     return difference;
+  }
+
+  isSelected(optionId: number | string): Observable<boolean> {
+    const v = this.currentSelectedDataIds.includes(optionId);
+
+    return zip([
+      of(optionId),
+      this.currentSelectedOptions$.asObservable(),
+    ]).pipe(
+      map(([optionId, currentSelectedOptions]) => {
+        const c = v;
+        debugger;
+
+        return currentSelectedOptions
+          .map((option) => option.value)
+          .includes(optionId);
+      })
+    );
   }
 }
 

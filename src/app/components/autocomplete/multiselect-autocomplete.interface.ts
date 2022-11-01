@@ -1,6 +1,6 @@
 export type AutocompleteOption = {
   label: string;
-  value: number;
+  value: number | string;
   selected?: boolean;
 };
 

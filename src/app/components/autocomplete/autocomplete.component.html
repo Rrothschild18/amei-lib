@@ -18,7 +18,7 @@
   <mat-option class="d-none"> </mat-option>
   <mat-checkbox
     class="checkbox"
-    [checked]="allSelected"
+    [checked]="allSelected | async"
     (click)="onSelectAll()"
     *ngIf="selectAllOption"
   >
@@ -27,7 +27,7 @@
 
   <div *ngFor="let option of filteredOptionsByUser$ | async; trackBy: trackBy">
     <mat-checkbox
-      [checked]="false"
+      [checked]="isSelected(option.value) | async"
       class="checkbox"
       (click)="onAddOption(option.value)"
     >
@@ -35,3 +35,12 @@
     </mat-checkbox>
   </div>
 </mat-autocomplete>
+
+<h6>Current Selected</h6>
+<pre>{{ currentSelectedOptions$ | async | json }}</pre>
+
+<h6>Current Selected Ids</h6>
+<pre>{{ currentSelectedIdsHTML }}</pre>
+
+<h6>Current Options</h6>
+<pre>{{ currentOptions$ | async | json }}</pre>
