@@ -8,6 +8,7 @@ import {
   combineLatest,
   combineLatestAll,
   zip,
+  Subscription,
 } from 'rxjs';
 import { Observable, startWith } from 'rxjs';
 import { FormControl } from '@angular/forms';
@@ -30,7 +31,12 @@ export class AutocompleteComponent implements OnInit {
   @Input() appearance: MatFormFieldAppearance = 'fill';
   @Input() floatingLabel: FloatLabelType = 'always';
   @Input() selectAllOption: boolean = true;
-  @Input() data: any = [];
+  @Input('data') set newData(newData: AutocompleteOption[]) {
+    this.data = [...this.data, ...newData];
+    this.currentOptions$.next(this.data);
+  }
+
+  data: AutocompleteOption[] = [];
 
   @Output() selectedOptions = new EventEmitter<
     Observable<AutocompleteOption[]>
@@ -41,31 +47,26 @@ export class AutocompleteComponent implements OnInit {
   lastSearchValue: string | null = null;
   isLoading: boolean = false;
 
-  currentOptions$: BehaviorSubject<AutocompleteOption[]> = new BehaviorSubject<
-    AutocompleteOption[]
-  >([]);
+  currentOptions$ = new BehaviorSubject<AutocompleteOption[]>([]);
 
-  currentSelectedOptions$: BehaviorSubject<AutocompleteOption[]> =
-    new BehaviorSubject<AutocompleteOption[]>([]);
+  currentSelectedOptions$ = new BehaviorSubject<AutocompleteOption[]>([]);
 
   selectedData: AutocompleteOption[] = [];
   selectedDataIds: Array<string | number> = [];
   uniqueSelectedDataIds: Set<string | number> = new Set();
 
-  allSelected: Observable<boolean> = combineLatest([
+  allSelected$: Observable<boolean> = combineLatest([
     this.currentSelectedOptions$,
     this.currentOptions$,
   ]).pipe(
-    map(([currentSelectedOptions, currentOptions]) => {
-      let currentOptionsIds = currentSelectedOptions.map(
-        (option) => option.value
-      );
-
+    map(([currentSelectedOptions, _]) => {
       if (!currentSelectedOptions.length) {
         return false;
       }
-      return currentOptions.every((currentOption) =>
-        currentOptionsIds.includes(currentOption.value)
+
+      return this.isSuperset(
+        new Set(...[this.currentSelectedDataIds]),
+        new Set(...[this.currentOptionsIds])
       );
     })
   );
@@ -116,11 +117,16 @@ export class AutocompleteComponent implements OnInit {
 
   //Warning: edit mode maybe dont have those IDs at data
   get updatedOptionsToEmit(): AutocompleteOption[] {
-    return this.data?.filter((option: any) =>
+    const allSelected = this.data?.filter((option: any) =>
       [...this.uniqueSelectedDataIds].find(
         (selectedId) => selectedId === option.value
       )
     );
+
+    return allSelected.map((option: AutocompleteOption) => ({
+      ...option,
+      selected: true,
+    }));
   }
 
   //Delete
@@ -167,20 +173,24 @@ export class AutocompleteComponent implements OnInit {
   }
 
   onSelectAll() {
-    if (this.allSelected) {
+    if (this.allSelected$) {
       let newUniqueIds = this.symmetricDifference(
         new Set(...[this.currentOptionsIds]),
         this.uniqueSelectedDataIds
       );
       debugger;
 
+      newUniqueIds.forEach((optionId) => {
+        this.onAddOption(optionId);
+      });
+
       //Set new ids
       this.uniqueSelectedDataIds = newUniqueIds;
 
-      this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
+      // this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
 
       //Event Emitter
-      this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
+      // this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
 
       return;
     }
@@ -191,23 +201,22 @@ export class AutocompleteComponent implements OnInit {
      * allSelected = false
      */
 
-    if (!this.allSelected) {
-      const v = this.currentSelectedDataIds;
-      const vv = this.currentOptionsIds;
+    if (!this.allSelected$) {
+      // const v = this.currentSelectedDataIds;
+      // const vv = this.currentOptionsIds;
       //Update array of IDs
-      this.uniqueSelectedDataIds = new Set(
+      let newUniqueIds = new Set(
         ...new Array([
           ...this.currentSelectedDataIds,
           ...this.currentOptionsIds,
         ])
       );
 
-      debugger;
-      //Updates selected options
-      this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
+      newUniqueIds.forEach((optionId) => {
+        this.onAddOption(optionId);
+      });
 
-      //Event Emitter
-      this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
+      this.uniqueSelectedDataIds = newUniqueIds;
     }
   }
 
@@ -222,9 +231,17 @@ export class AutocompleteComponent implements OnInit {
       }
     }
 
-    debugger;
-
     return difference;
+  }
+
+  isSuperset(set: Set<number | string>, subset: Set<number | string>) {
+    for (const elem of subset) {
+      if (!set.has(elem)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   isSelected(optionId: number | string): Observable<boolean> {

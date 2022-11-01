@@ -18,7 +18,7 @@
             class="w-100"
             #proceduresLimitAutocomplete
             placeholder="Limitar Procedimentos"
-            [data]="proceduresList$ | async"
+            [data]="(proceduresList$ | async) || []"
             (selectedOptions)="onSelectedOptions($event)"
           >
           </app-autocomplete>
