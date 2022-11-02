@@ -32,12 +32,9 @@ export class AutocompleteComponent implements OnInit {
   @Input() appearance: MatFormFieldAppearance = 'fill';
   @Input() floatingLabel: FloatLabelType = 'always';
   @Input() selectAllOption: boolean = true;
-  @Input('data') set newData(newData: AutocompleteOption[]) {
-    this.data = [...this.data, ...newData];
-    this.currentOptions$.next(this.data);
-  }
+  @Input() data: AutocompleteOption[] = [];
 
-  data: AutocompleteOption[] = [];
+  // data: AutocompleteOption[] = [];
 
   @Output() selectedOptions = new EventEmitter<
     Observable<AutocompleteOption[]>
@@ -52,8 +49,8 @@ export class AutocompleteComponent implements OnInit {
 
   currentSelectedOptions$ = new BehaviorSubject<AutocompleteOption[]>([]);
 
-  selectedData: AutocompleteOption[] = [];
-  selectedDataIds: Array<string | number> = [];
+  // selectedData: AutocompleteOption[] = [];
+  // selectedDataIds: Array<string | number> = [];
   uniqueSelectedDataIds: Set<string | number> = new Set();
 
   allSelected$: Observable<boolean> = this.onSelectChange();
@@ -79,7 +76,13 @@ export class AutocompleteComponent implements OnInit {
         }),
 
         tap((currentOptions) => {
+          currentOptions = currentOptions.map((option: AutocompleteOption) => ({
+            ...option,
+            selected: this.currentSelectedDataIds.includes(option.value),
+          }));
+
           this.currentOptions$.next(currentOptions);
+
           this.isLoading = false;
         })
       )
@@ -91,12 +94,6 @@ export class AutocompleteComponent implements OnInit {
       (option: AutocompleteOption) => option.value
     );
   }
-
-  // get currentUserFilteredOptionsIds(): Array<number | string> {
-  //   return this.currentSelectedOptions$.value.map(
-  //     (option: AutocompleteOption) => option.value
-  //   );
-  // }
 
   get currentSelectedDataIds(): Array<number | string> {
     return this.currentSelectedOptions$.value.map(
@@ -189,59 +186,59 @@ export class AutocompleteComponent implements OnInit {
   }
 
   onSelectAll() {
-    if (this.allSelected$) {
-      let newUniqueIds = this.symmetricDifference(
-        new Set(...[this.currentOptionsIds]),
-        this.uniqueSelectedDataIds
-      );
+    let newUniqueIds = this.symmetricDifference(
+      new Set(...[this.currentOptionsIds]),
+      this.uniqueSelectedDataIds
+    );
 
-      //Set new ids
-      this.uniqueSelectedDataIds = newUniqueIds;
+    const allSelected = this.currentOptions$
+      .getValue()
+      .every((option) => this.currentSelectedDataIds.includes(option.value));
 
-      if (!this.uniqueSelectedDataIds.size) {
-        this.currentOptions$.next([...this.selectedAllFalse]);
-        this.currentSelectedOptions$.next([]);
-        this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
+    debugger;
 
-        return;
-      }
+    if (newUniqueIds.size === 0) {
+      this.data.map((option) => ({
+        ...option,
+        selected: this.currentSelectedDataIds.includes(option.value),
+      }));
 
-      this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
-      this.currentOptions$.next([...this.updatedOptionsToEmit]);
+      //Added merged selected Options
+      this.currentSelectedOptions$.next([]);
+
+      //Update currentOptions as selected
+      this.currentOptions$.next([
+        ...this.currentOptions$.getValue().map((option) => {
+          if (option.selected) delete option.selected;
+
+          return option;
+        }),
+      ]);
 
       //Event Emitter
-      this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
+      this.selectedOptions.next(of([]));
 
-      return;
-    }
-
-    /**
-     * If exist any filtered option by user thats not selected, it implies that he wants to select all.
-     *
-     * allSelected = false
-     */
-
-    if (!this.allSelected$) {
-      //Update array of IDs
-      let newUniqueIds = new Set(
-        ...new Array([
-          ...this.currentSelectedDataIds,
-          ...this.currentOptionsIds,
-        ])
-      );
-
-      //Set new ids
       this.uniqueSelectedDataIds = newUniqueIds;
+    } else {
+      debugger;
 
+      if (!allSelected)
+        this.uniqueSelectedDataIds = new Set([
+          ...this.uniqueSelectedDataIds,
+          ...newUniqueIds,
+        ]);
+
+      const v = [...this.updatedOptionsToEmit];
+      //Added merged selected Options
       this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
+
+      //Update currentOptions as selected
       this.currentOptions$.next([...this.updatedOptionsToEmit]);
 
       //Event Emitter
       this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
     }
   }
-
-  onDeselectAll() {}
 
   symmetricDifference(setA: Set<number | string>, setB: Set<number | string>) {
     const difference = new Set(setA);
