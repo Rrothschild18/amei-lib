@@ -13,7 +13,12 @@ import {
 } from 'rxjs';
 import { Observable, startWith, switchMap } from 'rxjs';
 import { FormControl } from '@angular/forms';
-import { ChangeDetectionStrategy, EventEmitter, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  EventEmitter,
+  Output,
+} from '@angular/core';
 import { Component, Input, OnInit } from '@angular/core';
 import {
   FloatLabelType,
@@ -34,8 +39,6 @@ export class AutocompleteComponent implements OnInit {
   @Input() selectAllOption: boolean = true;
   @Input() data: AutocompleteOption[] = [];
 
-  // data: AutocompleteOption[] = [];
-
   @Output() selectedOptions = new EventEmitter<
     Observable<AutocompleteOption[]>
   >();
@@ -49,13 +52,11 @@ export class AutocompleteComponent implements OnInit {
 
   currentSelectedOptions$ = new BehaviorSubject<AutocompleteOption[]>([]);
 
-  // selectedData: AutocompleteOption[] = [];
-  // selectedDataIds: Array<string | number> = [];
   uniqueSelectedDataIds: Set<string | number> = new Set();
 
   allSelected$: Observable<boolean> = this.onSelectChange();
 
-  constructor() {}
+  constructor(private cdRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.searchControl.valueChanges
@@ -115,6 +116,15 @@ export class AutocompleteComponent implements OnInit {
     }));
   }
 
+  get updatedCurrentOptionsToEmit(): AutocompleteOption[] {
+    return this.currentOptions$
+      .getValue()
+      .map((option: AutocompleteOption) => ({
+        ...option,
+        selected: this.currentSelectedDataIds.includes(option.value),
+      }));
+  }
+
   get selectedAllFalse(): AutocompleteOption[] {
     return this.data?.map((option: AutocompleteOption) => ({
       ...option,
@@ -160,16 +170,23 @@ export class AutocompleteComponent implements OnInit {
   }
 
   onAddOption(optionId: string | number, event: MouseEvent) {
-    event.stopPropagation();
-
     if (this.uniqueSelectedDataIds.has(optionId)) {
-      //Always update the Set of IDs
       this.uniqueSelectedDataIds.delete(optionId);
 
       this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
 
       //Event Emitter
       this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
+
+      this.currentOptions$.next([
+        ...this.currentOptions$.getValue().map((option) => ({
+          ...option,
+          selected: this.currentSelectedDataIds.includes(option.value),
+        })),
+      ]);
+
+      //Magic stuff
+      this.cdRef.checkNoChanges();
 
       return;
     }
@@ -182,6 +199,14 @@ export class AutocompleteComponent implements OnInit {
     //Event Emitter
     this.selectedOptions.next(this.currentSelectedOptions$.asObservable());
 
+    this.currentOptions$.next([
+      ...this.currentOptions$.getValue().map((option) => ({
+        ...option,
+        selected: this.currentSelectedDataIds.includes(option.value),
+      })),
+    ]);
+
+    this.cdRef.checkNoChanges();
     return;
   }
 
@@ -228,7 +253,6 @@ export class AutocompleteComponent implements OnInit {
           ...newUniqueIds,
         ]);
 
-      const v = [...this.updatedOptionsToEmit];
       //Added merged selected Options
       this.currentSelectedOptions$.next([...this.updatedOptionsToEmit]);
 
@@ -264,5 +288,3 @@ export class AutocompleteComponent implements OnInit {
     return true;
   }
 }
-
-//fix/Autocomplete-multiselect-fixes
