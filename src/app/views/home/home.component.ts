@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit {
 
   proceduresRoute = `https://amei-dev.amorsaude.com.br/api/v1/procedimentos`;
   headers = {
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJKb8OjbyBkYSBTaWx2YSIsImxvZ2dlZENsaW5pYyI6bnVsbCwicm9sZSI6InVzZXIiLCJyb2xlSWQiOnsiaWQiOjEsImRlc2NyaWNhbyI6Ik1BVFJJWiJ9LCJwZXJtaXNzaW9ucyI6W10sImlhdCI6MTY2NzM5NDY2NiwiZXhwIjoxNjY3NDIzNDY2fQ.Ip3B5sOusXNOspJQ0QdlyDMImAhwguUrJG2FEycpRIE`,
+    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJKb8OjbyBkYSBTaWx2YSIsImxvZ2dlZENsaW5pYyI6bnVsbCwicm9sZSI6InVzZXIiLCJyb2xlSWQiOnsiaWQiOjEsImRlc2NyaWNhbyI6Ik1BVFJJWiJ9LCJwZXJtaXNzaW9ucyI6W10sImlhdCI6MTY2NzQyMzYzNywiZXhwIjoxNjY3NDUyNDM3fQ.UULnZPXJ0IngBD4IgnYLoOrGlJSwSI8MoTU1SMqAK4c`,
   };
 
   proceduresList$: Observable<AutocompleteOption[]> = this.http
@@ -87,12 +87,14 @@ export class HomeComponent implements OnInit {
     )
     .pipe(
       map((proceduresFromApi) =>
-        proceduresFromApi
-          .map((procedure: IProcedureFromApi) => ({
-            label: procedure.nome,
-            value: procedure.id,
-          }))
-          .slice(0, 10)
+        proceduresFromApi === null
+          ? []
+          : proceduresFromApi
+              .map((procedure: IProcedureFromApi) => ({
+                label: procedure.nome,
+                value: procedure.id,
+              }))
+              .slice(0, 10)
       )
     );
 

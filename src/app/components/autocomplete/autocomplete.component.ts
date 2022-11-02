@@ -5,6 +5,7 @@ import {
   BehaviorSubject,
   of,
   combineLatest,
+  filter,
 } from 'rxjs';
 import { Observable, startWith, switchMap } from 'rxjs';
 import { FormControl } from '@angular/forms';
@@ -27,7 +28,17 @@ export class AutocompleteComponent implements OnInit {
   @Input() appearance: MatFormFieldAppearance = 'fill';
   @Input() floatingLabel: FloatLabelType = 'always';
   @Input() selectAllOption: boolean = true;
-  @Input() data: AutocompleteOption[] = [];
+  @Input('data') set newData(newData: AutocompleteOption[] | null) {
+    if (newData) {
+      this.data = [...this.data, ...newData];
+      this.currentOptions$.next(this.data);
+      return;
+    }
+
+    this.data = [];
+  }
+
+  data: AutocompleteOption[] = [];
 
   @Output() selectedOptions = new EventEmitter<
     Observable<AutocompleteOption[]>
@@ -56,14 +67,13 @@ export class AutocompleteComponent implements OnInit {
           this.lastSearchValue = searchControlValue;
         }),
         startWith(''),
-        debounceTime(2000),
         map((searchControlValue) => {
           const search =
             typeof searchControlValue === 'string'
               ? searchControlValue
               : searchControlValue.label;
 
-          return search ? this._filter(search as string) : this.data.slice();
+          return search ? this._filter(search as string) : this.data;
         }),
 
         tap((currentOptions) => {
@@ -73,8 +83,16 @@ export class AutocompleteComponent implements OnInit {
           }));
 
           this.currentOptions$.next(currentOptions);
-
           this.isLoading = false;
+        }),
+        tap((currentOptions) => {
+          if (this.lastSearchValue === null) {
+            this.isLoading = false;
+          }
+
+          if (this.lastSearchValue !== null && !currentOptions.length) {
+            this.isLoading = true;
+          }
         })
       )
       .subscribe();
