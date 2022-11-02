@@ -30,7 +30,7 @@
     <mat-checkbox
       [checked]="option.selected"
       class="checkbox"
-      (click)="onAddOption(option.value, $event)"
+      (change)="onAddOption(option.value)"
     >
       {{ option.label }}
     </mat-checkbox>

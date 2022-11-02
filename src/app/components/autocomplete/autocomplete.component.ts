@@ -3,22 +3,12 @@ import {
   map,
   tap,
   BehaviorSubject,
-  first,
   of,
   combineLatest,
-  combineLatestAll,
-  zip,
-  Subscription,
-  iif,
 } from 'rxjs';
 import { Observable, startWith, switchMap } from 'rxjs';
 import { FormControl } from '@angular/forms';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  EventEmitter,
-  Output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, EventEmitter, Output } from '@angular/core';
 import { Component, Input, OnInit } from '@angular/core';
 import {
   FloatLabelType,
@@ -56,7 +46,7 @@ export class AutocompleteComponent implements OnInit {
 
   allSelected$: Observable<boolean> = this.onSelectChange();
 
-  constructor(private cdRef: ChangeDetectorRef) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.searchControl.valueChanges
@@ -169,7 +159,7 @@ export class AutocompleteComponent implements OnInit {
     return item.value;
   }
 
-  onAddOption(optionId: string | number, event: MouseEvent) {
+  onAddOption(optionId: string | number) {
     if (this.uniqueSelectedDataIds.has(optionId)) {
       this.uniqueSelectedDataIds.delete(optionId);
 
@@ -184,9 +174,6 @@ export class AutocompleteComponent implements OnInit {
           selected: this.currentSelectedDataIds.includes(option.value),
         })),
       ]);
-
-      //Magic stuff
-      this.cdRef.checkNoChanges();
 
       return;
     }
@@ -206,7 +193,6 @@ export class AutocompleteComponent implements OnInit {
       })),
     ]);
 
-    this.cdRef.checkNoChanges();
     return;
   }
 
