@@ -18,11 +18,13 @@
             class="w-100"
             #proceduresLimitAutocomplete
             placeholder="Limitar Procedimentos"
-            [data]="proceduresList$ | async"
+            [data]="proceduresList$$ | async"
             (selectedOptions)="onSelectedOptions($event)"
+            (userSearchToApi)="onUserSearchToApi($event)"
           >
           </app-autocomplete>
         </div>
+        <pre>{{ userSearch$ | async }}</pre>
         <pre>{{ selectedOptions$ | async | json }}</pre>
       </div>
     </div>

@@ -6,6 +6,8 @@ import {
   of,
   combineLatest,
   filter,
+  timer,
+  distinctUntilChanged,
 } from 'rxjs';
 import { Observable, startWith, switchMap } from 'rxjs';
 import { FormControl } from '@angular/forms';
@@ -28,10 +30,27 @@ export class AutocompleteComponent implements OnInit {
   @Input() appearance: MatFormFieldAppearance = 'fill';
   @Input() floatingLabel: FloatLabelType = 'always';
   @Input() selectAllOption: boolean = true;
-  @Input('data') set newData(newData: AutocompleteOption[] | null) {
-    if (newData) {
-      this.data = [...this.data, ...newData];
-      this.currentOptions$.next(this.data);
+
+  @Input('data') set newData(incomingData: AutocompleteOption[] | null) {
+    // Rethink this function, its working fine but not optimized
+    if (!!incomingData?.length) {
+      const hasDifference = this.symmetricDifference(
+        new Set([...this.data.map((option) => option.value)]),
+        new Set([...incomingData.map((option) => option.value)])
+      );
+
+      if (hasDifference) {
+        let filteredDataToAdd = incomingData.filter((option) =>
+          [...hasDifference].find((id) => option.value === id)
+        );
+        this.data = [...this.data, ...filteredDataToAdd];
+        this.currentOptions$.next(this.data);
+      }
+
+      if (this.lastSearchValue) {
+        this.searchControl.setValue(this.lastSearchValue);
+      }
+
       return;
     }
 
@@ -43,6 +62,8 @@ export class AutocompleteComponent implements OnInit {
   @Output() selectedOptions = new EventEmitter<
     Observable<AutocompleteOption[]>
   >();
+
+  @Output() userSearchToApi = new EventEmitter<Observable<string>>();
 
   filteredOptionsByUser$!: Observable<AutocompleteOption[]>;
   searchControl: FormControl = new FormControl('');
@@ -57,14 +78,20 @@ export class AutocompleteComponent implements OnInit {
 
   allSelected$: Observable<boolean> = this.onSelectChange();
 
+  searchNotFound: boolean = false;
+
+  emittedUserSearch: boolean = false;
+
   constructor() {}
 
   ngOnInit(): void {
     this.searchControl.valueChanges
       .pipe(
+        filter((searchControlValue) => searchControlValue),
         tap((searchControlValue) => {
           this.isLoading = true;
           this.lastSearchValue = searchControlValue;
+          this.searchNotFound = false;
         }),
         startWith(''),
         map((searchControlValue) => {
@@ -72,6 +99,8 @@ export class AutocompleteComponent implements OnInit {
             typeof searchControlValue === 'string'
               ? searchControlValue
               : searchControlValue.label;
+
+          if (searchControlValue === '') return this.data;
 
           return search ? this._filter(search as string) : this.data;
         }),
@@ -88,11 +117,26 @@ export class AutocompleteComponent implements OnInit {
         tap((currentOptions) => {
           if (this.lastSearchValue === null) {
             this.isLoading = false;
+            return;
           }
 
-          if (this.lastSearchValue !== null && !currentOptions.length) {
+          //* This not working as intended must rethink
+          if (this.lastSearchValue && !currentOptions.length) {
             this.isLoading = true;
+
+            if (!this.emittedUserSearch) {
+              this.userSearchToApi.next(of(this.lastSearchValue));
+              this.emittedUserSearch = true;
+              this.searchNotFound = true;
+
+              return;
+            }
+
+            this.emittedUserSearch = false;
+            this.isLoading = false;
+            this.searchNotFound = true;
           }
+          return;
         })
       )
       .subscribe();
@@ -224,8 +268,6 @@ export class AutocompleteComponent implements OnInit {
       .getValue()
       .every((option) => this.currentSelectedDataIds.includes(option.value));
 
-    debugger;
-
     if (newUniqueIds.size === 0) {
       this.data.map((option) => ({
         ...option,
@@ -249,8 +291,6 @@ export class AutocompleteComponent implements OnInit {
 
       this.uniqueSelectedDataIds = newUniqueIds;
     } else {
-      debugger;
-
       if (!allSelected)
         this.uniqueSelectedDataIds = new Set([
           ...this.uniqueSelectedDataIds,

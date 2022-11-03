@@ -1,10 +1,19 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, Observable, take, tap } from 'rxjs';
+import {
+  map,
+  Observable,
+  take,
+  tap,
+  switchMap,
+  startWith,
+  BehaviorSubject,
+} from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import {
   AutocompleteOption,
   IExpertiseAreaFromApi,
   IProcedureFromApi,
+  IProcedureListFromApi,
 } from 'src/app/components/autocomplete/multiselect-autocomplete.interface';
 
 @Component({
@@ -14,6 +23,8 @@ import {
 })
 export class HomeComponent implements OnInit {
   isOpen = false;
+
+  userSearch$ = new BehaviorSubject('');
 
   links = [
     {
@@ -75,28 +86,48 @@ export class HomeComponent implements OnInit {
 
   proceduresRoute = `https://amei-dev.amorsaude.com.br/api/v1/procedimentos`;
   headers = {
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJKb8OjbyBkYSBTaWx2YSIsImxvZ2dlZENsaW5pYyI6bnVsbCwicm9sZSI6InVzZXIiLCJyb2xlSWQiOnsiaWQiOjEsImRlc2NyaWNhbyI6Ik1BVFJJWiJ9LCJwZXJtaXNzaW9ucyI6W10sImlhdCI6MTY2NzQyMzYzNywiZXhwIjoxNjY3NDUyNDM3fQ.UULnZPXJ0IngBD4IgnYLoOrGlJSwSI8MoTU1SMqAK4c`,
+    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJKb8OjbyBkYSBTaWx2YSIsImxvZ2dlZENsaW5pYyI6bnVsbCwicm9sZSI6InVzZXIiLCJyb2xlSWQiOnsiaWQiOjEsImRlc2NyaWNhbyI6Ik1BVFJJWiJ9LCJwZXJtaXNzaW9ucyI6W10sImlhdCI6MTY2NzQ5MDQ4NywiZXhwIjoxNjY3NTE5Mjg3fQ.-5hH2WZfsQWCa6UoZGEdmSgfzMHiTnl99v0PDk1JpC8`,
   };
+  // https://amei-dev.amorsaude.com.br/api/v1/procedimentos/filter/?page=1&limit=40&name=Estudo&active=true
 
   proceduresList$: Observable<AutocompleteOption[]> = this.http
-    .get<IProcedureFromApi[]>(
-      `https://amei-dev.amorsaude.com.br/api/v1/procedimentos/professional?professionalId=289`,
+    .get<IProcedureListFromApi>(
+      `https://amei-dev.amorsaude.com.br/api/v1/procedimentos/filter/?page=1&limit=40`,
       {
         headers: this.headers,
       }
     )
     .pipe(
-      map((proceduresFromApi) =>
-        proceduresFromApi === null
-          ? []
-          : proceduresFromApi
-              .map((procedure: IProcedureFromApi) => ({
+      map((proceduresFromApi) => {
+        return proceduresFromApi.items.map((procedure: IProcedureFromApi) => ({
+          label: procedure.nome,
+          value: procedure.id,
+        }));
+      })
+    );
+
+  proceduresList$$: Observable<AutocompleteOption[]> = this.userSearch$.pipe(
+    startWith(''),
+    switchMap((procedureName) => {
+      return this.http
+        .get<IProcedureListFromApi>(
+          `https://amei-dev.amorsaude.com.br/api/v1/procedimentos/filter/?page=1&limit=40&name=${procedureName}`,
+          {
+            headers: this.headers,
+          }
+        )
+        .pipe(
+          map((proceduresFromApi) => {
+            return proceduresFromApi.items.map(
+              (procedure: IProcedureFromApi) => ({
                 label: procedure.nome,
                 value: procedure.id,
-              }))
-              .slice(0, 10)
-      )
-    );
+              })
+            );
+          })
+        );
+    })
+  );
 
   selectedOptions$!: Observable<AutocompleteOption[]>;
 
@@ -150,5 +181,9 @@ export class HomeComponent implements OnInit {
 
   onSelectedOptions(event: Observable<AutocompleteOption[]>): void {
     this.selectedOptions$ = event;
+  }
+
+  onUserSearchToApi(event: Observable<string>) {
+    event.subscribe((v) => this.userSearch$.next(v));
   }
 }

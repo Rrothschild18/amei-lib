@@ -14,6 +14,12 @@ export interface IExpertiseAreaFromApi {
   ativo: boolean;
 }
 
+export interface IProcedureListFromApi {
+  items: IProcedureFromApi[];
+  meta: {
+    [key: string]: any;
+  };
+}
 export interface IProcedureFromApi {
   id: number;
   nome: string;

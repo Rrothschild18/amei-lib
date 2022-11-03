@@ -22,7 +22,7 @@
       class="checkbox"
       [checked]="allSelected$ | async"
       (change)="onSelectAll()"
-      *ngIf="selectAllOption && currentOptions.length"
+      *ngIf="selectAllOption && currentOptions.length && !searchNotFound"
     >
       Todos
     </mat-checkbox>
@@ -36,7 +36,14 @@
         {{ option.label }}
       </mat-checkbox>
     </div>
+
+    <div *ngIf="searchNotFound">
+      <h6>NO RESULTS FOUND</h6>
+    </div>
   </mat-autocomplete>
+
+  <h6>Search not found</h6>
+  <pre>{{ searchNotFound }}</pre>
 
   <h6>Current Selected</h6>
   <pre>{{ currentSelectedOptions$ | async | json }}</pre>
