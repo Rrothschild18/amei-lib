@@ -4,6 +4,10 @@ export type AutocompleteOption = {
   selected?: boolean;
 };
 
+export type AutocompleteConfig = {
+  [key: string | number]: AutocompleteOption;
+};
+
 //IGNORE
 
 export interface IExpertiseAreaFromApi {

@@ -86,25 +86,14 @@ export class HomeComponent implements OnInit {
 
   proceduresRoute = `https://amei-dev.amorsaude.com.br/api/v1/procedimentos`;
   headers = {
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJKb8OjbyBkYSBTaWx2YSIsImxvZ2dlZENsaW5pYyI6bnVsbCwicm9sZSI6InVzZXIiLCJyb2xlSWQiOnsiaWQiOjEsImRlc2NyaWNhbyI6Ik1BVFJJWiJ9LCJwZXJtaXNzaW9ucyI6W10sImlhdCI6MTY2NzQ5MDQ4NywiZXhwIjoxNjY3NTE5Mjg3fQ.-5hH2WZfsQWCa6UoZGEdmSgfzMHiTnl99v0PDk1JpC8`,
+    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY3NTM2Mzk4MiwiZXhwIjoxNjc1MzkyNzgyfQ.hHMdeMlWqFXyEfTdorf4TyYXXCgNNeemRI8WWvPMjIg`,
   };
   // https://amei-dev.amorsaude.com.br/api/v1/procedimentos/filter/?page=1&limit=40&name=Estudo&active=true
 
-  proceduresList$: Observable<AutocompleteOption[]> = this.http
-    .get<IProcedureListFromApi>(
-      `https://amei-dev.amorsaude.com.br/api/v1/procedimentos/filter/?page=1&limit=40`,
-      {
-        headers: this.headers,
-      }
-    )
-    .pipe(
-      map((proceduresFromApi) => {
-        return proceduresFromApi.items.map((procedure: IProcedureFromApi) => ({
-          label: procedure.nome,
-          value: procedure.id,
-        }));
-      })
-    );
+  expertiseAreaList$: Observable<AutocompleteOption[]> =
+    this.expertiseAreasFromApi();
+
+  proceduresList$: Observable<AutocompleteOption[]> = this.proceduresFromApi();
 
   proceduresList$$: Observable<AutocompleteOption[]> = this.userSearch$.pipe(
     startWith(''),
@@ -155,7 +144,7 @@ export class HomeComponent implements OnInit {
     console.log(payload);
   }
 
-  getFilteredExpertiseAreasByQuery(): void {
+  expertiseAreas(): void {
     // const filteredExpertiseAreas = await firstValueFrom(
     //   this.expertiseAreaService.listExpertiseAreasByProfessionalId(
     //     this.professionalId
@@ -185,5 +174,41 @@ export class HomeComponent implements OnInit {
 
   onUserSearchToApi(event: Observable<string>) {
     event.subscribe((v) => this.userSearch$.next(v));
+  }
+
+  proceduresFromApi() {
+    return this.http
+      .get<IProcedureListFromApi>(
+        `https://amei-dev.amorsaude.com.br/api/v1/procedimentos/filter/?page=1&limit=40`,
+        {
+          headers: this.headers,
+        }
+      )
+      .pipe(
+        map((proceduresFromApi) =>
+          proceduresFromApi.items.map((procedure: IProcedureFromApi) => ({
+            label: procedure.nome,
+            value: procedure.id,
+          }))
+        )
+      );
+  }
+
+  expertiseAreasFromApi() {
+    return this.http
+      .get<IExpertiseAreaFromApi[]>(
+        `https://amei-dev.amorsaude.com.br/api/v1/especialidades/?page=1&limit=999`,
+        {
+          headers: this.headers,
+        }
+      )
+      .pipe(
+        map((expertiseAreasFromApi) =>
+          expertiseAreasFromApi.map((expertiseArea: IExpertiseAreaFromApi) => ({
+            label: expertiseArea.descricao,
+            value: expertiseArea.id,
+          }))
+        )
+      );
   }
 }

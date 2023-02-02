@@ -3,7 +3,18 @@
     <h2>HOMErr</h2>
 
     <div class="row">
-      <div class="col-6"></div>
+      <div class="col-6">
+        <div class="d-flex justify-content-center bg-white p-5 rounded">
+          <app-autocomplete
+            class="w-100"
+            #expertiseAreaAutoComplete
+            placeholder="Filtrar area por"
+            [data]="expertiseAreaList$ | async"
+          >
+          </app-autocomplete>
+        </div>
+      </div>
+
       <div class="col-6">
         <div class="d-flex justify-content-center bg-white p-5 rounded">
           <!-- <app-list-test>

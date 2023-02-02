@@ -13,44 +13,41 @@
       [matAutocomplete]="autoCompleteRef"
     />
     <mat-spinner [diameter]="30" matSuffix *ngIf="isLoading"></mat-spinner>
+    <mat-error
+      class="mt-5 fs-6"
+      *ngIf="searchControl.invalid || searchControl.errors?.['invalid']"
+      >Campo obrigatório*</mat-error
+    >
   </mat-form-field>
 
-  <pre>{{ allSelected$ | async }}</pre>
   <mat-autocomplete #autoCompleteRef="matAutocomplete" class="w-100">
     <mat-option class="d-none"> </mat-option>
     <mat-checkbox
       class="checkbox"
       [checked]="allSelected$ | async"
       (change)="onSelectAll()"
-      *ngIf="selectAllOption && currentOptions.length && !searchNotFound"
+      *ngIf="hasOptionsToToggle"
     >
       Todos
     </mat-checkbox>
 
-    <div *ngFor="let option of currentOptions$ | async; trackBy: trackBy">
+    <div
+      *ngFor="
+        let option of currentOptions$ | async | keyvalue;
+        trackBy: trackByFn
+      "
+    >
       <mat-checkbox
-        [checked]="option.selected"
+        [checked]="option.value.selected"
         class="checkbox"
-        (change)="onAddOption(option.value)"
+        (change)="onAddOption(option.value.value)"
       >
-        {{ option.label }}
+        {{ option.value.label }}
       </mat-checkbox>
     </div>
 
-    <div *ngIf="searchNotFound">
-      <h6>NO RESULTS FOUND</h6>
+    <div *ngIf="searchNotFound && !hasOptionsToToggle" class="p-3">
+      <h6 class="text-gray-medium m-0">Não foram encontrados resultados</h6>
     </div>
   </mat-autocomplete>
-
-  <h6>Search not found</h6>
-  <pre>{{ searchNotFound }}</pre>
-
-  <h6>Current Selected</h6>
-  <pre>{{ currentSelectedOptions$ | async | json }}</pre>
-
-  <h6>Current Selected Ids</h6>
-  <pre>{{ currentSelectedIdsHTML }}</pre>
-
-  <h6>Current Options</h6>
-  <pre>{{ currentOptions$ | async | json }}</pre>
 </div>
