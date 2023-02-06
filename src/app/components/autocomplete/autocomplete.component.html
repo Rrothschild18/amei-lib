@@ -20,6 +20,7 @@
     >
   </mat-form-field>
 
+  <pre>{{ allSelected$ | async }}</pre>
   <mat-autocomplete #autoCompleteRef="matAutocomplete" class="w-100">
     <mat-option class="d-none"> </mat-option>
     <mat-checkbox
@@ -50,4 +51,16 @@
       <h6 class="text-gray-medium m-0">Não foram encontrados resultados</h6>
     </div>
   </mat-autocomplete>
+
+  <h6>Search not found</h6>
+  <pre>{{ searchNotFound }}</pre>
+
+  <h6>Current Selected</h6>
+  <pre>{{ currentSelectedOptions$ | async | json }}</pre>
+
+  <h6>Current Selected Ids</h6>
+  <pre>{{ currentSelectedIdsHTML }}</pre>
+
+  <h6>Current Options</h6>
+  <pre>{{ currentOptions$ | async | json }}</pre>
 </div>

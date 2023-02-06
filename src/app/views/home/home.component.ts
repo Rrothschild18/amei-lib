@@ -7,6 +7,8 @@ import {
   switchMap,
   startWith,
   BehaviorSubject,
+  combineLatest,
+  of,
 } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import {
@@ -24,7 +26,7 @@ import {
 export class HomeComponent implements OnInit {
   isOpen = false;
 
-  userSearch$ = new BehaviorSubject('');
+  userSearch$!: Observable<string>;
 
   links = [
     {
@@ -86,7 +88,7 @@ export class HomeComponent implements OnInit {
 
   proceduresRoute = `https://amei-dev.amorsaude.com.br/api/v1/procedimentos`;
   headers = {
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY3NTM2Mzk4MiwiZXhwIjoxNjc1MzkyNzgyfQ.hHMdeMlWqFXyEfTdorf4TyYXXCgNNeemRI8WWvPMjIg`,
+    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY3NTQzMzM2NywiZXhwIjoxNjc1NDYyMTY3fQ.Bn9E5huU7Uf51we3dt9sLx_IJ9KP22mFMjHMhiTQcks`,
   };
   // https://amei-dev.amorsaude.com.br/api/v1/procedimentos/filter/?page=1&limit=40&name=Estudo&active=true
 
@@ -95,34 +97,17 @@ export class HomeComponent implements OnInit {
 
   proceduresList$: Observable<AutocompleteOption[]> = this.proceduresFromApi();
 
-  proceduresList$$: Observable<AutocompleteOption[]> = this.userSearch$.pipe(
-    startWith(''),
-    switchMap((procedureName) => {
-      return this.http
-        .get<IProcedureListFromApi>(
-          `https://amei-dev.amorsaude.com.br/api/v1/procedimentos/filter/?page=1&limit=40&name=${procedureName}`,
-          {
-            headers: this.headers,
-          }
-        )
-        .pipe(
-          map((proceduresFromApi) => {
-            return proceduresFromApi.items.map(
-              (procedure: IProcedureFromApi) => ({
-                label: procedure.nome,
-                value: procedure.id,
-              })
-            );
-          })
-        );
-    })
-  );
+  proceduresList$$!: Observable<AutocompleteOption[]>;
 
   selectedOptions$!: Observable<AutocompleteOption[]>;
 
+  selectedExpertiseAreaOptions$!: Observable<AutocompleteOption[]>;
+
   constructor(private http: HttpClient) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.proceduresList$$ = this.filteredProceduresByExpArea();
+  }
 
   toggleDrawer() {
     this.isOpen = !this.isOpen;
@@ -172,8 +157,15 @@ export class HomeComponent implements OnInit {
     this.selectedOptions$ = event;
   }
 
+  onSelectedExpertiseAreaOptions(
+    event: Observable<AutocompleteOption[]>
+  ): void {
+    debugger;
+    this.selectedExpertiseAreaOptions$ = event;
+  }
+
   onUserSearchToApi(event: Observable<string>) {
-    event.subscribe((v) => this.userSearch$.next(v));
+    this.userSearch$ = event;
   }
 
   proceduresFromApi() {
@@ -210,5 +202,42 @@ export class HomeComponent implements OnInit {
           }))
         )
       );
+  }
+
+  filteredProceduresByExpArea() {
+    return combineLatest({
+      procedureName: this.userSearch$ || of(''),
+      expertiseAreas: this.selectedExpertiseAreaOptions$ || of(null),
+    }).pipe(
+      switchMap(({ procedureName, expertiseAreas }) => {
+        debugger;
+        let expertiseAreasIds =
+          expertiseAreas?.map((expArea) => expArea.value) || [];
+
+        return this.http
+          .get<IProcedureListFromApi>(
+            `https://amei-dev.amorsaude.com.br/api/v1/procedimentos/filter/?page=1&limit=900${
+              procedureName ? `&name=${procedureName}` : ''
+            }${
+              expertiseAreasIds.length
+                ? `&specialtyIds=${expertiseAreasIds}`
+                : ''
+            }`,
+            {
+              headers: this.headers,
+            }
+          )
+          .pipe(
+            map((proceduresFromApi) => {
+              return proceduresFromApi.items.map(
+                (procedure: IProcedureFromApi) => ({
+                  label: procedure.nome,
+                  value: procedure.id,
+                })
+              );
+            })
+          );
+      })
+    );
   }
 }

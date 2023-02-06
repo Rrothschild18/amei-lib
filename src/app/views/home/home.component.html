@@ -10,6 +10,7 @@
             #expertiseAreaAutoComplete
             placeholder="Filtrar area por"
             [data]="expertiseAreaList$ | async"
+            (selectedOptions)="onSelectedExpertiseAreaOptions($event)"
           >
           </app-autocomplete>
         </div>

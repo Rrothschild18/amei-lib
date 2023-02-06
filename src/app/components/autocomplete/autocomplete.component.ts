@@ -184,7 +184,7 @@ export class AutocompleteComponent implements OnInit {
   }
 
   get hasOptionsToToggle(): boolean {
-    return !!Object.keys(this.currentOptions$.getValue()).length;
+    return Object.keys(this.currentOptions$.getValue()).length > 1;
   }
 
   onSelectChange(): void {
@@ -233,13 +233,8 @@ export class AutocompleteComponent implements OnInit {
 
     if (currentSelected[optionId]) {
       //update current options
-
-      if (currentOptions[optionId]) {
-        currentOptions[optionId].selected = false;
-        this.currentOptions$.next(currentOptions);
-      } else {
-        this.data[optionId].selected = false;
-      }
+      currentOptions[optionId].selected = false;
+      this.data[optionId].selected = false;
 
       //update current selected
       delete currentSelected[optionId];
