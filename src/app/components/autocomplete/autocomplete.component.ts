@@ -1,3 +1,4 @@
+import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   Component,
   ChangeDetectionStrategy,
@@ -19,6 +20,8 @@ import {
   tap,
   debounceTime,
   map,
+  combineLatest,
+  shareReplay,
 } from 'rxjs';
 import {
   AutocompleteConfig,
@@ -35,83 +38,122 @@ export class AutocompleteComponent implements OnInit {
   @Input() placeholder!: string;
   @Input() appearance: MatFormFieldAppearance = 'outline';
   @Input() floatingLabel: FloatLabelType = 'auto';
+  @Input() multiple: boolean = true;
+  @Input() cacheData: boolean = true;
+  @Input() cacheSelectData: boolean = true;
   @Input() selectAllOption: boolean = true;
+
   @Input('selectedData') set onSelectedData(data: AutocompleteOption[] | null) {
     const hasData = !!data?.length;
-    if (hasData) {
-      const mergedData = [...Object.values(this.selectedData), ...data];
-      mergedData.forEach((option) => {
-        const optionNotExists = !this.data[option.value];
+    const currData = this.data$.getValue();
+    let dataToAdd: AutocompleteConfig = {};
+    this.selectedData$.next(data || []);
 
-        if (optionNotExists) {
-          const currSelected = this.currentSelectedOptions$.getValue();
-          this.data[option.value] = { ...option, selected: true };
-          currSelected[option.value] = { ...option, selected: true };
-          this.currentOptions$.next(currSelected);
-          this.selectedOptions.next(of(Object.values(currSelected)));
+    if (data && hasData) {
+      if (this.cacheSelectData) {
+        data?.forEach((option) => {
+          const dataOptionNotExists = !currData[option.value];
 
-          // return;
-        } else {
-          const currSelected = this.currentSelectedOptions$.getValue();
+          if (dataOptionNotExists) {
+            dataToAdd[option.value] = option;
+            dataToAdd[option.value].selected = true;
+          } else {
+            dataToAdd[option.value] = option;
+            dataToAdd[option.value].selected = true;
+          }
+        });
+        this.data$.next({ ...currData, ...dataToAdd });
+      } else {
+        Object.values(currData).forEach(
+          (option) => (currData[option.value].selected = false)
+        );
 
-          this.data[option.value].selected = true;
-          currSelected[option.value] = this.data[option.value];
+        data.forEach((option) => {
+          const existAtCurrentData = !!currData[option.value];
 
-          this.selectedOptions.next(of(Object.values(currSelected)));
-          // return;
-        }
-      });
+          if (existAtCurrentData) {
+            currData[option.value] = option;
+            currData[option.value].selected = true;
+          }
+        });
 
-      this.onSelectChange();
+        this.data$.next(currData);
+      }
+
+      // this.selectedOptions.emit(of(this.currentSelectedOptionsEmit));
 
       return;
     }
-
-    this.selectedData = {};
   }
 
   @Input('data') set newData(incomingData: AutocompleteOption[] | null) {
+    let dataToAdd: AutocompleteConfig = {};
     const hasIncomingData = !!incomingData?.length;
-    const currSelected = Object.values(this.currentSelectedOptions$.getValue());
+    const noCurrentOptions = !Object.keys(this.currentOptions$.getValue())
+      .length;
+    const currData = this.data$.getValue();
+    const hasCurrValues = Object.keys(currData).length;
+    const currentSelectedDataFromParent = this.selectedData$.getValue();
+    const hasCurrentSelectedDataFromParent =
+      !!this.selectedData$.getValue().length;
 
     if (hasIncomingData) {
-      const mergedData = [...Object.values(this.data), ...incomingData];
+      if (this.cacheData) {
+        this.cacheIncomingData(incomingData);
+      } else {
+        dataToAdd = this.transformToConfig(incomingData);
 
-      mergedData.forEach((option) => {
-        const optionNotExists = !this.data[option.value];
-
-        if (optionNotExists) {
-          this.data[option.value] = option;
+        if (noCurrentOptions && this.emittedUserSearch) {
+          this.isLoading$.next(false);
+          this.emittedUserSearch = false;
         }
-      });
 
-      if (this.emittedUserSearch) {
-        this.emittedUserSearch = false;
-        this.isLoading = false;
-        this.searchNotFound = true;
+        if (noCurrentOptions && !this.emittedUserSearch) {
+          this.isLoading$.next(true);
+          this.emittedUserSearch = true;
+        }
+
+        const incomingAsConfig = this.transformToConfig(incomingData);
+
+        if (hasCurrValues) {
+          Object.entries(currData).forEach(([key, option]) => {
+            const existsAtIncoming = !!incomingAsConfig[+key];
+            const isSelectedPreviously = !!option?.selected;
+
+            if (existsAtIncoming && isSelectedPreviously && !this.multiple) {
+              dataToAdd[+key] = option;
+              dataToAdd[+key].selected = true;
+            }
+          });
+        }
+
+        if (hasCurrentSelectedDataFromParent) {
+          const previousSelected = this.transformToConfig(
+            currentSelectedDataFromParent
+          );
+
+          Object.entries(previousSelected).forEach(([key, option]) => {
+            const existsAtIncoming = !!incomingAsConfig[+key];
+
+            if (existsAtIncoming) {
+              dataToAdd[+key] = option;
+              dataToAdd[+key].selected = true;
+            }
+          });
+        }
+
+        this.data$.next({ ...dataToAdd });
       }
-
-      const transformedIncomingData: {
-        [key: string | number]: AutocompleteOption;
-      } = {};
-
-      incomingData.forEach((option) => {
-        transformedIncomingData[option.value] = this.data[option.value];
-      });
-
-      this.currentOptions$.next(transformedIncomingData);
-      this.selectedOptions.next(of(currSelected));
-      this.onSelectChange();
 
       return;
     }
 
-    //TODO: Verify why an event emitter triggers component states
-    this.selectedOptions.next(of(currSelected));
-    this.emittedUserSearch = false;
-    this.isLoading = false;
-    this.searchNotFound = true;
-    this.data = { ...this.data };
+    if (!this.cacheData) {
+      this.data$.next({});
+      this.emittedUserSearch = true;
+    }
+    // this.selectedOptions.emit(of(this.currentSelectedOptionsEmit));
+    this.isLoading$.next(false);
   }
 
   @Output() selectedOptions = new EventEmitter<
@@ -120,104 +162,100 @@ export class AutocompleteComponent implements OnInit {
 
   @Output() userSearchToApi = new EventEmitter<Observable<string>>();
 
-  data: AutocompleteConfig = {};
-  selectedData: AutocompleteConfig = {};
-
-  currentOptions$ = new BehaviorSubject<AutocompleteConfig>({});
-  currentSelectedOptions$ = new BehaviorSubject<AutocompleteConfig>({});
-  allSelected$ = new BehaviorSubject(false);
-
   searchControl: FormControl = new FormControl('');
+
+  data$ = new BehaviorSubject<AutocompleteConfig>({});
+  selectedData$ = new BehaviorSubject<AutocompleteOption[]>([]);
+
+  private currentOptions$ = new BehaviorSubject<AutocompleteConfig>({});
+  currentOptions$$: Observable<AutocompleteConfig> = this.setUpCurrentOptions();
+
   lastSearchValue: string | null = null;
-  isLoading: boolean = false;
-  searchNotFound: boolean = false;
+
+  isLoading$ = new BehaviorSubject<boolean>(true);
+
+  allSelected$: Observable<BooleanInput> = this.calculateSets();
   emittedUserSearch: boolean = false;
 
   constructor() {}
 
-  ngOnInit(): void {
-    this.searchControl.valueChanges
-      .pipe(
-        startWith(''),
-        tap((searchControlValue) => {
-          this.isLoading = true;
-          this.lastSearchValue = searchControlValue;
-          this.searchNotFound = false;
-        }),
-        debounceTime(500),
-        map((searchControlValue) => {
-          const search =
-            typeof searchControlValue === 'string'
-              ? searchControlValue
-              : searchControlValue.label;
+  ngOnInit(): void {}
 
-          return search ? this._filter(search as string) : this.data;
-        }),
-        tap((currentOptions) => {
-          this.currentOptions$.next(currentOptions);
-        }),
-        tap((currentOptions) => {
-          // if (this.lastSearchValue && !this.searchNotFound) {
-          //   this.isLoading = true;
-          //   this.emittedUserSearch = true;
-          //   return;
-          // }
-          // this.isLoading = false;
-
-          this.userSearchToApi.next(of(this.lastSearchValue || ''));
-          this.isLoading = false;
-          this.emittedUserSearch = true;
-
-          return;
-        })
-      )
-      .subscribe(() => {
-        this.onSelectChange();
-      });
-  }
-
-  //Delete
-  get currentSelectedIdsHTML(): string {
-    return Object.keys(this.currentSelectedOptions$.getValue())
-      .map((v) => v)
-      .join(',');
-  }
-
-  get hasOptionsToToggle(): boolean {
-    return Object.keys(this.currentOptions$.getValue()).length > 1;
-  }
-
-  onSelectChange(): void {
-    const currentSelectedOptions = this.currentSelectedOptions$.getValue();
-    const currentOptions = this.currentOptions$.getValue();
-    const hasCurrentSelectedOptions = !!Object.values(currentSelectedOptions)
-      .length;
-    const hasCurrentOptions = !!Object.values(currentOptions).length;
-
-    if (!hasCurrentSelectedOptions || !hasCurrentOptions) {
-      this.allSelected$.next(false);
-      return;
-    }
-
-    const isSuperSet = this.isSuperset(
-      new Set(Object.keys(currentSelectedOptions)),
-      new Set(Object.keys(currentOptions))
+  //Debugging
+  get currentSelectedIdsHTML$(): Observable<string> {
+    return this.currentSelectedOptions$.pipe(
+      map((options) => {
+        return Object.values(options)
+          .map((v) => v.value)
+          .join(',');
+      })
     );
-
-    this.allSelected$.next(isSuperSet);
   }
 
-  private _filter(label: string): AutocompleteConfig {
+  get currentSelected(): AutocompleteConfig {
+    const selectedOptions: AutocompleteOption[] = Object.values(
+      this.data$
+    ).filter(({ selected }) => selected);
+
+    let transformedOptions = this.transformToConfig(selectedOptions);
+
+    return transformedOptions;
+  }
+
+  get currentSelectedOptions$(): Observable<AutocompleteConfig> {
+    return this.data$.asObservable().pipe(
+      map((currentData) => {
+        const selectedOptions = Object.values(currentData).filter(
+          (option: AutocompleteOption) => option.selected
+        );
+
+        return this.transformToConfig(selectedOptions);
+      })
+    );
+  }
+
+  get currentSelectedOptionsEmit(): AutocompleteOption[] {
+    const currentData = this.data$.getValue();
+
+    const selectedOptions = Object.values(currentData)
+      .filter((option: AutocompleteOption) => option.selected)
+      .map((option) => ({
+        label: option.label,
+        value: option.value,
+      }));
+
+    return selectedOptions;
+  }
+
+  get hasMoreThanOneOption$(): Observable<boolean> {
+    return this.currentOptions$.pipe(
+      map((options) => Object.keys(options).length > 1 && this.multiple)
+    );
+  }
+
+  get searchNotFound$(): Observable<boolean> {
+    return this.currentOptions$.pipe(
+      map(
+        (options) =>
+          Object.keys(options).length === 0 && !this.isLoading$.getValue()
+      )
+    );
+  }
+
+  private _filter(
+    label: string,
+    data: AutocompleteConfig = {}
+  ): AutocompleteConfig {
     const filterValue = label.toLowerCase();
 
-    const filteredIds = Object.values(this.data)
+    const filteredIds = Object.values(data)
       .filter((option: any) => option.label.toLowerCase().includes(filterValue))
       .map((option) => option.value);
 
     let filteredData: AutocompleteConfig = {};
 
     filteredIds.forEach(
-      (optionId) => (filteredData[optionId] = this.data[optionId])
+      (optionId) => (filteredData[optionId] = data[optionId])
     );
 
     return filteredData;
@@ -227,122 +265,109 @@ export class AutocompleteComponent implements OnInit {
     return option2['key'];
   }
 
-  onAddOption(optionId: string | number) {
-    const currentSelected = this.currentSelectedOptions$.getValue();
-    const currentOptions = this.currentOptions$.getValue();
+  toggleOption(optionId: string | number) {
+    let currData = this.data$.getValue();
+    const currentAlreadySelected = currData[optionId].selected;
+    const currentNotSelected = !currData[optionId].selected;
 
-    if (currentSelected[optionId]) {
-      //update current options
-      currentOptions[optionId].selected = false;
-      this.data[optionId].selected = false;
+    if (this.multiple) {
+      if (currentNotSelected) {
+        currData = {
+          ...currData,
+          [optionId]: { ...currData[optionId], selected: true },
+        };
+      }
 
-      //update current selected
-      delete currentSelected[optionId];
-      this.currentSelectedOptions$.next(currentSelected);
-
-      //Event Emitter
-      this.selectedOptions.next(of(Object.values(currentSelected)));
-      this.onSelectChange();
-      return;
-    } else {
-      //Update current options
-      currentOptions[optionId].selected = true;
-      this.currentOptions$.next(currentOptions);
-
-      //update current selected
-      currentSelected[optionId] = {
-        ...currentOptions[optionId],
-        selected: true,
-      };
-
-      this.currentSelectedOptions$.next({ ...currentSelected });
-
-      //Event Emitter
-      this.selectedOptions.next(of(Object.values(currentSelected)));
-      this.onSelectChange();
+      if (currentAlreadySelected) {
+        currData = {
+          ...currData,
+          [optionId]: { ...currData[optionId], selected: false },
+        };
+      }
     }
+
+    if (!this.multiple) {
+      if (currentNotSelected) {
+        Object.values(currData).forEach((option) => {
+          let optionId = option.value;
+
+          currData[optionId] = {
+            ...option,
+            selected: false,
+          };
+        });
+
+        currData[optionId].selected = true;
+      }
+
+      if (currentAlreadySelected) {
+        Object.values(currData).forEach((option) => {
+          let optionId = option.value;
+
+          currData[optionId] = {
+            ...option,
+            selected: false,
+          };
+        });
+
+        currData[optionId].selected = false;
+      }
+    }
+
+    this.data$.next(currData);
+    this.selectedOptions.emit(of(this.currentSelectedOptionsEmit));
   }
 
   onSelectAll() {
-    const currentOptionsKeys = Object.keys(this.currentOptions$.getValue());
-    const currentSelectedOptionsKeys = Object.keys(
-      this.currentSelectedOptions$.getValue()
-    );
-    const hasCurrentSelectedOptionsKeys = !!currentSelectedOptionsKeys.length;
-    const allSelected = this.allSelected$.getValue();
-
+    const currentData = this.data$.getValue();
     const currentOptions = this.currentOptions$.getValue();
-    const currentSelectedOptions = this.currentSelectedOptions$.getValue();
+    const currentSelectedOptions = this.transformToConfig(
+      Object.values(currentData).filter(
+        (option: AutocompleteOption) => option.selected
+      )
+    );
+    const allSelected = this.isSuperset(
+      new Set(Object.keys(currentSelectedOptions)),
+      new Set(Object.keys(currentOptions))
+    );
+
+    const dataToUpdate: AutocompleteConfig = {};
 
     /**
      * Case 1 - All current data is selected
      */
     if (allSelected) {
-      /**
-       * Case 1.1 - Has previous selectedData, add currOpt that is not selected
-       */
-      if (hasCurrentSelectedOptionsKeys) {
-        currentOptionsKeys.forEach((currOptionId) => {
-          const isSelected = currentOptions[currOptionId].selected;
+      Object.values(currentOptions).forEach((option) => {
+        dataToUpdate[option.value] = option;
+        dataToUpdate[option.value].selected = false;
+      });
 
-          if (isSelected) {
-            this.onAddOption(currOptionId);
-          }
-
-          return;
-        });
-
-        this.onSelectChange();
-        return;
-      }
-      /**
-       * Case 1.2 - No selected data,  add all currOptions
-       */
-      if (!hasCurrentSelectedOptionsKeys) {
-        currentOptionsKeys.forEach((currOptionId) => {
-          this.onAddOption(currOptionId);
-        });
-
-        this.onSelectChange();
-        return;
-      }
+      this.data$.next({
+        ...currentData,
+        ...dataToUpdate,
+      });
     }
+
     /**
      * Case 2 - All current data is not selected
      */
+
     if (!allSelected) {
-      /**
-       * Case 2.1 - not all is selected and have previous selected data
-       * add only not selected
-       */
-      if (hasCurrentSelectedOptionsKeys) {
-        currentOptionsKeys.forEach((currOptionId) => {
-          const isNotSelected = !currentOptions[currOptionId].selected;
+      Object.keys(currentOptions).forEach((value) => {
+        dataToUpdate[value] = currentOptions[value];
+        dataToUpdate[value].selected = true;
+      });
 
-          if (isNotSelected) {
-            this.onAddOption(currOptionId);
-          }
-        });
-
-        return;
-      }
-      /**
-       * Case 2.2 - Not all selected and no previous selected,
-       * add curr options
-       */
-      if (!hasCurrentSelectedOptionsKeys) {
-        currentOptionsKeys.forEach((currOptionId) => {
-          this.onAddOption(currOptionId);
-        });
-
-        this.onSelectChange();
-
-        return;
-      }
+      this.data$.next({
+        ...currentData,
+        ...dataToUpdate,
+      });
     }
+
+    this.selectedOptions.emit(of(this.currentSelectedOptionsEmit));
   }
 
-  isSuperset(set: Set<number | string>, subset: Set<number | string>) {
+  isSuperset(set: Set<number | string>, subset: Set<number | string>): boolean {
     for (const elem of subset) {
       if (!set.has(elem)) {
         return false;
@@ -350,5 +375,122 @@ export class AutocompleteComponent implements OnInit {
     }
 
     return true;
+  }
+
+  private calculateSets(): Observable<BooleanInput> {
+    return combineLatest({
+      currentSelectedOptions: this.currentSelectedOptions$,
+      currentOptions: this.currentOptions$,
+    }).pipe(
+      map(({ currentSelectedOptions, currentOptions }) =>
+        coerceBooleanProperty(
+          this.isSuperset(
+            new Set(Object.keys(currentSelectedOptions)),
+            new Set(Object.keys(currentOptions))
+          )
+        )
+      )
+    );
+  }
+
+  setUpCurrentOptions(): Observable<AutocompleteConfig> {
+    return combineLatest({
+      userSearch: this.searchControl.valueChanges.pipe(
+        tap((query) => {
+          this.isLoading$.next(true);
+          this.lastSearchValue = query;
+        }),
+        debounceTime(500),
+        startWith('')
+      ),
+      data: this.data$.asObservable(),
+    }).pipe(
+      shareReplay(),
+      map(({ userSearch, data }) => {
+        const search =
+          typeof userSearch === 'string' ? userSearch : userSearch.label;
+
+        const filteredData: AutocompleteConfig = search
+          ? this._filter(search as string, data)
+          : data;
+
+        this.currentOptions$.next(filteredData);
+
+        return filteredData;
+      }),
+
+      tap((currentOptions) => {
+        const noCurrentOptions = !Object.keys(currentOptions).length;
+
+        if (noCurrentOptions) {
+          !this.emittedUserSearch &&
+            this.userSearchToApi.emit(of(this.lastSearchValue || ''));
+          if (this.emittedUserSearch) this.isLoading$.next(false);
+
+          return;
+        }
+
+        this.isLoading$.next(false);
+      })
+    );
+  }
+
+  transformToConfig(arg: AutocompleteOption[]) {
+    if (arg && Array.isArray(arg)) {
+      let transformedOptions: AutocompleteConfig = {};
+
+      arg.forEach((option: AutocompleteOption) => {
+        transformedOptions[option.value] = { ...option };
+      });
+
+      return transformedOptions;
+    }
+
+    return arg;
+  }
+
+  transformToOption(arg: AutocompleteConfig) {
+    if (arg && typeof arg === 'object') {
+      let transformedOptions: AutocompleteOption[] = [];
+      transformedOptions = Object.values(arg);
+
+      return transformedOptions;
+    }
+
+    return arg;
+  }
+
+  cacheIncomingData(incomingData: AutocompleteOption[]): void {
+    const currData = this.data$.getValue();
+    let dataToAdd: AutocompleteConfig = {};
+
+    const mergedData = [
+      ...Object.values(this.data$.getValue()),
+      ...incomingData,
+    ];
+
+    mergedData.forEach((option) => {
+      const dataNotExists = !currData[option.value];
+
+      if (dataNotExists) {
+        dataToAdd[option.value] = option;
+      }
+    });
+
+    this.emittedUserSearch = false;
+    this.data$.next({ ...currData, ...dataToAdd });
+  }
+
+  cacheIncomingSelectedData(incomingData: AutocompleteOption[]): void {}
+
+  unselectOption(optionId: number | string) {
+    let currData = this.data$.getValue();
+
+    this.data$.next({
+      ...currData,
+      [optionId]: { ...currData[optionId], selected: false },
+    });
+
+    this.selectedOptions.emit(of(this.currentSelectedOptionsEmit));
   }
 }
