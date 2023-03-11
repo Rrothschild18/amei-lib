@@ -29,6 +29,7 @@ import { NestedFieldsComponent } from './components/nested-fields/nested-fields.
 import { ProfessionalFormComponent } from './views/professionals/professionals-form/professional-form.component';
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
+import { ProfessionalProceduresComponent } from './views/professional-procedures/professional-procedures.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { AutocompleteComponent } from './components/autocomplete/autocomplete.co
     NestedFieldsComponent,
     ProfessionalFormComponent,
     AutocompleteComponent,
+    ProfessionalProceduresComponent,
   ],
   imports: [
     BrowserModule,

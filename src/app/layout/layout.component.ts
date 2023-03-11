@@ -20,16 +20,6 @@ export class LayoutComponent implements OnInit {
       pathName: 'Cadastro pacientes',
       iconName: 'monetization_on',
     },
-    {
-      linkTo: '/home',
-      pathName: 'Horários de atendimento',
-      iconName: 'monetization_on',
-    },
-    {
-      linkTo: '/home',
-      pathName: 'Splits recebidos',
-      iconName: 'monetization_on',
-    },
   ];
 
   menuItens = [

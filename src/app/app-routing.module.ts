@@ -6,6 +6,7 @@ import { HomeComponent } from './views/home/home.component';
 import { LoginComponent } from './views/login/login.component';
 import { PatientFormComponent } from './views/patients/patient-form/patient-form.component';
 import { PatientsListComponent } from './views/patients/patients-list/patients-list.component';
+import { ProfessionalProceduresComponent } from './views/professional-procedures/professional-procedures.component';
 import { ProfessionalFormComponent } from './views/professionals/professionals-form/professional-form.component';
 import { ProfessionalsListComponent } from './views/professionals/professionals-list/professionals-list.component';
 
@@ -14,6 +15,10 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'patients', component: PatientsListComponent },
   { path: 'professionals', component: ProfessionalsListComponent },
+  {
+    path: 'professionals/:id/procedures',
+    component: ProfessionalProceduresComponent,
+  },
   { path: 'professionals/new', component: ProfessionalFormComponent },
   { path: 'patients/new', component: PatientFormComponent },
   { path: 'patients/:id/edit', component: PatientFormComponent },

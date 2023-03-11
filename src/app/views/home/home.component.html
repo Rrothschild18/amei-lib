@@ -1,44 +1,5 @@
 <section class="Home">
   <div class="container">
-    <h2>HOMErr</h2>
-
-    <div class="row">
-      <div class="col-6">
-        <div class="d-flex justify-content-center bg-white p-5 rounded">
-          <app-autocomplete
-            class="w-100"
-            #expertiseAreaAutoComplete
-            placeholder="Filtrar area por"
-            [data]="expertiseAreaList$ | async"
-            (selectedOptions)="onSelectedExpertiseAreaOptions($event)"
-          >
-          </app-autocomplete>
-        </div>
-      </div>
-
-      <div class="col-6">
-        <div class="d-flex justify-content-center bg-white p-5 rounded">
-          <!-- <app-list-test>
-            <ng-template name="Portugal" let-country>
-              <div class="d-flex justify-content-between">
-                <pre>{{ country | json }}</pre>
-              </div>
-            </ng-template>
-          </app-list-test> -->
-
-          <app-autocomplete
-            class="w-100"
-            #proceduresLimitAutocomplete
-            placeholder="Limitar Procedimentos"
-            [data]="proceduresList$$ | async"
-            (selectedOptions)="onSelectedOptions($event)"
-            (userSearchToApi)="onUserSearchToApi($event)"
-          >
-          </app-autocomplete>
-        </div>
-        <pre>{{ userSearch$ | async }}</pre>
-        <pre>{{ selectedOptions$ | async | json }}</pre>
-      </div>
-    </div>
+    <h2>Home</h2>
   </div>
 </section>
