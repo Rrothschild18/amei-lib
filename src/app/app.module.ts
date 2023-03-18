@@ -11,9 +11,9 @@ import { CardComponent } from './components/card/card.component';
 import { FieldComponent } from './components/field/field.component';
 import { FormGeneratorComponent } from './components/form-generator/form-generator.component';
 import { FormViewComponent } from './components/form-view/form-view.component';
-import { HeaderDirective } from './components/list-view/header.directive';
+// import { HeaderDirective } from './components/list-view/header.directive';
 import { ListViewComponent } from './components/list-view/list-view.component';
-import { CardBodyDirective } from './directives/card-body.directive';
+// import { CardBodyDirective } from './directives/card-body.directive';
 import { LayoutComponent } from './layout/layout.component';
 import { MaterialModule } from './material/material.module';
 import { PatientState } from './store/patients/patient.state';
@@ -39,11 +39,11 @@ import { ProfessionalProceduresComponent } from './views/professional-procedures
     LayoutComponent,
     CardComponent,
     CardTemplateComponent,
-    CardBodyDirective,
+    // CardBodyDirective,
     NgTemplateNameDirective,
     FormGeneratorComponent,
     ListViewComponent,
-    HeaderDirective,
+    // HeaderDirective,
     PatientsListComponent,
     PatientFormComponent,
     FieldComponent,

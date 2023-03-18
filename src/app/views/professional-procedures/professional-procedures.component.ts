@@ -472,7 +472,7 @@ export class ProfessionalProceduresComponent implements OnInit {
   }
 
   get token(): string {
-    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJBRE1JTiBVU0VSIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY3ODU1NzA4NywiZXhwIjoxNjc4NTg1ODg3fQ.vQthNvHWqi6dfdvLnJJNIDwyl13Z5D98bH_wVT7tH2E';
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJBRE1JTiBVU0VSIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY3ODgwNDIyOSwiZXhwIjoxNjc4ODMzMDI5fQ.Pehirw4OcmC5rTZAVsX7m7cDxjrnEjBA2IuX6QhtfAQ';
   }
 
   get baseUrl(): string {

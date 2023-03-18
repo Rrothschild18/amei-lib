@@ -229,7 +229,12 @@ export class AutocompleteComponent implements OnInit {
 
   get hasMoreThanOneOption$(): Observable<boolean> {
     return this.currentOptions$.pipe(
-      map((options) => Object.keys(options).length > 1 && this.multiple)
+      map(
+        (options) =>
+          Object.keys(options).length > 1 &&
+          this.multiple &&
+          this.selectAllOption
+      )
     );
   }
 

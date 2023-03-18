@@ -3,10 +3,11 @@
   [floatLabel]="floatingLabel"
   class="w-100"
 >
-  <mat-label>{{ placeholder }}</mat-label>
+  <mat-label id="labelPlaceholder">{{ placeholder }}</mat-label>
   <input
     matInput
     type="text"
+    id="searchControl"
     [formControl]="searchControl"
     [placeholder]="placeholder"
     [matAutocomplete]="autoCompleteRef"
@@ -22,10 +23,15 @@
     >Campo obrigatório*</mat-error
   >
 </mat-form-field>
-<mat-autocomplete #autoCompleteRef="matAutocomplete" class="w-100">
+<mat-autocomplete
+  #autoCompleteRef="matAutocomplete"
+  class="w-100"
+  id="autocomplete"
+>
   <mat-option class="d-none"> </mat-option>
   <mat-checkbox
     class="checkbox"
+    id="selectAllOption"
     [checked]="allSelected$ | async"
     (change)="onSelectAll()"
     *ngIf="hasMoreThanOneOption$ | async"
