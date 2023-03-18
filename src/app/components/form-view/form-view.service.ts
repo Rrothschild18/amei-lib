@@ -8,9 +8,7 @@ export interface FormValue {
 
 @Injectable()
 export class FormViewService {
-  private values$: BehaviorSubject<FormValue> = new BehaviorSubject<FormValue>(
-    {}
-  );
+  private values$ = new BehaviorSubject<FormValue>({});
 
   private formRefs$ = new Subject<QueryList<FormGeneratorComponent>>();
 

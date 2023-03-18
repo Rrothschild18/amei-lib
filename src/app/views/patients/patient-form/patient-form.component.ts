@@ -113,10 +113,11 @@ export class PatientFormComponent implements OnInit {
 
   get patientPersonalFields(): FieldsArrayName<Patient> {
     return [
-      'uuid',
+      // 'uuid',
       'isActive',
       'name',
       'lastName',
+      'civilStatus',
       'email',
       'document',
       'phone',
