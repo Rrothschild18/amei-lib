@@ -26,7 +26,7 @@ export class FormViewService {
     this.values$.next(emittedFormValue);
   }
 
-  setFormRefs(forms: QueryList<any>) {
+  setFormRefs(forms: QueryList<FormGeneratorComponent>) {
     this.formRefs$.next(forms);
   }
 

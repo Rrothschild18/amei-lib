@@ -21,7 +21,7 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import {
   FormValue,
   FormViewService,
@@ -33,7 +33,7 @@ import {
 } from 'src/app/models';
 import { Patient } from 'src/app/interfaces';
 import { FormGeneratorComponent } from 'src/app/components/form-generator/form-generator.component';
-import { Actions, Select, Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-patient-form',
@@ -42,7 +42,7 @@ import { Actions, Select, Store } from '@ngxs/store';
   providers: [{ provide: FormViewService }],
 })
 export class PatientFormComponent implements OnInit {
-  values: any = {};
+  values: FormValue = {};
   componentStore$: Observable<FormValue> = this.formService.formValues;
 
   @Select('Patient') patient$!: Observable<PatientStateModel>;
@@ -60,12 +60,10 @@ export class PatientFormComponent implements OnInit {
 
   constructor(
     public formService: FormViewService,
-    private cdRef: ChangeDetectorRef,
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
-    private store: Store,
-    private actions$: Actions
+    private store: Store
   ) {}
 
   ngOnInit(): void {
@@ -81,7 +79,7 @@ export class PatientFormComponent implements OnInit {
     // this.fetchNewCountryOptions();
   }
 
-  get mode() {
+  get mode$() {
     return this.route.url.pipe(
       // tap((url) => this.pageMode = url[url.length - 1].path === 'edit' ? 'edit' : 'create')),
       map((url) => (url[url.length - 1].path === 'edit' ? 'edit' : 'create')),
@@ -105,7 +103,6 @@ export class PatientFormComponent implements OnInit {
 
     if (formsHasInitializedControls) {
       this.formService.setFormRefs(this.formRefs);
-      this.cdRef.detectChanges();
     }
   }
 
@@ -254,15 +251,16 @@ export class PatientFormComponent implements OnInit {
     // });
   }
 
-  handle2(e: any) {
+  handle2(e: {
+    event: any;
+    form: FormGroup;
+    fieldControl: FormControl;
+    formStore: FormViewService;
+  }) {
     e.formStore.onFormChanges({
       fieldName: 'cep',
-      value: e.form.get('cep').value,
+      value: e?.form?.get('cep')?.value,
     });
-
-    // e.form.valueChanges.subscribe((formValue: any) => {
-    //   console.log('Form Value has changed at component', { formValue });
-    // });
   }
 
   bondForm() {
@@ -278,7 +276,7 @@ export class PatientFormComponent implements OnInit {
       console.log('cep changed', value);
     });
     cepFieldRef?.updateValueAndValidity();
-    this.cdRef.detectChanges();
+    // this.cdRef.detectChanges();
   }
 
   handleCepChange() {
@@ -310,7 +308,7 @@ export class PatientFormComponent implements OnInit {
           this.additionalForm.first.form.patchValue(parsedResult);
         })
       )
-      .subscribe((ofResponse) => {
+      .subscribe(() => {
         this.disableCepFields();
       });
   }

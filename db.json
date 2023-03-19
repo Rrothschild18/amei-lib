@@ -163,7 +163,28 @@
         "label": "Complement",
         "type": "text"
       }
-    }
+    },
+    "results": [
+      {
+        "uuid": "2d4979de-aac6-4cdd-b420-74fb8499cf33",
+        "isActive": true,
+        "name": "Raul",
+        "lastName": "Rothschild",
+        "civilStatus": "cb884f43-9a36-4fd8-8a35-f38c798dc5d4",
+        "email": "raul@gmail.com",
+        "document": "loerem",
+        "birthDate": "1998-02-18T02:00:00.000Z",
+        "games": "560e8a3f-1176-4f78-8fe7-174ab9fe8aa1",
+        "country": "ca36dad1-1e14-426c-b965-72072eef9487",
+        "cep": "14021410",
+        "city": "Ribeirão Preto",
+        "state": "SP",
+        "neighborhood": "City Ribeirão",
+        "address": "Rua Professor Sylvio Marcondes Machado",
+        "streetNumber": "56",
+        "complement": "CASA DE ESQUINA PORTAO VERDE"
+      }
+    ]
   },
 
   "games": {

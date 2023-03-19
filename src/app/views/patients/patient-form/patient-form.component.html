@@ -5,11 +5,11 @@
   </pre>
   <pre>
     <h6>URL</h6>
-    {{ mode | async }} 
+    {{ mode$ | async }} 
   </pre>
   <app-form-view
     entity="Patient"
-    [mode]="mode | async"
+    [mode]="mode$ | async"
     (fetchSuccess)="onFetchSuccess($event)"
   >
     <ng-template #header>
@@ -82,6 +82,7 @@
                           handle2({
                             event: $event,
                             form: this.form,
+                            fieldControl: fieldRef,
                             formStore
                           })
                         "
