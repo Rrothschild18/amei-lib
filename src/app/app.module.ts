@@ -30,6 +30,7 @@ import { ProfessionalFormComponent } from './views/professionals/professionals-f
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
 import { ProfessionalProceduresComponent } from './views/professional-procedures/professional-procedures.component';
+import { NewsletterComponent } from './components/newsletter/newsletter.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { ProfessionalProceduresComponent } from './views/professional-procedures
     ProfessionalFormComponent,
     AutocompleteComponent,
     ProfessionalProceduresComponent,
+    NewsletterComponent,
   ],
   imports: [
     BrowserModule,

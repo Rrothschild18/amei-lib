@@ -1,87 +1,13 @@
 <div class="container">
   <app-list-view entity="Patient">
-    <ng-template #header let-entity="entity">
+    <!-- <ng-template #header let-entity="entity">
       <div class="d-flex justify-content-between align-items-center w-100 my-5">
         <ul class="list-unstyled d-flex">
           <li class="me-2">Home</li>
         </ul>
         <button mat-button class="bg-warning">Enviar</button>
       </div>
-
-      <div class="row mb-5">
-        <div class="col-11">
-          <form [formGroup]="filters">
-            <mat-form-field appearance="fill" class="w-100">
-              <mat-label>Search...</mat-label>
-              <input
-                formControlName="nomeoucpf"
-                matInput
-                placeholder="Search..."
-                [value]="searchNameValue$ | async"
-              />
-            </mat-form-field>
-          </form>
-        </div>
-        <button
-          mat-button
-          [matMenuTriggerFor]="menu"
-          class="col-1 filter-button"
-        >
-          Filters
-          <mat-icon>filter_list</mat-icon>
-        </button>
-
-        <mat-menu #menu="matMenu" class="p-2">
-          <section [formGroup]="filters">
-            <!-- <div>
-              <mat-form-field
-                (click)="$event.stopPropagation()"
-                appearance="fill"
-                class="w-100"
-              >
-                <mat-label>E-mail</mat-label>
-                <input matInput placeholder="E-mail" formControlName="email" />
-              </mat-form-field>
-            </div> -->
-            <div>
-              <mat-label>Status</mat-label>
-              <mat-form-field
-                class="w-100"
-                appearance="fill"
-                (click)="$event.stopPropagation()"
-                appearance="fill"
-                class="w-100"
-              >
-                <mat-label>Ativo</mat-label>
-                <mat-select formControlName="ativo">
-                  <!-- <mat-option>Todos</mat-option> -->
-                  <!-- <mat-option [value]="true">Obito</mat-option> -->
-                  <mat-option [value]="true">Ativo</mat-option>
-                  <mat-option [value]="false">Inativo</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </section>
-          <div class="d-flex justify-content-end">
-            <button
-              mat-stroked-button
-              (click)="clearFilters()"
-              color="primary"
-              class="me-2"
-            >
-              Clean
-            </button>
-            <button
-              mat-flat-button
-              (click)="handleFilter($event)"
-              color="primary"
-            >
-              Filter
-            </button>
-          </div>
-        </mat-menu>
-      </div>
-    </ng-template>
+    </ng-template> -->
 
     <ng-template
       #body

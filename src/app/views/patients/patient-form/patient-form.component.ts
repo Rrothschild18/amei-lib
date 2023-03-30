@@ -58,6 +58,9 @@ export class PatientFormComponent implements OnInit {
   @ViewChildren(FormGeneratorComponent)
   formRefs!: QueryList<FormGeneratorComponent>;
 
+  isFetchingCep = true;
+  successFullRequestToViaCep = true;
+
   constructor(
     public formService: FormViewService,
     private http: HttpClient,
@@ -208,6 +211,39 @@ export class PatientFormComponent implements OnInit {
   get patientAdditionalValidators(): FieldsValidatorsConfig<Patient> {
     return {
       address: [Validators.maxLength(20)],
+    };
+  }
+
+  //Todo                            FieldsFieldsConfig<Patient>
+  get patientAdditionalFieldEvents(): any {
+    return {
+      address: {
+        onBlur: () => {
+          this.isFetchingCep = true;
+          //CallBack to fetch ViaCep. Updates state with injected service
+        },
+        onClick: () => {},
+        onMouseEnter: () => {},
+        onMouseLeave: () => {},
+      },
+    };
+  }
+
+  //Todo                            FieldsPropsConfig<Patient>
+  get patientAdditionalProps(): any {
+    return {
+      address: {
+        isLoading: this.isFetchingCep,
+        isDisabled: this.isFetchingCep || this.successFullRequestToViaCep,
+      },
+      neighborhood: {
+        isLoading: this.isFetchingCep,
+        isDisabled: this.isFetchingCep || this.successFullRequestToViaCep,
+      },
+      street: {
+        isLoading: this.isFetchingCep,
+        isDisabled: this.isFetchingCep || this.successFullRequestToViaCep,
+      },
     };
   }
 
