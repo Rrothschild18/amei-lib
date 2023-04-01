@@ -1,3 +1,9 @@
+import { ThemePalette } from '@angular/material/core';
+import {
+  FloatLabelType,
+  MatFormFieldAppearance,
+} from '@angular/material/form-field';
+
 export class Field {
   name: string;
   label: string;
@@ -36,3 +42,42 @@ export type FieldTypes =
   | 'radio'
   | 'email'
   | 'checkbox';
+
+export interface IBasicInputAttributes {
+  name?: string;
+  value?: any;
+  placeholder?: string;
+  required?: boolean;
+  disabled?: boolean;
+  isLoading: false;
+  readonly?: boolean;
+  autofocus?: boolean;
+  minlength?: number;
+  maxlength?: number;
+  pattern?: string;
+  multiple?: boolean;
+  indeterminate?: boolean;
+}
+
+export interface ITextareaAttributes extends IBasicInputAttributes {
+  rows?: number;
+  cols?: number;
+}
+
+export interface ISelectAttributes extends IBasicInputAttributes {
+  multiple?: boolean;
+}
+
+export type FieldAttrs =
+  | IBasicInputAttributes
+  | ITextareaAttributes
+  | ISelectAttributes
+  | IMaterialInputAttributes;
+
+export interface IMaterialInputAttributes extends IBasicInputAttributes {
+  hideRequiredMarker?: boolean;
+  floatLabel?: FloatLabelType;
+  appearance?: MatFormFieldAppearance;
+  color?: ThemePalette;
+  hintLabel?: string;
+}

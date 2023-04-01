@@ -1,5 +1,9 @@
 import { FormControl, FormGroup, ValidatorFn } from '@angular/forms';
-import { Field, FieldTypes } from './field';
+import { Field, FieldAttrs, FieldTypes } from './field';
+
+export type FieldsAttributesConfig<T extends {} = any> = {
+  [key in keyof T]?: FieldAttrs;
+};
 
 export type FieldsValidatorsConfig<T extends {} = any> = {
   [key in keyof T]?: ValidatorFn[];

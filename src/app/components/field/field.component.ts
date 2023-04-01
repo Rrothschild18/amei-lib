@@ -1,7 +1,8 @@
+import { Dispatch } from '@ngxs-labs/dispatch-decorator';
 import { FormViewService } from 'src/app/components/form-view/form-view.service';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
-import { Field } from 'src/app/models/field';
+import { Field, FieldAttrs } from 'src/app/models/field';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -13,6 +14,8 @@ export class FieldComponent implements OnInit, OnDestroy {
   @Input() field!: Field;
   @Input() form!: FormGroup;
   @Input() fieldFormControl!: AbstractControl | null;
+  //ngx-mask not included
+  @Input() fieldAttributes: FieldAttrs | undefined;
 
   private fieldValueSubscription$?: Subscription = new Subscription();
 
@@ -35,7 +38,6 @@ export class FieldComponent implements OnInit, OnDestroy {
   setUpFieldChange(): void {
     this.fieldValueSubscription$ =
       this.fieldFormControl?.valueChanges.subscribe((changedValue) => {
-        debugger;
         this.formService.formValues.next({
           fieldName: this.field.name,
           value: changedValue,

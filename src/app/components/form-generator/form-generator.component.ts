@@ -17,12 +17,13 @@ import {
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
 import {
   FieldColumnConfigTypes,
+  FieldsAttributesConfig,
   FieldsColumnsConfig,
   FieldsConfig,
   FieldsValidatorsConfig,
   FormFieldContext,
 } from 'src/app/models';
-import { Field } from 'src/app/models/field';
+import { Field, FieldAttrs } from 'src/app/models/field';
 
 @Component({
   selector: 'app-form-generator',
@@ -38,15 +39,15 @@ export class FormGeneratorComponent implements OnInit {
     this.fields = fields;
     this.toFormGroup(this.toArrayFields(this.fields));
   }
-
-  @Input('fieldsValidators') fieldsValidators: FieldsValidatorsConfig = {};
-
-  @Input('columns') columns: FieldsColumnsConfig = {};
+  @Input() fieldsValidators: FieldsValidatorsConfig = {};
+  @Input() fieldsAttributes: FieldsAttributesConfig = {};
+  @Input() columns: FieldsColumnsConfig = {};
 
   @ContentChildren(NgTemplateNameDirective)
   _templates!: QueryList<NgTemplateNameDirective>;
 
   constructor(private fb: FormBuilder) {}
+
   ngOnInit(): void {}
 
   get hasFields(): boolean {
@@ -66,7 +67,6 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   toFormGroup(fields: Field[] = []) {
-    // console.log('Render FieldControls');
     if (this.hasFormValues) return;
 
     const fieldsType = ['text', 'select', 'textarea', 'date', 'radio'];
@@ -174,5 +174,9 @@ export class FormGeneratorComponent implements OnInit {
 
   setDefaultColumnClass() {
     return 'col-6';
+  }
+
+  getFieldAttributes(fieldName: string): FieldAttrs | undefined {
+    return this.fieldsAttributes[fieldName] || undefined;
   }
 }

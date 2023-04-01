@@ -1,13 +1,24 @@
 <div [ngSwitch]="field.type" [formGroup]="form">
   <ng-container *ngSwitchCase="'text'">
-    <mat-form-field class="w-100" appearance="fill">
+    <mat-form-field class="w-100" appearance="fill" [hideRequiredMarker]="true">
       <mat-label>{{ field.placeholder || field.label }}</mat-label>
-      <input matInput [formControlName]="field.name" />
+      <input
+        matInput
+        [placeholder]="field.placeholder || ''"
+        [formControlName]="field.name"
+        [disabled]="!!fieldAttributes?.disabled"
+        [autofocus]="!!fieldAttributes?.autofocus"
+        [required]="!!fieldAttributes?.required"
+        [minlength]="fieldAttributes?.minlength ?? 0"
+        [maxlength]="fieldAttributes?.maxlength ?? 999"
+        [readonly]="!!fieldAttributes?.readonly"
+        [pattern]="fieldAttributes?.pattern ?? ''"
+      />
       <mat-spinner
         class="loading"
         [diameter]="30"
         matSuffix
-        *ngIf="field.loadingStatus"
+        *ngIf="!!fieldAttributes?.isLoading"
       ></mat-spinner>
       <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
         showError(form.get(field.name)?.errors)
@@ -16,9 +27,21 @@
   </ng-container>
 
   <ng-container *ngSwitchCase="'email'">
-    <mat-form-field class="w-100" appearance="fill">
+    <mat-form-field class="w-100" appearance="fill" [hideRequiredMarker]="true">
       <mat-label>{{ field.placeholder || field.label }}</mat-label>
-      <input matInput [formControlName]="field.name" type="email" />
+      <input
+        matInput
+        type="email"
+        [formControlName]="field.name"
+        [autofocus]="!!fieldAttributes?.autofocus"
+        [disabled]="!!fieldAttributes?.disabled"
+        [maxlength]="fieldAttributes?.maxlength ?? 999"
+        [minlength]="fieldAttributes?.minlength ?? 0"
+        [placeholder]="field.placeholder || ''"
+        [pattern]="fieldAttributes?.pattern ?? ''"
+        [readonly]="!!fieldAttributes?.readonly"
+        [required]="!!fieldAttributes?.required"
+      />
       <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
         showError(form.get(field.name)?.errors)
       }}</mat-error>
@@ -26,9 +49,15 @@
   </ng-container>
 
   <ng-container *ngSwitchCase="'select'">
-    <mat-form-field class="w-100" appearance="fill">
+    <mat-form-field class="w-100" appearance="fill" [hideRequiredMarker]="true">
       <mat-label>{{ field.label }}</mat-label>
-      <mat-select [formControlName]="field.name">
+      <mat-select
+        [formControlName]="field.name"
+        [placeholder]="field.placeholder || ''"
+        [disabled]="!!fieldAttributes?.disabled"
+        [required]="!!fieldAttributes?.required"
+        [multiple]="!!fieldAttributes?.multiple"
+      >
         <mat-option
           *ngFor="let option of field.options"
           [value]="option.value"
@@ -42,9 +71,20 @@
   </ng-container>
 
   <ng-container *ngSwitchCase="'textarea'">
-    <mat-form-field class="w-100" appearance="fill">
+    <mat-form-field class="w-100" appearance="fill" [hideRequiredMarker]="true">
       <mat-label>{{ field.name }}</mat-label>
-      <textarea matInput [formControlName]="field.name"></textarea>
+      <textarea
+        matInput
+        [formControlName]="field.name"
+        [autofocus]="!!fieldAttributes?.autofocus"
+        [disabled]="!!fieldAttributes?.disabled"
+        [maxlength]="fieldAttributes?.maxlength ?? 999"
+        [minlength]="fieldAttributes?.minlength ?? 0"
+        [placeholder]="field.placeholder || ''"
+        [pattern]="fieldAttributes?.pattern ?? ''"
+        [readonly]="!!fieldAttributes?.readonly"
+        [required]="!!fieldAttributes?.required"
+      ></textarea>
       <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
         showError(form.get(field.name)?.errors)
       }}</mat-error>
@@ -56,6 +96,8 @@
       <mat-radio-group
         aria-label="Select an option"
         [formControlName]="field.name"
+        [disabled]="!!fieldAttributes?.disabled"
+        [required]="!!fieldAttributes?.required"
       >
         <mat-label class="d-block">{{ field.label }}</mat-label>
         <mat-radio-button
@@ -69,12 +111,25 @@
 
   <ng-container *ngSwitchCase="'date'">
     <div>
-      <mat-form-field appearance="fill" class="w-100">
+      <mat-form-field
+        appearance="fill"
+        class="w-100"
+        [hideRequiredMarker]="true"
+      >
         <mat-label>{{ field.placeholder || field.label }}</mat-label>
         <input
           matInput
           [formControlName]="field.name"
           [matDatepicker]="picker"
+          [autofocus]="!!fieldAttributes?.autofocus"
+          [disabled]="!!fieldAttributes?.disabled"
+          [maxlength]="fieldAttributes?.maxlength ?? 999"
+          [minlength]="fieldAttributes?.minlength ?? 0"
+          [placeholder]="field.placeholder || ''"
+          [pattern]="fieldAttributes?.pattern ?? ''"
+          [readonly]="!!fieldAttributes?.readonly"
+          [required]="!!fieldAttributes?.required"
+          [pattern]="fieldAttributes?.pattern || ''"
         />
         <mat-hint>MM/DD/YYYY</mat-hint>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -91,8 +146,10 @@
       <mat-checkbox
         labelPosition="before"
         *ngFor="let option of field.options"
-        [indeterminate]="true"
         [formControlName]="option.label"
+        [indeterminate]="!!fieldAttributes?.indeterminate"
+        [disabled]="!!fieldAttributes?.disabled"
+        [required]="!!fieldAttributes?.required"
       >
         {{ option.label }}
       </mat-checkbox>

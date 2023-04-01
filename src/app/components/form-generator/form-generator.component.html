@@ -11,6 +11,7 @@
             [field]="field"
             [fieldFormControl]="form.get(field.name)"
             [form]="form"
+            [fieldAttributes]="getFieldAttributes(field.name)"
           ></app-field>
         </div>
       </ng-template>
