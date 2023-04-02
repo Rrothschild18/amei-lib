@@ -22,7 +22,7 @@ export type ColumTypes = 'col' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | string;
 export type FieldsArrayName<T extends {}> = Array<keyof T>;
 
 export type FieldsConfig<T extends {} = any> = {
-  [key in keyof T]: FieldConfig<T, key>;
+  [key in keyof T]?: FieldConfig<T, key>;
 };
 
 export interface FieldConfig<T, FieldConfigKey extends keyof T> {

@@ -42,13 +42,11 @@ export class FieldComponent implements OnInit, OnDestroy {
   setUpFieldChange(): void {
     this.fieldValueSubscription$ =
       this.fieldFormControl?.valueChanges.subscribe((changedValue) => {
-        debugger;
         this.formService.formValues.next({
           fieldName: this.field.name,
           value: changedValue,
         });
       });
-    this.form.updateValueAndValidity();
   }
 
   //TODO map errors with an object, destruct arguments and accept custom errors messages

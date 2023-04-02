@@ -9,6 +9,7 @@ import { PatientsListComponent } from './views/patients/patients-list/patients-l
 import { ProfessionalProceduresComponent } from './views/professional-procedures/professional-procedures.component';
 import { ProfessionalFormComponent } from './views/professionals/professionals-form/professional-form.component';
 import { ProfessionalsListComponent } from './views/professionals/professionals-list/professionals-list.component';
+import { EmployeeFormComponent } from './views/employees/employee-form/employee-form.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -22,6 +23,8 @@ const routes: Routes = [
   { path: 'professionals/new', component: ProfessionalFormComponent },
   { path: 'patients/new', component: PatientFormComponent },
   { path: 'patients/:id/edit', component: PatientFormComponent },
+
+  { path: 'employees/new', component: EmployeeFormComponent },
 ];
 
 @NgModule({

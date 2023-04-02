@@ -20,6 +20,11 @@ export class LayoutComponent implements OnInit {
       pathName: 'Cadastro pacientes',
       iconName: 'monetization_on',
     },
+    {
+      linkTo: '/employees/new',
+      pathName: 'Cadastro funcionarios',
+      iconName: 'monetization_on',
+    },
   ];
 
   menuItens = [

@@ -31,6 +31,7 @@ import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
 import { ProfessionalProceduresComponent } from './views/professional-procedures/professional-procedures.component';
 import { NewsletterComponent } from './components/newsletter/newsletter.component';
+import { EmployeeFormComponent } from './views/employees/employee-form/employee-form.component';
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import { NewsletterComponent } from './components/newsletter/newsletter.componen
     AutocompleteComponent,
     ProfessionalProceduresComponent,
     NewsletterComponent,
+    EmployeeFormComponent,
   ],
   imports: [
     BrowserModule,

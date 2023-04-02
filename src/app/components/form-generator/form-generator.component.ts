@@ -14,6 +14,7 @@ import {
   FormBuilder,
   Validators,
 } from '@angular/forms';
+import { Observable, of } from 'rxjs';
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
 import {
   FieldColumnConfigTypes,
@@ -45,6 +46,8 @@ export class FormGeneratorComponent implements OnInit {
 
   @ContentChildren(NgTemplateNameDirective)
   _templates!: QueryList<NgTemplateNameDirective>;
+
+  vm$: Observable<string> = of('');
 
   constructor(private fb: FormBuilder) {}
 

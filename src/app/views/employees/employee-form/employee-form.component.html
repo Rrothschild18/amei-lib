@@ -1,0 +1,16 @@
+<ng-container *ngIf="fields$ | async as fields">
+  <section>
+    <h2>Employees</h2>
+    <div class="container h-100 d-flex flex-column align-items-center mb-5">
+      <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
+        <app-form-generator
+          [fields]="filterObject(fields, employeePersonalFields)"
+          [columns]="employeePersonalColumns"
+          [fieldsValidators]="employeePersonalValidators"
+          #personalForm
+        >
+        </app-form-generator>
+      </div>
+    </div>
+  </section>
+</ng-container>
