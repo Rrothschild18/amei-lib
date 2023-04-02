@@ -39,8 +39,8 @@ export class FormGeneratorComponent implements OnInit {
     this.fields = fields;
     this.toFormGroup(this.toArrayFields(this.fields));
   }
-  @Input() fieldsValidators: FieldsValidatorsConfig = {};
-  @Input() fieldsAttributes: FieldsAttributesConfig = {};
+  @Input() fieldsValidators: FieldsValidatorsConfig | null = {};
+  @Input() fieldsAttributes!: FieldsAttributesConfig | null;
   @Input() columns: FieldsColumnsConfig = {};
 
   @ContentChildren(NgTemplateNameDirective)
@@ -78,7 +78,13 @@ export class FormGeneratorComponent implements OnInit {
         let checkBoxGroup: any = {};
 
         field.options.forEach((option: { label: string; value: string }) => {
-          checkBoxGroup[option.label] = ['', this.handleValidators(field.name)];
+          checkBoxGroup[option.label] = [
+            {
+              value: '',
+              disabled: !!this.fieldsAttributes?.[field.name]?.disabled,
+            },
+            this.handleValidators(field.name),
+          ];
         });
 
         form[field.name] = this.fb.group(checkBoxGroup);
@@ -86,13 +92,20 @@ export class FormGeneratorComponent implements OnInit {
 
       if (fieldsType.includes(field.type)) {
         for (let { name: fieldName } of fields) {
-          form[fieldName] = ['', this.handleValidators(fieldName)];
+          form[fieldName] = [
+            {
+              value: '',
+              disabled: !!this.fieldsAttributes?.[fieldName]?.disabled,
+            },
+            this.handleValidators(fieldName),
+          ];
         }
       }
     }
 
     this.form = this.fb.group(form);
     this.form.patchValue(formPivot.value);
+    this.form.updateValueAndValidity();
   }
 
   toArrayFields(fields: {} = {}): Field[] {
@@ -165,7 +178,7 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   handleValidators(fieldName: string): ValidatorFn[] {
-    const validators: ValidatorFn[] = this.fieldsValidators[fieldName] || [];
+    const validators: ValidatorFn[] = this.fieldsValidators?.[fieldName] || [];
     const hasNullByPass: boolean = validators.some(
       (validator) => validator === Validators.nullValidator
     );
@@ -177,6 +190,6 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   getFieldAttributes(fieldName: string): FieldAttrs | undefined {
-    return this.fieldsAttributes[fieldName] || undefined;
+    return this.fieldsAttributes?.[fieldName] || undefined;
   }
 }

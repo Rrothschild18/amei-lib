@@ -61,7 +61,8 @@
               <app-form-generator
                 [fields]="filterObject(fields, patientAdditionalFields)"
                 [columns]="patientAdditionalColumns"
-                [fieldsValidators]="patientAdditionalValidators"
+                [fieldsValidators]="patientAdditionalValidators$ | async"
+                [fieldsAttributes]="patientAdditionalAttributes$ | async"
                 #additionalForm
               >
                 <!-- <ng-template

@@ -2,9 +2,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PatientStateModel } from './../../../store/patients/patient.model';
 import { Entities } from './../../../store/entities/entities.namespace';
 import { HttpClient } from '@angular/common/http';
-import { FieldsConfig } from './../../../models/form';
+import { FieldsAttributesConfig, FieldsConfig } from './../../../models/form';
 import {
+  BehaviorSubject,
+  catchError,
   delay,
+  EMPTY,
   filter,
   first,
   forkJoin,
@@ -13,8 +16,10 @@ import {
   of,
   switchMap,
   tap,
+  throwError,
 } from 'rxjs';
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   OnInit,
@@ -40,6 +45,7 @@ import { Select, Store } from '@ngxs/store';
   templateUrl: './patient-form.component.html',
   styleUrls: ['./patient-form.component.scss'],
   providers: [{ provide: FormViewService }],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PatientFormComponent implements OnInit {
   values: FormValue = {};
@@ -58,8 +64,20 @@ export class PatientFormComponent implements OnInit {
   @ViewChildren(FormGeneratorComponent)
   formRefs!: QueryList<FormGeneratorComponent>;
 
-  isFetchingCep = true;
+  isFetchingCep = false;
   successFullRequestToViaCep = true;
+
+  // <FieldsValidatorsConfig<Patient>
+
+  patientAdditionalValidators$ = new BehaviorSubject<
+    FieldsValidatorsConfig<Patient>
+  >({
+    address: [Validators.maxLength(20)],
+  });
+
+  patientAdditionalAttributes$ = new BehaviorSubject<
+    FieldsAttributesConfig<Patient>
+  >({});
 
   constructor(
     public formService: FormViewService,
@@ -208,11 +226,11 @@ export class PatientFormComponent implements OnInit {
     };
   }
 
-  get patientAdditionalValidators(): FieldsValidatorsConfig<Patient> {
-    return {
-      address: [Validators.maxLength(20)],
-    };
-  }
+  // get patientAdditionalValidators(): FieldsValidatorsConfig<Patient> {
+  //   return {
+  //     address: [Validators.maxLength(20)],
+  //   };
+  // }
 
   //Todo                            FieldsFieldsConfig<Patient>
   get patientAdditionalFieldEvents(): any {
@@ -229,23 +247,14 @@ export class PatientFormComponent implements OnInit {
     };
   }
 
-  //Todo                            FieldsPropsConfig<Patient>
-  get patientAdditionalProps(): any {
-    return {
-      address: {
-        isLoading: this.isFetchingCep,
-        isDisabled: this.isFetchingCep || this.successFullRequestToViaCep,
-      },
-      neighborhood: {
-        isLoading: this.isFetchingCep,
-        isDisabled: this.isFetchingCep || this.successFullRequestToViaCep,
-      },
-      street: {
-        isLoading: this.isFetchingCep,
-        isDisabled: this.isFetchingCep || this.successFullRequestToViaCep,
-      },
-    };
-  }
+  // get patientAdditionalAttributes(): FieldsAttributesConfig<Patient> {
+  //   return {
+  //     cep: {
+  //       isLoading: this.isFetchingCep,
+  //       disabled: true,
+  //     },
+  //   };
+  // }
 
   hasFields(fields: {}): boolean {
     return !!Object.keys(fields).length;
@@ -321,9 +330,20 @@ export class PatientFormComponent implements OnInit {
         filter(
           (fieldEvent: FormValue) =>
             fieldEvent['fieldName'] === 'cep' &&
-            fieldEvent['value'].length === 8
+            fieldEvent['value']?.length === 8
         ),
-        tap(() => (this.fetchingCep = true)),
+        tap(() => {
+          const previousState = this.patientAdditionalAttributes$.getValue();
+          this.patientAdditionalAttributes$.next({
+            ...previousState,
+            cep: {
+              isLoading: true,
+              disabled: true,
+            },
+          });
+
+          debugger;
+        }),
         delay(2000),
         map((fieldEvent) => fieldEvent['value']),
         switchMap((cepValue) =>
@@ -340,12 +360,29 @@ export class PatientFormComponent implements OnInit {
           };
         }),
         tap((parsedResult) => {
-          this.fetchingCep = false;
+          // this.fetchingCep = false;
+          const previousState = this.patientAdditionalAttributes$.getValue();
+
+          this.patientAdditionalAttributes$.next({
+            ...previousState,
+            cep: {
+              ...previousState['cep'],
+              isLoading: false,
+              disabled: true,
+            },
+          });
           this.additionalForm.first.form.patchValue(parsedResult);
         })
+        // catchError((error) => {
+        //   console.log(error);
+
+        //   debugger;
+
+        //   return throwError(() => '1234');
+        // })
       )
       .subscribe(() => {
-        this.disableCepFields();
+        // this.disableCepFields();
       });
   }
 

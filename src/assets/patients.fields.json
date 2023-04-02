@@ -6,8 +6,18 @@
   },
   "isActive": {
     "name": "isActive",
-    "label": "Ativo",
-    "type": "radio"
+    "label": "Is active?",
+    "type": "radio",
+    "options": [
+      {
+        "label": "Yes",
+        "value": true
+      },
+      {
+        "label": "No",
+        "value": false
+      }
+    ]
   },
   "name": {
     "name": "name",
@@ -21,7 +31,7 @@
   },
   "civilStatus": {
     "name": "civilStatus",
-    "label": "Estado civil",
+    "label": "Civil status",
     "type": "select",
     "options": [
       {
@@ -88,5 +98,67 @@
         "value": "631185e0-fa25-4d6c-ac98-701bda2f772b"
       }
     ]
+  },
+  "country": {
+    "name": "country",
+    "label": "Countries",
+    "type": "select",
+    "options": [
+      {
+        "label": "Brazil",
+        "value": "f0d0a6fb-ee32-4039-a358-e84695ca80b8"
+      },
+      {
+        "label": "Ireland",
+        "value": "ca36dad1-1e14-426c-b965-72072eef9487"
+      },
+      {
+        "label": "Australia",
+        "value": "303c7046-5db6-498d-9d1d-0d501b1a1f2e"
+      },
+      {
+        "label": "Canada",
+        "value": "093c9a2e-8c84-4fe7-8caa-08301a143712"
+      },
+      {
+        "label": "Portugal",
+        "value": "f9c83357-addc-4d36-ae31-2d09aed15a54"
+      }
+    ]
+  },
+  "cep": {
+    "name": "cep",
+    "label": "CEP",
+    "type": "text"
+  },
+  "state": {
+    "name": "state",
+    "label": "State",
+    "type": "text"
+  },
+  "city": {
+    "name": "city",
+    "label": "City",
+    "type": "text"
+  },
+  "neighborhood": {
+    "name": "neighborhood",
+    "label": "Neighborhood",
+    "type": "text"
+  },
+  "address": {
+    "name": "address",
+    "label": "Address",
+    "type": "text"
+  },
+  "streetNumber": {
+    "name": "streetNumber",
+    "label": "Street number",
+    "type": "text"
+  },
+  "complement": {
+    "name": "complement",
+    "label": "Complement",
+    "type": "text"
   }
 }

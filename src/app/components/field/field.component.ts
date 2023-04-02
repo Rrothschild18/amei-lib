@@ -1,6 +1,12 @@
 import { Dispatch } from '@ngxs-labs/dispatch-decorator';
 import { FormViewService } from 'src/app/components/form-view/form-view.service';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Field, FieldAttrs } from 'src/app/models/field';
 import { Subscription } from 'rxjs';
@@ -29,8 +35,6 @@ export class FieldComponent implements OnInit, OnDestroy {
     this.setUpFieldChange();
   }
 
-  ngOnChanges() {}
-
   ngOnDestroy() {
     this.fieldValueSubscription$?.unsubscribe();
   }
@@ -38,11 +42,13 @@ export class FieldComponent implements OnInit, OnDestroy {
   setUpFieldChange(): void {
     this.fieldValueSubscription$ =
       this.fieldFormControl?.valueChanges.subscribe((changedValue) => {
+        debugger;
         this.formService.formValues.next({
           fieldName: this.field.name,
           value: changedValue,
         });
       });
+    this.form.updateValueAndValidity();
   }
 
   //TODO map errors with an object, destruct arguments and accept custom errors messages
