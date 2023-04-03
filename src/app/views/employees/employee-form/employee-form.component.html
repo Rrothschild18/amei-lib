@@ -4,6 +4,7 @@
     <button mat-button (click)="resetValidations()">RESETTT</button>
     <button mat-button (click)="changeFields()">change fieldss</button>
     <button mat-button (click)="changeFields2()">Go to Original</button>
+    <button mat-button (click)="resetColumns()">Reset columns</button>
     <div class="container h-100 d-flex flex-column align-items-center mb-5">
       <pre>{{ componentStore$ | async | json }}</pre>
       <pre>{{ formValues | json }}</pre>
@@ -18,7 +19,7 @@
 
         <app-form
           [fields]="filterObject(fields, employeePersonalFields$.getValue())"
-          [columns]="employeePersonalColumns"
+          [columns]="employeePersonalColumns$ | async"
           [fieldsValidators]="employeePersonalValidators$ | async"
           #personalForm
         >

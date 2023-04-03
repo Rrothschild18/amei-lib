@@ -12,6 +12,7 @@ import {
 } from '@angular/forms';
 import { BehaviorSubject, Observable, combineLatest, tap } from 'rxjs';
 import {
+  FieldColumnConfigTypes,
   FieldsAttributesConfig,
   FieldsColumnsConfig,
   FieldsConfig,
@@ -74,7 +75,7 @@ export class FormComponent implements OnInit {
     }
   }
 
-  @Input() set columns(value: FieldsColumnsConfig) {
+  @Input() set columns(value: FieldsColumnsConfig | null) {
     const hasColumns = !!Object.keys(value || {}).length;
 
     if (hasColumns) {
@@ -215,6 +216,62 @@ export class FormComponent implements OnInit {
 
   deleteKeysFromFormControl(keys: string[]) {
     keys.forEach((key) => this.form.removeControl(key));
+  }
+
+  getFieldClass(index: any) {
+    if (typeof this._columns$.getValue() === 'string') {
+      return `col-${this._columns$.getValue()}`;
+    }
+
+    const v = Array.isArray(this._columns$.getValue())
+      ? this.handleColumnsByIndex(index)
+      : this.handleColumnsByField(index);
+    debugger;
+    return Array.isArray(this._columns$.getValue())
+      ? this.handleColumnsByIndex(index)
+      : this.handleColumnsByField(index);
+  }
+
+  handleColumnsByField(index: any) {
+    debugger;
+    return this.breakpoint(this._columns$.getValue()[index]);
+  }
+
+  handleColumnsByIndex(index: any) {
+    if (!Array.isArray(this.fields)) {
+      index = Object.keys(this.fields).findIndex((field) => field === index);
+    }
+
+    const length = Object.values(this._columns$.getValue()).length;
+
+    if (!length) {
+      return this.setDefaultColumnClass();
+    }
+
+    return this.breakpoint(this._columns$.getValue()[index]);
+  }
+
+  setDefaultColumnClass() {
+    return 'col-6';
+  }
+
+  breakpoint(columns: FieldColumnConfigTypes = {}) {
+    const classes = [];
+    const profiles: any = {
+      col: 'col',
+      xs: 'col-xs',
+      sm: 'col-sm',
+      md: 'col-md',
+      lg: 'col-lg',
+      xl: 'col-xl',
+    };
+
+    for (const key in columns) {
+      const value = columns[key];
+      classes.push(`${profiles[key]}-${value}`);
+    }
+
+    return [...classes];
   }
 
   ngAfterViewInit() {

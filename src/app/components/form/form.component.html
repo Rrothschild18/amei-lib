@@ -23,10 +23,13 @@
   <ng-container *ngFor="let data of vm.fields | keyvalue">
     <!-- <pre>{{ data | json }}</pre> -->
     <!-- <pre> [fieldAttributes]="getFieldAttributes(field.key)"</pre> -->
-    <app-field
-      [field]="data.value"
-      [fieldFormControl]="form.get(data.key)"
-      [form]="form"
-    ></app-field>
+    <div class="row">
+      <app-field
+        [class]="getFieldClass(data.key)"
+        [field]="data.value"
+        [fieldFormControl]="form.get(data.key)"
+        [form]="form"
+      ></app-field>
+    </div>
   </ng-container>
 </ng-container>
