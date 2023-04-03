@@ -14,7 +14,6 @@ import {
   FormBuilder,
   Validators,
 } from '@angular/forms';
-import { Observable, of } from 'rxjs';
 import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
 import {
   FieldColumnConfigTypes,
@@ -47,11 +46,11 @@ export class FormGeneratorComponent implements OnInit {
   @ContentChildren(NgTemplateNameDirective)
   _templates!: QueryList<NgTemplateNameDirective>;
 
-  vm$: Observable<string> = of('');
-
   constructor(private fb: FormBuilder) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    debugger;
+  }
 
   get hasFields(): boolean {
     return !!Object.keys(this.fields).length;
@@ -70,24 +69,18 @@ export class FormGeneratorComponent implements OnInit {
   }
 
   toFormGroup(fields: Field[] = []) {
-    if (this.hasFormValues) return;
-
+    const formPivot: FormGroup = this.form;
     const fieldsType = ['text', 'select', 'textarea', 'date', 'radio'];
     const form: any = {};
-    const formPivot: FormGroup = this.form;
+    debugger;
+    // if (this.hasFormValues) return;
 
     for (let field of fields) {
       if (field.type === 'checkbox') {
         let checkBoxGroup: any = {};
 
         field.options.forEach((option: { label: string; value: string }) => {
-          checkBoxGroup[option.label] = [
-            {
-              value: '',
-              disabled: !!this.fieldsAttributes?.[field.name]?.disabled,
-            },
-            this.handleValidators(field.name),
-          ];
+          checkBoxGroup[option.label] = ['', this.handleValidators(field.name)];
         });
 
         form[field.name] = this.fb.group(checkBoxGroup);
@@ -106,6 +99,7 @@ export class FormGeneratorComponent implements OnInit {
       }
     }
 
+    debugger;
     this.form = this.fb.group(form);
     this.form.patchValue(formPivot.value);
     this.form.updateValueAndValidity();

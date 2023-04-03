@@ -18,7 +18,7 @@ import { FieldConfig } from 'src/app/models';
   styleUrls: ['./field.component.scss'],
 })
 export class FieldComponent implements OnInit, OnDestroy {
-  @Input() field!: FieldConfig<{}, keyof {}>;
+  @Input() field!: FieldConfig<{}, keyof {}> | Field;
   @Input() form!: FormGroup;
   @Input() fieldFormControl!: AbstractControl | null;
   //ngx-mask not included
