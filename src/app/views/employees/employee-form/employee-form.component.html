@@ -1,11 +1,48 @@
 <ng-container *ngIf="fields$ | async as fields">
   <section>
     <h2>Employees</h2>
-    <button mat-button (click)="resetValidations()">RESETTT</button>
-    <button mat-button (click)="changeFields()">change fieldss</button>
-    <button mat-button (click)="changeFields2()">Go to Original</button>
-    <button mat-button (click)="resetColumns()">Reset columns</button>
+
     <div class="container h-100 d-flex flex-column align-items-center mb-5">
+      <div class="d-flex">
+        <div class="d-flex flex-column">
+          <button
+            mat-flat-button
+            class="mb-2"
+            color="primary"
+            (click)="changeFields()"
+          >
+            Change form fields for 3 fields
+          </button>
+          <button mat-flat-button color="primary" (click)="changeFields2()">
+            Set to full fields
+          </button>
+        </div>
+
+        <div class="d-flex flex-column">
+          <button
+            mat-flat-button
+            class="mb-2"
+            color="primary"
+            (click)="setColumnsToOriginal()"
+          >
+            Set to columns original
+          </button>
+
+          <button mat-flat-button color="warn" (click)="resetColumns()">
+            Reset columns
+          </button>
+        </div>
+        <div class="d-flex flex-column">
+          <button
+            mat-flat-button
+            class="me-2"
+            color="warn"
+            (click)="resetValidations()"
+          >
+            Reset current validators
+          </button>
+        </div>
+      </div>
       <pre>{{ componentStore$ | async | json }}</pre>
       <pre>{{ formValues | json }}</pre>
       <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">

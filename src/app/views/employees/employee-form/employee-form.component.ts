@@ -277,4 +277,61 @@ export class EmployeeFormComponent implements OnInit {
   resetColumns() {
     this.employeePersonalColumns$.next({});
   }
+
+  setColumnsToOriginal() {
+    this.employeePersonalColumns$.next({
+      isActive: {
+        col: 12,
+      },
+      name: {
+        col: 12,
+        lg: 4,
+        md: 6,
+        sm: 12,
+      },
+      lastName: {
+        md: 12,
+        lg: 6,
+      },
+      document: {
+        col: 12,
+      },
+      phone: {
+        col: 6,
+      },
+      email: {
+        lg: 6,
+      },
+      birthDate: {
+        lg: 6,
+      },
+      games: {
+        lg: 6,
+      },
+      country: {
+        lg: 6,
+      },
+      cep: {
+        lg: 4,
+      },
+      state: {
+        col: 4,
+      },
+      city: {
+        col: 4,
+      },
+      address: {
+        col: 8,
+      },
+      neighborhood: {
+        col: 2,
+      },
+      streetNumber: {
+        col: 2,
+      },
+      complement: {
+        col: 12,
+      },
+    });
+  }
 }
