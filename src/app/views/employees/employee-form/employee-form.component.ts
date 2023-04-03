@@ -1,7 +1,11 @@
+import { Validators } from '@angular/forms';
 import { EmployeesService } from './../../../services/employees.service';
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { FormViewService } from 'src/app/components/form-view/form-view.service';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import {
+  FormValue,
+  FormViewService,
+} from 'src/app/components/form-view/form-view.service';
 import { Employee } from 'src/app/interfaces';
 import {
   FieldsConfig,
@@ -16,6 +20,7 @@ import {
   templateUrl: './employee-form.component.html',
   styleUrls: ['./employee-form.component.scss'],
   providers: [{ provide: FormViewService }],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmployeeFormComponent implements OnInit {
   constructor(
@@ -26,7 +31,27 @@ export class EmployeeFormComponent implements OnInit {
   fields$: Observable<FieldsConfig<Employee>> =
     this.employeesService.getFields();
 
-  ngOnInit(): void {}
+  componentStore$: Observable<FormValue> = this.formService.formValues;
+
+  formValues: any;
+
+  employeePersonalValidators$ = new BehaviorSubject<
+    FieldsValidatorsConfig<Employee>
+  >({
+    email: [Validators.email, Validators.maxLength(20)],
+    lastName: [Validators.nullValidator],
+    address: [Validators.nullValidator],
+  });
+
+  ngOnInit(): void {
+    this.componentStore$.subscribe(({ fieldName, value }: FormValue) => {
+      if (!fieldName && !value) {
+        return {};
+      }
+
+      return (this.formValues = { ...this.formValues, [fieldName]: value });
+    });
+  }
 
   get employeePersonalColumns(): FieldsColumnsConfig<Employee> {
     return {
@@ -108,9 +133,13 @@ export class EmployeeFormComponent implements OnInit {
     ];
   }
 
-  get employeePersonalValidators(): FieldsValidatorsConfig<Employee> {
-    return {};
-  }
+  // get employeePersonalValidators(): FieldsValidatorsConfig<Employee> {
+  //   return {
+  //     email: [Validators.email, Validators.maxLength(20)],
+  //     lastName: [Validators.nullValidator],
+  //     address: [Validators.nullValidator],
+  //   };
+  // }
 
   filterObject(
     fields: FieldsConfig<Employee>,
@@ -133,5 +162,27 @@ export class EmployeeFormComponent implements OnInit {
     });
 
     return object;
+  }
+
+  resetValidations() {
+    this.employeePersonalValidators$.next({
+      isActive: [Validators.nullValidator],
+      name: [Validators.nullValidator],
+      lastName: [Validators.nullValidator],
+      document: [Validators.nullValidator],
+      phone: [Validators.nullValidator],
+      email: [Validators.nullValidator],
+      birthDate: [Validators.nullValidator],
+      civilStatus: [Validators.nullValidator],
+      games: [Validators.nullValidator],
+      country: [Validators.nullValidator],
+      cep: [Validators.nullValidator],
+      state: [Validators.nullValidator],
+      city: [Validators.nullValidator],
+      address: [Validators.nullValidator],
+      neighborhood: [Validators.nullValidator],
+      streetNumber: [Validators.nullValidator],
+      complement: [Validators.nullValidator],
+    });
   }
 }

@@ -10,6 +10,7 @@ import {
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Field, FieldAttrs } from 'src/app/models/field';
 import { Subscription } from 'rxjs';
+import { FieldConfig } from 'src/app/models';
 
 @Component({
   selector: 'app-field',
@@ -17,7 +18,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./field.component.scss'],
 })
 export class FieldComponent implements OnInit, OnDestroy {
-  @Input() field!: Field;
+  @Input() field!: FieldConfig<{}, keyof {}>;
   @Input() form!: FormGroup;
   @Input() fieldFormControl!: AbstractControl | null;
   //ngx-mask not included

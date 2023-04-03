@@ -32,6 +32,7 @@ import { AutocompleteComponent } from './components/autocomplete/autocomplete.co
 import { ProfessionalProceduresComponent } from './views/professional-procedures/professional-procedures.component';
 import { NewsletterComponent } from './components/newsletter/newsletter.component';
 import { EmployeeFormComponent } from './views/employees/employee-form/employee-form.component';
+import { FormComponent } from './components/form/form.component';
 
 @NgModule({
   declarations: [
@@ -58,6 +59,7 @@ import { EmployeeFormComponent } from './views/employees/employee-form/employee-
     ProfessionalProceduresComponent,
     NewsletterComponent,
     EmployeeFormComponent,
+    FormComponent,
   ],
   imports: [
     BrowserModule,
