@@ -8,12 +8,10 @@ import {
   FormControl,
   FormGroup,
   FormBuilder,
-  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { BehaviorSubject, Observable, combineLatest, tap } from 'rxjs';
 import {
-  Field,
   FieldsAttributesConfig,
   FieldsColumnsConfig,
   FieldsConfig,
@@ -34,8 +32,18 @@ export type FormViewModel = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormComponent implements OnInit {
-  @Input() set fieldsAttributes(value: FieldsAttributesConfig) {
-    this._fieldsAttributes$.next(value);
+  @Input() set fieldsAttributes(value: FieldsAttributesConfig | null) {
+    const hasAttributes = !!Object.keys(value || {}).length;
+
+    if (hasAttributes) {
+      this._fieldsAttributes$.next({ ...value });
+      return;
+    }
+
+    if (!hasAttributes) {
+      this._fieldsAttributes$.next({});
+      return;
+    }
   }
 
   @Input() set fieldsValidators(value: FieldsValidatorsConfig | null) {
@@ -53,11 +61,31 @@ export class FormComponent implements OnInit {
   }
 
   @Input() set fields(value: FieldsConfig) {
-    this._fields$.next(value);
+    const hasFields = !!Object.keys(value || {}).length;
+
+    if (hasFields) {
+      this._fields$.next({ ...value });
+      return;
+    }
+
+    if (!hasFields) {
+      this._fields$.next({});
+      return;
+    }
   }
 
   @Input() set columns(value: FieldsColumnsConfig) {
-    this._columns$.next(value);
+    const hasColumns = !!Object.keys(value || {}).length;
+
+    if (hasColumns) {
+      this._columns$.next({ ...value });
+      return;
+    }
+
+    if (!hasColumns) {
+      this._columns$.next({});
+      return;
+    }
   }
 
   private _fieldsAttributes$ = new BehaviorSubject<FieldsAttributesConfig>({});
@@ -84,7 +112,8 @@ export class FormComponent implements OnInit {
       fieldsValidators: this.fieldsValidators$,
     }).pipe(
       tap(() => this.setUpFormGroups()),
-      tap(() => this.setUpFormGroupsValidators())
+      tap(() => this.setUpFormGroupsValidators()),
+      tap(() => this.setUpFormAttributes())
     );
 
     // this.setUpFormGroups();
@@ -95,12 +124,18 @@ export class FormComponent implements OnInit {
   }
 
   setUpFormGroups() {
-    if (this.hasFormValues) return;
+    const [keysToAdd, keysToDelete] =
+      this.calculateDiffBetweenControlsAndFields();
+
+    //TODO Delete values keys from stores
+    this.deleteKeysFromFormControl(keysToDelete);
 
     const mappedFields = Object.entries(this._fields$.getValue());
     const fieldsType = ['text', 'select', 'textarea', 'date', 'radio', 'email'];
 
     for (let [fieldName, field] of mappedFields) {
+      if (!keysToAdd.includes(fieldName)) continue;
+
       const fieldType = field?.type ?? 'text';
 
       if (fieldsType.includes(fieldType)) {
@@ -118,14 +153,11 @@ export class FormComponent implements OnInit {
   setUpFormGroupsValidators() {
     const validations = this._fieldsValidators$.getValue();
     const mappedFields = Object.entries(this._fields$.getValue());
-    debugger;
-    mappedFields.forEach(([fieldName, field]: any) => {
-      // debugger;
 
+    mappedFields.forEach(([fieldName, field]: any) => {
       const existValidation = validations[fieldName];
 
       if (existValidation) {
-        debugger;
         this.form.get(fieldName)?.clearValidators();
 
         const validators = validations[fieldName] || [Validators.required];
@@ -138,6 +170,10 @@ export class FormComponent implements OnInit {
 
       this.form.get(fieldName)?.addValidators([Validators.required]);
     });
+  }
+
+  setUpFormAttributes() {
+    return;
   }
 
   setUpCheckboxControl(fieldName: string, field: any) {
@@ -156,6 +192,29 @@ export class FormComponent implements OnInit {
     );
 
     return checkBoxGroup;
+  }
+
+  calculateDiffBetweenControlsAndFields(): [string[], string[]] {
+    const currentControlsKeys = Object.keys(this.form.controls);
+    const incomingFieldsKeys = Object.keys(this._fields$.getValue());
+
+    const deletedKeysFromControls = currentControlsKeys.filter(
+      (key) => !incomingFieldsKeys.includes(key)
+    );
+    const addedKeysFromIncomingFields = incomingFieldsKeys.filter(
+      (key) => !currentControlsKeys.includes(key)
+    );
+
+    const hasDeleted = !!deletedKeysFromControls.length;
+    const hasAdded = !!addedKeysFromIncomingFields.length;
+
+    if (!hasDeleted && !hasAdded) return [[], []];
+
+    return [addedKeysFromIncomingFields, deletedKeysFromControls];
+  }
+
+  deleteKeysFromFormControl(keys: string[]) {
+    keys.forEach((key) => this.form.removeControl(key));
   }
 
   ngAfterViewInit() {

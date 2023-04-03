@@ -43,6 +43,11 @@ export class EmployeeFormComponent implements OnInit {
     address: [Validators.nullValidator],
   });
 
+  employeePersonalFields$ = new BehaviorSubject<FieldsArrayName<Employee>>([
+    // 'uuid',
+    'isActive',
+  ]);
+
   ngOnInit(): void {
     this.componentStore$.subscribe(({ fieldName, value }: FormValue) => {
       if (!fieldName && !value) {
@@ -110,28 +115,28 @@ export class EmployeeFormComponent implements OnInit {
     };
   }
 
-  get employeePersonalFields(): FieldsArrayName<Employee> {
-    return [
-      // 'uuid',
-      'isActive',
-      'name',
-      'lastName',
-      'civilStatus',
-      'email',
-      'document',
-      'phone',
-      'birthDate',
-      'games',
-      'country',
-      'cep',
-      'state',
-      'city',
-      'neighborhood',
-      'address',
-      'streetNumber',
-      'complement',
-    ];
-  }
+  // get employeePersonalFields(): FieldsArrayName<Employee> {
+  //   return [
+  //     // 'uuid',
+  //     'isActive',
+  //     'name',
+  //     'lastName',
+  //     'civilStatus',
+  //     'email',
+  //     'document',
+  //     'phone',
+  //     'birthDate',
+  //     'games',
+  //     'country',
+  //     'cep',
+  //     'state',
+  //     'city',
+  //     'neighborhood',
+  //     'address',
+  //     'streetNumber',
+  //     'complement',
+  //   ];
+  // }
 
   // get employeePersonalValidators(): FieldsValidatorsConfig<Employee> {
   //   return {
@@ -184,5 +189,30 @@ export class EmployeeFormComponent implements OnInit {
       streetNumber: [Validators.nullValidator],
       complement: [Validators.nullValidator],
     });
+  }
+
+  changeFields() {
+    this.employeePersonalFields$.next(['games', 'country', 'civilStatus']);
+  }
+  changeFields2() {
+    this.employeePersonalFields$.next([
+      ...this.employeePersonalFields$.getValue(),
+      'name',
+      'lastName',
+      'civilStatus',
+      'email',
+      'document',
+      'phone',
+      'birthDate',
+      'games',
+      'country',
+      'cep',
+      'state',
+      'city',
+      'neighborhood',
+      'address',
+      'streetNumber',
+      'complement',
+    ]);
   }
 }
