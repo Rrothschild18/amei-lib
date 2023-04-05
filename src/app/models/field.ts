@@ -49,7 +49,7 @@ export interface IBasicInputAttributes {
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
-  isLoading: boolean;
+  isLoading?: boolean;
   readonly?: boolean;
   autofocus?: boolean;
   minlength?: number;

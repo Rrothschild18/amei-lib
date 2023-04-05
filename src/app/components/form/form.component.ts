@@ -174,6 +174,33 @@ export class FormComponent implements OnInit {
   }
 
   setUpFormAttributes() {
+    // debugger;
+    const mappedAttributes = Object.entries(this._fieldsAttributes$.getValue());
+    mappedAttributes.forEach(([fieldName, attributes]: any) => {
+      // debugger;
+      const fieldNoExists = !this._fields$.getValue()[fieldName];
+      // debugger;
+
+      if (fieldNoExists) return;
+
+      const isFormControlDisabled =
+        this.form.get(fieldName)?.status === 'DISABLED';
+
+      if (isFormControlDisabled && attributes.disabled) return;
+
+      if (isFormControlDisabled && !attributes.disabled) {
+        this.form.get(fieldName)?.enable();
+        return;
+      }
+
+      if (!isFormControlDisabled && attributes.disabled) {
+        this.form.get(fieldName)?.disable();
+        return;
+      }
+
+      attributes.disabled && this.form.get(fieldName)?.disable();
+    });
+
     return;
   }
 
@@ -226,14 +253,13 @@ export class FormComponent implements OnInit {
     const v = Array.isArray(this._columns$.getValue())
       ? this.handleColumnsByIndex(index)
       : this.handleColumnsByField(index);
-    debugger;
+
     return Array.isArray(this._columns$.getValue())
       ? this.handleColumnsByIndex(index)
       : this.handleColumnsByField(index);
   }
 
   handleColumnsByField(index: any) {
-    debugger;
     return this.breakpoint(this._columns$.getValue()[index]);
   }
 
@@ -274,7 +300,8 @@ export class FormComponent implements OnInit {
     return [...classes];
   }
 
-  ngAfterViewInit() {
-    debugger;
+  getFieldAttributes(fieldName: string) {
+    return this._fieldsAttributes$.getValue()[fieldName];
   }
+  ngAfterViewInit() {}
 }

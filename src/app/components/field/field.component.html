@@ -58,6 +58,12 @@
           >{{ option.label }}</mat-option
         >
       </mat-select>
+      <mat-spinner
+        class="loading"
+        [diameter]="30"
+        matSuffix
+        *ngIf="!!fieldAttributes?.isLoading"
+      ></mat-spinner>
       <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
         showError(form.get(field.name)?.errors)
       }}</mat-error>

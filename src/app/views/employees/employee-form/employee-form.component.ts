@@ -1,7 +1,7 @@
 import { Validators } from '@angular/forms';
 import { EmployeesService } from './../../../services/employees.service';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, filter, map, tap } from 'rxjs';
 import {
   FormValue,
   FormViewService,
@@ -13,7 +13,11 @@ import {
   FieldsValidatorsConfig,
   FieldsArrayName,
   FieldColumnConfigTypes,
+  FieldsAttributesConfig,
+  FieldConfig,
 } from 'src/app/models';
+import { HttpClient } from '@angular/common/http';
+import { Entities } from 'src/app/store/entities/entities.namespace';
 
 @Component({
   selector: 'app-employee-form',
@@ -23,13 +27,10 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmployeeFormComponent implements OnInit {
-  constructor(
-    public formService: FormViewService,
-    private employeesService: EmployeesService
-  ) {}
-
   fields$: Observable<FieldsConfig<Employee>> =
     this.employeesService.getFields();
+
+  fields: FieldsConfig<Employee> = {};
 
   componentStore$: Observable<FormValue> = this.formService.formValues;
 
@@ -105,6 +106,22 @@ export class EmployeeFormComponent implements OnInit {
     }
   );
 
+  employeePersonalAttributes$ = new BehaviorSubject<
+    FieldsAttributesConfig<Employee>
+  >({
+    address: {
+      disabled: true,
+    },
+  });
+
+  onChangeFieldAndHasCountries$!: Observable<boolean>;
+
+  constructor(
+    public formService: FormViewService,
+    private employeesService: EmployeesService,
+    private http: HttpClient
+  ) {}
+
   ngOnInit(): void {
     this.componentStore$.subscribe(({ fieldName, value }: FormValue) => {
       if (!fieldName && !value) {
@@ -113,95 +130,36 @@ export class EmployeeFormComponent implements OnInit {
 
       return (this.formValues = { ...this.formValues, [fieldName]: value });
     });
+
+    this.fields$.subscribe((fields) => (this.fields = fields));
+
+    this.handleFetchGames();
+
+    this.onChangeFieldAndHasCountries$.subscribe(() => {
+      this.employeePersonalAttributes$.next({
+        ...this.employeePersonalAttributes$.getValue(),
+        games: {
+          isLoading: true,
+          disabled: true,
+        },
+      });
+
+      this.fetchNewGames();
+    });
   }
 
-  get employeePersonalColumns(): FieldsColumnsConfig<Employee> {
-    return {
-      isActive: {
-        col: 12,
-      },
-      name: {
-        col: 12,
-        lg: 4,
-        md: 6,
-        sm: 12,
-      },
-      lastName: {
-        md: 12,
-        lg: 6,
-      },
-      document: {
-        col: 12,
-      },
-      phone: {
-        col: 6,
-      },
-      email: {
-        lg: 6,
-      },
-      birthDate: {
-        lg: 6,
-      },
-      games: {
-        lg: 6,
-      },
-      country: {
-        lg: 6,
-      },
-      cep: {
-        lg: 4,
-      },
-      state: {
-        col: 4,
-      },
-      city: {
-        col: 4,
-      },
-      address: {
-        col: 8,
-      },
-      neighborhood: {
-        col: 2,
-      },
-      streetNumber: {
-        col: 2,
-      },
-      complement: {
-        col: 12,
-      },
-    };
+  handleFetchGames() {
+    this.onChangeFieldAndHasCountries$ = this.employeePersonalFields$.pipe(
+      map(
+        (fields: FieldsArrayName<Employee>) =>
+          !!fields.find((fieldName) => fieldName === 'games')
+      ),
+      filter(
+        (hasGamesField) =>
+          hasGamesField && !this.fields['games']?.options?.length
+      )
+    );
   }
-
-  // get employeePersonalFields(): FieldsArrayName<Employee> {
-  //   return [
-  //     // 'uuid',
-  //     'isActive',
-  //     'name',
-  //     'lastName',
-  //     'civilStatus',
-  //     'email',
-  //     'document',
-  //     'phone',
-  //     'birthDate',
-  //     'games',
-  //     'country',
-  //     'cep',
-  //     'state',
-  //     'city',
-  //     'neighborhood',
-  //     'address',
-  //     'streetNumber',
-  //     'complement',
-  //   ];
-  // }
-
-  // get employeePersonalValidators(): FieldsValidatorsConfig<Employee> {
-  //   return {
-  //     email: [Validators.email, Validators.maxLength(20)],
-  //     lastName: [Validators.nullValidator],
-  //     address: [Validators.nullValidator],
-  //   };
-  // }
 
   filterObject(
     fields: FieldsConfig<Employee>,
@@ -332,6 +290,46 @@ export class EmployeeFormComponent implements OnInit {
       complement: {
         col: 12,
       },
+    });
+  }
+
+  setBirthdayFieldDisabled() {
+    this.employeePersonalAttributes$.next({
+      ...this.employeePersonalAttributes$.getValue(),
+      birthDate: {
+        disabled: true,
+      },
+    });
+  }
+
+  setBirthdayFieldEnabled() {
+    this.employeePersonalAttributes$.next({
+      ...this.employeePersonalAttributes$.getValue(),
+      birthDate: {
+        disabled: false,
+      },
+    });
+  }
+
+  fetchNewGames() {
+    this.http.get('http://localhost:3000/games').subscribe((games: any) => {
+      this.employeePersonalAttributes$.next({
+        ...this.employeePersonalAttributes$.getValue(),
+        games: {
+          disabled: false,
+          isLoading: false,
+        },
+      });
+
+      if (this.fields.games) {
+        this.fields = {
+          ...this.fields,
+          games: {
+            ...this.fields.games,
+            options: games.options,
+          },
+        };
+      }
     });
   }
 }

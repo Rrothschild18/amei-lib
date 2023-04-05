@@ -28,6 +28,7 @@
         [class]="getFieldClass(data.key)"
         [field]="data.value"
         [fieldFormControl]="form.get(data.key)"
+        [fieldAttributes]="getFieldAttributes(data.key)"
         [form]="form"
       ></app-field>
     </div>

@@ -76,55 +76,13 @@
     "name": "games",
     "label": "games",
     "type": "select",
-    "options": [
-      {
-        "label": "Dota 2",
-        "value": "560e8a3f-1176-4f78-8fe7-174ab9fe8aa1"
-      },
-      {
-        "label": "League of Legends",
-        "value": "d6749294-14ce-413c-a180-e78b33285ec6"
-      },
-      {
-        "label": "Rust",
-        "value": "9371c545-ceb4-4215-90d6-9cd1316e2bbd"
-      },
-      {
-        "label": "Warcraft",
-        "value": "eb169d5f-40c1-4176-8b9e-d6b3a385b807"
-      },
-      {
-        "label": "Warzone",
-        "value": "631185e0-fa25-4d6c-ac98-701bda2f772b"
-      }
-    ]
+    "options": []
   },
   "country": {
     "name": "country",
     "label": "Countries",
     "type": "select",
-    "options": [
-      {
-        "label": "Brazil",
-        "value": "f0d0a6fb-ee32-4039-a358-e84695ca80b8"
-      },
-      {
-        "label": "Ireland",
-        "value": "ca36dad1-1e14-426c-b965-72072eef9487"
-      },
-      {
-        "label": "Australia",
-        "value": "303c7046-5db6-498d-9d1d-0d501b1a1f2e"
-      },
-      {
-        "label": "Canada",
-        "value": "093c9a2e-8c84-4fe7-8caa-08301a143712"
-      },
-      {
-        "label": "Portugal",
-        "value": "f9c83357-addc-4d36-ae31-2d09aed15a54"
-      }
-    ]
+    "options": []
   },
   "cep": {
     "name": "cep",

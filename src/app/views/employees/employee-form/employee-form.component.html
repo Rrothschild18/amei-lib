@@ -1,7 +1,6 @@
-<ng-container *ngIf="fields$ | async as fields">
-  <section>
-    <h2>Employees</h2>
-
+<ng-container *ngIf="fields$ | async">
+  <section class="container">
+    <h2 class="my-5">Employees</h2>
     <div class="container h-100 d-flex flex-column align-items-center mb-5">
       <div class="d-flex">
         <div class="d-flex flex-column">
@@ -34,6 +33,23 @@
         </div>
         <div class="d-flex flex-column">
           <button
+            color="primary"
+            class="mb-2"
+            mat-flat-button
+            (click)="setBirthdayFieldEnabled()"
+          >
+            Enable birthday
+          </button>
+          <button
+            mat-flat-button
+            color="warn"
+            (click)="setBirthdayFieldDisabled()"
+          >
+            Set to birthDay disabled
+          </button>
+        </div>
+        <div class="d-flex flex-column">
+          <button
             mat-flat-button
             class="me-2"
             color="warn"
@@ -46,18 +62,11 @@
       <pre>{{ componentStore$ | async | json }}</pre>
       <pre>{{ formValues | json }}</pre>
       <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
-        <!-- <app-form-generator
-          [fields]="filterObject(fields, employeePersonalFields)"
-          [columns]="employeePersonalColumns"
-          [fieldsValidators]="employeePersonalValidators"
-          #personalForm
-        >
-        </app-form-generator> -->
-
         <app-form
           [fields]="filterObject(fields, employeePersonalFields$.getValue())"
           [columns]="employeePersonalColumns$ | async"
           [fieldsValidators]="employeePersonalValidators$ | async"
+          [fieldsAttributes]="employeePersonalAttributes$ | async"
           #personalForm
         >
         </app-form>
