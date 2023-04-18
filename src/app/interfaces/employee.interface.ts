@@ -17,4 +17,5 @@ export interface Employee {
   state: string;
   games: string;
   country: string;
+  users: string;
 }

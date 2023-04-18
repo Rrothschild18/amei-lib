@@ -10,6 +10,7 @@ import {
   FormBuilder,
   Validators,
 } from '@angular/forms';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { BehaviorSubject, Observable, combineLatest, tap } from 'rxjs';
 import {
   FieldColumnConfigTypes,
@@ -31,6 +32,7 @@ export type FormViewModel = {
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
 })
 export class FormComponent implements OnInit {
   @Input() set fieldsAttributes(value: FieldsAttributesConfig | null) {
@@ -132,7 +134,15 @@ export class FormComponent implements OnInit {
     this.deleteKeysFromFormControl(keysToDelete);
 
     const mappedFields = Object.entries(this._fields$.getValue());
-    const fieldsType = ['text', 'select', 'textarea', 'date', 'radio', 'email'];
+    const fieldsType = [
+      'text',
+      'select',
+      'textarea',
+      'date',
+      'radio',
+      'email',
+      'autocomplete',
+    ];
 
     for (let [fieldName, field] of mappedFields) {
       if (!keysToAdd.includes(fieldName)) continue;

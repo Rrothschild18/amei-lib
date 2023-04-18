@@ -1,7 +1,7 @@
 import { Validators } from '@angular/forms';
 import { EmployeesService } from './../../../services/employees.service';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable, filter, map, tap } from 'rxjs';
+import { BehaviorSubject, Observable, filter, map } from 'rxjs';
 import {
   FormValue,
   FormViewService,
@@ -12,12 +12,9 @@ import {
   FieldsColumnsConfig,
   FieldsValidatorsConfig,
   FieldsArrayName,
-  FieldColumnConfigTypes,
   FieldsAttributesConfig,
-  FieldConfig,
 } from 'src/app/models';
 import { HttpClient } from '@angular/common/http';
-import { Entities } from 'src/app/store/entities/entities.namespace';
 
 @Component({
   selector: 'app-employee-form',
@@ -45,8 +42,10 @@ export class EmployeeFormComponent implements OnInit {
   });
 
   employeePersonalFields$ = new BehaviorSubject<FieldsArrayName<Employee>>([
-    // 'uuid',
     'isActive',
+    'name',
+    'lastName',
+    'users',
   ]);
 
   employeePersonalColumns$ = new BehaviorSubject<FieldsColumnsConfig<Employee>>(
@@ -103,6 +102,9 @@ export class EmployeeFormComponent implements OnInit {
       complement: {
         col: 12,
       },
+      users: {
+        col: 12,
+      },
     }
   );
 
@@ -111,6 +113,10 @@ export class EmployeeFormComponent implements OnInit {
   >({
     address: {
       disabled: true,
+    },
+    birthDate: {
+      // disabled: true,
+      min: new Date(),
     },
   });
 
@@ -131,7 +137,10 @@ export class EmployeeFormComponent implements OnInit {
       return (this.formValues = { ...this.formValues, [fieldName]: value });
     });
 
-    this.fields$.subscribe((fields) => (this.fields = fields));
+    this.fields$.subscribe((fields) => {
+      debugger;
+      this.fields = fields;
+    });
 
     this.handleFetchGames();
 

@@ -41,7 +41,8 @@ export type FieldTypes =
   | 'date'
   | 'radio'
   | 'email'
-  | 'checkbox';
+  | 'checkbox'
+  | 'autocomplete';
 
 export interface IBasicInputAttributes {
   name?: string;
@@ -57,6 +58,8 @@ export interface IBasicInputAttributes {
   pattern?: string;
   multiple?: boolean;
   indeterminate?: boolean;
+  min?: Date;
+  max?: Date;
 }
 
 export interface ITextareaAttributes extends IBasicInputAttributes {

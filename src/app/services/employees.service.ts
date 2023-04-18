@@ -131,6 +131,23 @@ export class EmployeesService {
         label: 'Complement',
         type: 'text',
       },
+      users: {
+        name: 'users',
+        label: 'Users',
+        type: 'autocomplete',
+        options: [
+          { value: 'a6b9e9e9-43f8-4ec1-9d77-10dbbbed3a02', label: 'John' },
+          { value: '9d6a8f70-1e6c-4f23-942d-8e6b06aeb92c', label: 'Jane' },
+          { value: '0aaabca2-ffdd-433d-bda6-20c70aaefcb9', label: 'David' },
+          { value: 'e16e0685-5af5-488d-b057-139c1ca9f817', label: 'Emily' },
+          { value: '1a144cdd-2f3e-4d19-bd43-f831e54d32ba', label: 'Michael' },
+          { value: 'f75ddca1-c74c-4d11-93ec-9b36604f9e26', label: 'Olivia' },
+          { value: 'c1a16a85-b65c-4157-9ba9-9c3b99cf2a2c', label: 'Sophia' },
+          { value: 'fe80f5dd-9739-40ab-9e96-0075d6a787a6', label: 'Daniel' },
+          { value: 'ed1ba067-cfcc-4d72-b6ce-ae7e33f0b756', label: 'Isabella' },
+          { value: 'e7421ed7-60f6-4a11-86e5-b6d228f61fb1', label: 'Lucas' },
+        ],
+      },
     });
   }
 }

@@ -124,6 +124,8 @@
           [pattern]="fieldAttributes?.pattern ?? ''"
           [readonly]="!!fieldAttributes?.readonly"
           [pattern]="fieldAttributes?.pattern || ''"
+          [min]="fieldAttributes?.min || undefined"
+          [max]="fieldAttributes?.max || undefined"
         />
         <mat-hint>MM/DD/YYYY</mat-hint>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -145,6 +147,56 @@
       >
         {{ option.label }}
       </mat-checkbox>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'autocomplete'">
+    <div class="w-100">
+      <!-- <mat-form-field appearance="fill">
+        <mat-label>{{ field.label }}</mat-label>
+        <input
+          type="text"
+          matInput
+          [formControlName]="field.name"
+          [placeholder]="field.placeholder ?? ''"
+          [autofocus]="!!fieldAttributes?.autofocus"
+          [minlength]="fieldAttributes?.minlength ?? 0"
+          [maxlength]="fieldAttributes?.maxlength ?? 999"
+          [readonly]="!!fieldAttributes?.readonly"
+          [pattern]="fieldAttributes?.pattern ?? ''"
+          [matAutocomplete]="auto"
+        />
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let option of field.options" [value]="option">
+            {{ option.label }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field> -->
+      <!-- <mat-label>{{ fieldFormControl | json }}</mat-label> -->
+      <!-- <pre>{{ field | json }}</pre> -->
+      <mat-form-field class="example-full-width" appearance="fill">
+        <mat-label>{{ field.label }}</mat-label>
+        <input
+          type="text"
+          placeholder="Pick one"
+          aria-label="Number"
+          matInput
+          [formControlName]="field.name"
+          [matAutocomplete]="auto"
+        />
+        <mat-autocomplete
+          #auto="matAutocomplete"
+          [displayWith]="displayFn.bind(this)"
+        >
+          <!-- autoCompleteOptions$ -->
+          <mat-option
+            *ngFor="let option of filteredAutoCompleteOptions$ | async"
+            [value]="option"
+          >
+            {{ option.label }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
     </div>
   </ng-container>
 </div>
