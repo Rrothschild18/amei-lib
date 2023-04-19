@@ -25,6 +25,11 @@ export class LayoutComponent implements OnInit {
       pathName: 'Cadastro funcionarios',
       iconName: 'monetization_on',
     },
+    {
+      linkTo: '/calendar',
+      pathName: 'Calendario',
+      iconName: 'monetization_on',
+    },
   ];
 
   menuItens = [

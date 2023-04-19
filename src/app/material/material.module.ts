@@ -32,6 +32,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatTableModule } from '@angular/material/table';
+import { MatDividerModule } from '@angular/material/divider';
 
 import { CdkTableModule } from '@angular/cdk/table';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
@@ -91,6 +92,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     PortalModule,
     MatSelectModule,
     BrowserAnimationsModule,
+    MatDividerModule,
   ],
 })
 export class MaterialModule {}

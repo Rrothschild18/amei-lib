@@ -33,6 +33,7 @@ import { ProfessionalProceduresComponent } from './views/professional-procedures
 import { NewsletterComponent } from './components/newsletter/newsletter.component';
 import { EmployeeFormComponent } from './views/employees/employee-form/employee-form.component';
 import { FormComponent } from './components/form/form.component';
+import { CalendarOverviewComponent } from './views/calendar-overview/calendar-overview.component';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { FormComponent } from './components/form/form.component';
     NewsletterComponent,
     EmployeeFormComponent,
     FormComponent,
+    CalendarOverviewComponent,
   ],
   imports: [
     BrowserModule,
