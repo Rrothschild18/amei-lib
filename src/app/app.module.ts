@@ -34,6 +34,7 @@ import { NewsletterComponent } from './components/newsletter/newsletter.componen
 import { EmployeeFormComponent } from './views/employees/employee-form/employee-form.component';
 import { FormComponent } from './components/form/form.component';
 import { CalendarOverviewComponent } from './views/calendar-overview/calendar-overview.component';
+import { CalendarMonthComponent } from './views/calendar-month/calendar-month.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { CalendarOverviewComponent } from './views/calendar-overview/calendar-ov
     EmployeeFormComponent,
     FormComponent,
     CalendarOverviewComponent,
+    CalendarMonthComponent,
   ],
   imports: [
     BrowserModule,

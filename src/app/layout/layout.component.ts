@@ -25,9 +25,14 @@ export class LayoutComponent implements OnInit {
       pathName: 'Cadastro funcionarios',
       iconName: 'monetization_on',
     },
+    // {
+    //   linkTo: '/calendar',
+    //   pathName: 'Calendario',
+    //   iconName: 'monetization_on',
+    // },
     {
-      linkTo: '/calendar',
-      pathName: 'Calendario',
+      linkTo: '/calendar-month',
+      pathName: 'Calendario Mes',
       iconName: 'monetization_on',
     },
   ];

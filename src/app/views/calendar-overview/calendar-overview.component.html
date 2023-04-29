@@ -12,40 +12,26 @@
 
   <ng-container *ngFor="let row of hoursOfDay; let i = index">
     <mat-grid-list cols="8" rowHeight="50px">
-      <mat-grid-tile *ngFor="let col of daysOfWeek; let j = index">
-        <div
-          *ngIf="i === 0 && j === 0"
-          class="d-flex justify-content-center align-items-center w-100"
-        >
+      <mat-grid-tile>
+        <div class="d-flex justify-content-center align-items-center w-100">
           <button mat-flat-button>Add event</button>
         </div>
         <div
-          *ngIf="i === 0 && j !== 0"
+          *ngIf="i === 0"
           class="d-flex flex-column justify-content-center align-items-center w-100"
         >
-          <h6>{{ getWeekName(j - 1) }}</h6>
-          <h6>{{ getMonthDay(j - 1) }}</h6>
+          <!-- <h6>{{ getWeekName(j - 1) }}</h6> -->
+          <!-- <h6>{{ getMonthDay(j - 1) }}</h6> -->
         </div>
 
-        <div
-          *ngIf="i !== 0 && j !== 0"
-          class="d-flex justify-content-center align-items-center w-100"
-        >
-          <span> {{ i }} {{ j }} </span>
+        <div class="d-flex justify-content-center align-items-center w-100">
+          <!-- <span> {{ i }} {{ j }} </span> -->
         </div>
-        <div
-          *ngIf="i !== 0 && j === 0"
-          class="d-flex justify-content-center align-items-center w-100"
-        >
+        <div class="d-flex justify-content-center align-items-center w-100">
           <span>{{ row }}</span>
         </div>
-        <!-- <mat-divider [vertical]="true" class="h-100"></mat-divider> -->
 
-        <mat-divider
-          [vertical]="true"
-          class="h-100"
-          *ngIf="j < 7"
-        ></mat-divider>
+        <mat-divider [vertical]="true" class="h-100"></mat-divider>
       </mat-grid-tile>
       <mat-divider *ngIf="i !== 0"></mat-divider>
     </mat-grid-list>
