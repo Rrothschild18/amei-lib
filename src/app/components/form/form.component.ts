@@ -142,6 +142,7 @@ export class FormComponent implements OnInit {
       'radio',
       'email',
       'autocomplete',
+      'checkbox',
     ];
 
     for (let [fieldName, field] of mappedFields) {
@@ -153,7 +154,7 @@ export class FormComponent implements OnInit {
         this.form.addControl(fieldName, new FormControl(''));
       }
 
-      if (fieldType === 'checkbox') {
+      if (fieldType === 'checkboxGroup') {
         const checkBoxGroupConfig = this.setUpCheckboxControl(fieldName, field);
 
         this.form.addControl(fieldName, this.fb.group(checkBoxGroupConfig));

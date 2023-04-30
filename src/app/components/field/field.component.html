@@ -137,7 +137,7 @@
     </div>
   </ng-container>
 
-  <ng-container *ngSwitchCase="'checkbox'">
+  <ng-container *ngSwitchCase="'checkboxGroup'">
     <div class="w-100" [formGroupName]="field.name">
       <mat-checkbox
         labelPosition="before"
@@ -148,5 +148,15 @@
         {{ option.label }}
       </mat-checkbox>
     </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'checkbox'">
+    <mat-checkbox
+      labelPosition="before"
+      [formControlName]="field.name"
+      [indeterminate]="!!fieldAttributes?.indeterminate"
+    >
+      {{ field.label }}
+    </mat-checkbox>
   </ng-container>
 </div>

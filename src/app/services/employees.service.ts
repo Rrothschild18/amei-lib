@@ -45,6 +45,7 @@ export class EmployeesService {
         name: 'civilStatus',
         label: 'Civil status',
         type: 'select',
+        multiple: true,
         options: [
           {
             label: 'Solteiro',
@@ -146,6 +147,62 @@ export class EmployeesService {
           { value: 'fe80f5dd-9739-40ab-9e96-0075d6a787a6', label: 'Daniel' },
           { value: 'ed1ba067-cfcc-4d72-b6ce-ae7e33f0b756', label: 'Isabella' },
           { value: 'e7421ed7-60f6-4a11-86e5-b6d228f61fb1', label: 'Lucas' },
+        ],
+      },
+      fruits: {
+        name: 'fruits',
+        label: 'Fruits',
+        type: 'checkboxGroup',
+        options: [
+          {
+            label: 'Banana',
+            value: false,
+          },
+          {
+            label: 'Strawberry',
+            value: false,
+          },
+          {
+            label: 'Apple',
+            value: false,
+          },
+          {
+            label: 'Orange',
+            value: false,
+          },
+        ],
+      },
+      bmw: {
+        name: 'bmw',
+        label: 'bmw',
+        type: 'checkbox',
+        options: [
+          {
+            label: 'Bmw',
+            value: false,
+          },
+        ],
+      },
+      ferrari: {
+        name: 'ferrari',
+        label: 'Ferrari?',
+        type: 'checkbox',
+        options: [
+          {
+            label: 'Ferrari',
+            value: false,
+          },
+        ],
+      },
+      corvette: {
+        name: 'corvette',
+        label: 'Corvette?',
+        type: 'checkbox',
+        options: [
+          {
+            label: 'Corvette',
+            value: false,
+          },
         ],
       },
     });

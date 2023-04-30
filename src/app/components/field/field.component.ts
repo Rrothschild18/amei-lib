@@ -91,16 +91,4 @@ export class FieldComponent implements OnInit, OnDestroy {
 
     return 'default error xD';
   }
-
-  displayFn(value: { label: string; value: string | number }): string {
-    if (this.field.options) {
-      const selectedOption = this.field.options.find(
-        (option) => option.value === value.value
-      );
-
-      return selectedOption?.label || '';
-    }
-
-    return '';
-  }
 }

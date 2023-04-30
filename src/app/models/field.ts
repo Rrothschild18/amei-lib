@@ -42,6 +42,7 @@ export type FieldTypes =
   | 'radio'
   | 'email'
   | 'checkbox'
+  | 'checkboxGroup'
   | 'autocomplete';
 
 export interface IBasicInputAttributes {

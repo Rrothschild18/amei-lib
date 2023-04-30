@@ -53,6 +53,10 @@ export class EmployeeFormComponent implements OnInit {
     'isActive',
     'name',
     'lastName',
+    'fruits',
+    'bmw',
+    'corvette',
+    'ferrari',
   ]);
 
   employeePersonalColumns$ = new BehaviorSubject<FieldsColumnsConfig<Employee>>(
@@ -109,6 +113,18 @@ export class EmployeeFormComponent implements OnInit {
       complement: {
         col: 12,
       },
+      fruits: {
+        col: 6,
+      },
+      bmw: {
+        col: 4,
+      },
+      ferrari: {
+        col: 4,
+      },
+      corvette: {
+        col: 4,
+      },
     }
   );
 
@@ -121,6 +137,10 @@ export class EmployeeFormComponent implements OnInit {
     birthDate: {
       // disabled: true,
       min: new Date(),
+    },
+    civilStatus: {
+      multiple: true,
+      // min: new Date(),
     },
   });
 
@@ -144,6 +164,7 @@ export class EmployeeFormComponent implements OnInit {
 
     this.fields$.subscribe((fields) => {
       this.fields = fields;
+      debugger;
     });
 
     this.handleFetchGames();
@@ -220,7 +241,15 @@ export class EmployeeFormComponent implements OnInit {
   }
 
   changeFields() {
-    this.employeePersonalFields$.next(['games', 'country', 'civilStatus']);
+    this.employeePersonalFields$.next([
+      'games',
+      'country',
+      'civilStatus',
+      'fruits',
+      'bmw',
+      'corvette',
+      'ferrari',
+    ]);
   }
 
   changeFields2() {

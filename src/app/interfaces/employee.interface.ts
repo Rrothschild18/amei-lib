@@ -18,4 +18,8 @@ export interface Employee {
   games: string;
   country: string;
   users: string;
+  fruits: object;
+  bmw: boolean;
+  corvette: boolean;
+  ferrari: boolean;
 }

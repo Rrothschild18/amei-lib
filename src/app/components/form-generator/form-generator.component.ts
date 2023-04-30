@@ -48,9 +48,7 @@ export class FormGeneratorComponent implements OnInit {
 
   constructor(private fb: FormBuilder) {}
 
-  ngOnInit(): void {
-    debugger;
-  }
+  ngOnInit(): void {}
 
   get hasFields(): boolean {
     return !!Object.keys(this.fields).length;
@@ -70,13 +68,18 @@ export class FormGeneratorComponent implements OnInit {
 
   toFormGroup(fields: Field[] = []) {
     const formPivot: FormGroup = this.form;
-    const fieldsType = ['text', 'select', 'textarea', 'date', 'radio'];
+    const fieldsType = [
+      'text',
+      'select',
+      'textarea',
+      'date',
+      'radio',
+      'checkbox',
+    ];
     const form: any = {};
-    debugger;
-    // if (this.hasFormValues) return;
 
     for (let field of fields) {
-      if (field.type === 'checkbox') {
+      if (field.type === 'checkboxGroup') {
         let checkBoxGroup: any = {};
 
         field.options.forEach((option: { label: string; value: string }) => {
@@ -99,7 +102,6 @@ export class FormGeneratorComponent implements OnInit {
       }
     }
 
-    debugger;
     this.form = this.fb.group(form);
     this.form.patchValue(formPivot.value);
     this.form.updateValueAndValidity();

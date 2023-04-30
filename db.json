@@ -21,6 +21,44 @@
           }
         ]
       },
+      "fruits": {
+        "name": "fruits",
+        "label": "Fruits",
+        "type": "checkboxGroup",
+        "options": [
+          {
+            "label": "Banana",
+            "value": false
+          },
+          {
+            "label": "Strawberry",
+            "value": false
+          },
+          {
+            "label": "Apple",
+            "value": false
+          },
+          {
+            "label": "Orange",
+            "value": false
+          }
+        ]
+      },
+      "bmw": {
+        "name": "bmw",
+        "label": "bmw",
+        "type": "checkbox"
+      },
+      "ferrari": {
+        "name": "ferrari",
+        "label": "Ferrari?",
+        "type": "checkbox"
+      },
+      "corvette": {
+        "name": "corvette",
+        "label": "Corvette?",
+        "type": "checkbox"
+      },
       "name": {
         "name": "name",
         "label": "Nome",
