@@ -1,7 +1,15 @@
 import { Validators } from '@angular/forms';
 import { EmployeesService } from './../../../services/employees.service';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable, filter, map } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  filter,
+  map,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import {
   FormValue,
   FormViewService,
@@ -121,6 +129,7 @@ export class EmployeeFormComponent implements OnInit {
   });
 
   onChangeFieldAndHasCountries$!: Observable<boolean>;
+  onFetchMoreEmployees$!: Observable<any>;
 
   constructor(
     public formService: FormViewService,
@@ -138,11 +147,11 @@ export class EmployeeFormComponent implements OnInit {
     });
 
     this.fields$.subscribe((fields) => {
-      debugger;
       this.fields = fields;
     });
 
     this.handleFetchGames();
+    this.handleFetchEmployees();
 
     this.onChangeFieldAndHasCountries$.subscribe(() => {
       this.employeePersonalAttributes$.next({
@@ -155,6 +164,55 @@ export class EmployeeFormComponent implements OnInit {
 
       this.fetchNewGames();
     });
+  }
+
+  handleFetchEmployees() {
+    // this.onFetchMoreEmployees$ =
+    this.componentStore$
+      .pipe(
+        tap((v) => {
+          debugger;
+        }),
+        filter((formValue: FormValue) => {
+          debugger;
+
+          const v = formValue['fieldName'] === 'users';
+          const vv = typeof formValue['value'] === 'object';
+
+          debugger;
+          return (
+            formValue['fieldName'] === 'users' &&
+            typeof formValue['value'] === 'object'
+          );
+        }),
+        tap((v) => {
+          debugger;
+        }),
+        map((values: FormValue) => values['users']),
+        switchMap(() => {
+          // map((values: FormValue) => values['users'])
+          return this.http.get('http://localhost:3000/users');
+        })
+      )
+      .subscribe((users: any) => {
+        this.employeePersonalAttributes$.next({
+          ...this.employeePersonalAttributes$.getValue(),
+          users: {
+            disabled: false,
+            isLoading: false,
+          },
+        });
+
+        if (this.fields.users) {
+          this.fields = {
+            ...this.fields,
+            users: {
+              ...this.fields.users,
+              options: users,
+            },
+          };
+        }
+      });
   }
 
   handleFetchGames() {

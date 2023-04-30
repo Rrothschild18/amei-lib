@@ -34,10 +34,6 @@
 
   <mat-sidenav-container class="w-100 h-100 d-flex" [hasBackdrop]="false">
     <mat-sidenav [(opened)]="isOpen">
-      <mat-form-field class="w-100" appearance="fill">
-        <mat-label>Favorite food</mat-label>
-        <input matInput placeholder="Ex. Pizza" value="Sushi" />
-      </mat-form-field>
       <mat-nav-list>
         <mat-list-item *ngFor="let link of links">
           <a
