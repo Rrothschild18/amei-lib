@@ -53,7 +53,6 @@ export class EmployeeFormComponent implements OnInit {
     'isActive',
     'name',
     'lastName',
-    'users',
   ]);
 
   employeePersonalColumns$ = new BehaviorSubject<FieldsColumnsConfig<Employee>>(
@@ -110,9 +109,6 @@ export class EmployeeFormComponent implements OnInit {
       complement: {
         col: 12,
       },
-      users: {
-        col: 12,
-      },
     }
   );
 
@@ -151,7 +147,6 @@ export class EmployeeFormComponent implements OnInit {
     });
 
     this.handleFetchGames();
-    this.handleFetchEmployees();
 
     this.onChangeFieldAndHasCountries$.subscribe(() => {
       this.employeePersonalAttributes$.next({
@@ -164,55 +159,6 @@ export class EmployeeFormComponent implements OnInit {
 
       this.fetchNewGames();
     });
-  }
-
-  handleFetchEmployees() {
-    // this.onFetchMoreEmployees$ =
-    this.componentStore$
-      .pipe(
-        tap((v) => {
-          debugger;
-        }),
-        filter((formValue: FormValue) => {
-          debugger;
-
-          const v = formValue['fieldName'] === 'users';
-          const vv = typeof formValue['value'] === 'object';
-
-          debugger;
-          return (
-            formValue['fieldName'] === 'users' &&
-            typeof formValue['value'] === 'object'
-          );
-        }),
-        tap((v) => {
-          debugger;
-        }),
-        map((values: FormValue) => values['users']),
-        switchMap(() => {
-          // map((values: FormValue) => values['users'])
-          return this.http.get('http://localhost:3000/users');
-        })
-      )
-      .subscribe((users: any) => {
-        this.employeePersonalAttributes$.next({
-          ...this.employeePersonalAttributes$.getValue(),
-          users: {
-            disabled: false,
-            isLoading: false,
-          },
-        });
-
-        if (this.fields.users) {
-          this.fields = {
-            ...this.fields,
-            users: {
-              ...this.fields.users,
-              options: users,
-            },
-          };
-        }
-      });
   }
 
   handleFetchGames() {

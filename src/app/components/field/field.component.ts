@@ -37,14 +37,6 @@ export class FieldComponent implements OnInit, OnDestroy {
   //ngx-mask not included
   @Input() fieldAttributes: FieldAttrs | undefined;
 
-  autoCompleteOptions$ = new BehaviorSubject<
-    { label: string; value: string }[]
-  >([]);
-
-  filteredAutoCompleteOptions$ = new BehaviorSubject<
-    { label: string; value: string }[]
-  >([]);
-
   private subSinks: Subscription = new Subscription();
 
   get isValid() {
@@ -54,10 +46,6 @@ export class FieldComponent implements OnInit, OnDestroy {
   constructor(private formService: FormViewService) {}
 
   ngOnInit(): void {
-    if (this.field.type === 'autocomplete') {
-      this.autoCompleteOptions$.next(this.field.options || []);
-    }
-
     this.setUpFieldChange();
   }
 
@@ -65,92 +53,15 @@ export class FieldComponent implements OnInit, OnDestroy {
     this.subSinks.unsubscribe();
   }
 
-  ngAfterViewInit() {
-    if (this.fieldFormControl) {
-      const autocompleteOptionsSubscription = combineLatest({
-        options: this.autoCompleteOptions$,
-        value: this.fieldFormControl.valueChanges.pipe(startWith('')),
-      })
-        .pipe(
-          map(({ options, value }) => {
-            const isObject = typeof value === 'object';
-            const isString = typeof value === 'string';
-            let filteredOptions = options;
-
-            if (isObject) {
-              filteredOptions = options.filter((option) =>
-                option.label.toLowerCase().includes(value.label.toLowerCase())
-              );
-            }
-
-            if (isString) {
-              filteredOptions = options.filter((option) =>
-                option.label.toLowerCase().includes(value.toLowerCase())
-              );
-            }
-
-            this.filteredAutoCompleteOptions$.next(filteredOptions);
-          })
-        )
-        .subscribe();
-
-      this.subSinks.add(autocompleteOptionsSubscription);
-    }
-  }
+  ngAfterViewInit() {}
 
   setUpFieldChange(): void {
     const fieldValueSubscription = this.fieldFormControl?.valueChanges
-      .pipe(
-        distinctUntilChanged(),
-        switchMap((changedValue) => {
-          if (this.field.type === 'autocomplete' && this.fieldFormControl) {
-            return combineLatest({
-              options: this.autoCompleteOptions$,
-              value: of(changedValue),
-            }).pipe(
-              map(({ options, value }) => {
-                const isObject = typeof value === 'object';
-                const isString = typeof value === 'string';
-                let filteredOptions: { label: string; value: string }[] = [];
-
-                if (isObject) {
-                  filteredOptions = options.filter((option) =>
-                    option.label
-                      .toLowerCase()
-                      .includes(value.label.toLowerCase())
-                  );
-                }
-
-                if (isString) {
-                  filteredOptions = options.filter((option) =>
-                    option.label.toLowerCase().includes(value.toLowerCase())
-                  );
-                }
-
-                this.filteredAutoCompleteOptions$.next(filteredOptions);
-
-                return this.handleAutoCompleteValueChange(changedValue);
-              })
-            );
-          }
-
-          return of(changedValue);
-        })
-      )
+      .pipe(distinctUntilChanged())
       .subscribe((changedValue) => {
-        if (this.field.type === 'autocomplete') {
-          debugger;
-          this.formService.formValues.next({
-            fieldName: this.field.name,
-            value: changedValue.value || changedValue,
-          });
-
-          return;
-        }
-
         this.formService.formValues.next({
           fieldName: this.field.name,
-          value: changedValue.value || changedValue,
+          value: changedValue,
         });
       });
 
@@ -191,38 +102,5 @@ export class FieldComponent implements OnInit, OnDestroy {
     }
 
     return '';
-  }
-
-  handleAutoCompleteValueChange(
-    autoCompleteEmittedValue: string | number | { label: string; value: string }
-  ) {
-    debugger;
-    const isObject = typeof autoCompleteEmittedValue === 'object';
-    const isTruthy =
-      autoCompleteEmittedValue !== null ||
-      autoCompleteEmittedValue !== undefined;
-    const hasLabel =
-      isObject && isTruthy && 'label' in autoCompleteEmittedValue;
-    const hasValue =
-      isObject && isTruthy && 'value' in autoCompleteEmittedValue;
-
-    if (isObject && isTruthy && hasLabel && hasValue) {
-      return autoCompleteEmittedValue;
-    }
-
-    if (!isObject && isTruthy && !hasLabel && !hasValue) {
-      const hasNoFilteredOptions =
-        !this.filteredAutoCompleteOptions$.getValue().length;
-      debugger;
-      if (hasNoFilteredOptions) {
-        return {
-          label: 'NO_RESULTS',
-          value: null,
-          query: autoCompleteEmittedValue,
-        };
-      }
-    }
-
-    return autoCompleteEmittedValue;
   }
 }
