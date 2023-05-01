@@ -51,6 +51,7 @@
         [formControlName]="field.name"
         [placeholder]="field.placeholder || ''"
         [multiple]="!!fieldAttributes?.multiple"
+        [value]="fieldAttributes?.value || undefined"
       >
         <mat-option
           *ngFor="let option of field.options"

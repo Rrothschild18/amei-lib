@@ -242,12 +242,9 @@ describe('AutocompleteComponent', () => {
 
         fixture.detectChanges();
 
-        debugger;
-
         let selectAllOption = fixture.debugElement.query(
           By.css('#selectAllOption')
         );
-        debugger;
 
         expect(selectAllOption).toBeNull();
       });
@@ -669,7 +666,6 @@ describe('AutocompleteComponent', () => {
         { label: 'Ireland', value: 3 },
         { label: 'Australia', value: 4 },
       ];
-      debugger;
 
       fixture.detectChanges();
 
@@ -677,17 +673,11 @@ describe('AutocompleteComponent', () => {
 
       fixture.detectChanges();
 
-      debugger;
-
       selectOptions(['Brazil', 'Canada', 'Ireland', 'Australia']);
-
-      debugger;
 
       fixture.detectChanges();
 
       expect(countSelectedOptions()).toBe(5);
-
-      debugger;
 
       const mockResult: AutocompleteConfig = {
         1: { label: 'Brazil', value: 1, selected: true },
@@ -695,8 +685,6 @@ describe('AutocompleteComponent', () => {
         3: { label: 'Ireland', value: 3, selected: true },
         4: { label: 'Australia', value: 4, selected: true },
       };
-
-      debugger;
 
       expect(component.data$.getValue()).toEqual(mockResult);
     }));

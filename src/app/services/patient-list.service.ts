@@ -53,8 +53,6 @@ export class PatientListService {
       'assets/patients.fields.json'
     );
 
-    debugger;
-
     return combineLatest([results, fields]).pipe(
       map(([results, fields]) => {
         const newPayload = {

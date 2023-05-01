@@ -70,7 +70,6 @@ export class FieldComponent implements OnInit, OnDestroy {
 
   //TODO map errors with an object, destruct arguments and accept custom errors messages
   showError(error: any) {
-    debugger;
     console.log(error);
     if (error.required) return 'Este campo é obrigatório';
     if (error.email) return 'E-mail inválido';

@@ -31,6 +31,56 @@ export type FinancialAccount = {
   nomeBanco: string;
 };
 
+export interface IFinancialAccountsForReceiptRequestParam {
+  id?: number;
+  name?: string;
+  unidadeId?: number;
+  tipoContaId?: number;
+}
+
+export interface IFinancialAccountsForReceipt {
+  id: number;
+  nome: string;
+  unidadeId: number;
+  unidade: string;
+  tipoContaId: number;
+  tipoConta: string;
+  bancoId: number;
+  banco: string;
+  agencia: string;
+  numero: string;
+}
+
+export interface IFormsOfSettlementParam {
+  tipoOperacaoId?: number;
+}
+export interface IFormsOfSettlementFromApi {
+  id: number;
+  formaLiquidacao: ETextAccountReceiveForms;
+  tipoOperacaoId: EFormsOfSettlementOperationType;
+  tipoOperacao: string;
+}
+
+export enum ETextAccountReceiveForms {
+  EMPTY = '',
+  DINHEIRO = 'Dinheiro',
+  PIX = 'PIX',
+  CARTAO_DEBITO = 'Cartão de Débito',
+  CARTAO_CREDITO = 'Cartão de Crédito',
+}
+
+export enum ENumberAccountReceiveForms {
+  DINHEIRO = 1,
+  PIX = 2,
+  CARTAO_DEBITO = 7,
+  CARTAO_CREDITO = 8,
+}
+
+export enum EFormsOfSettlementOperationType {
+  RECEITAS = 1,
+  DESPESAS = 2,
+}
+
 export type FinancialAccountFieldNames = FieldsArrayName<FinancialAccount>;
 
 export type FinancialAccountColumns = FieldsColumnsConfig<FinancialAccount>;

@@ -1,17 +1,34 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { IFinancialAccountsType } from '../interfaces';
+import {
+  IFinancialAccountsForReceipt,
+  IFinancialAccountsForReceiptRequestParam,
+  IFinancialAccountsType,
+  IFormsOfSettlementFromApi,
+  IFormsOfSettlementParam,
+} from '../interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FinancialAccountsService {
   baseUrl: string = 'https://amei-dev.amorsaude.com.br/api/v1';
+  token: string =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6InVzdWFyaW8yQGVtYWlsLmNvbSIsImZ1bGxOYW1lIjoiVVNVQVJJTyAyIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4Mjk1ODkzMCwiZXhwIjoxNjgyOTg3NzMwfQ.2S7P6yMbW0qSM1c9TwxqmkaNP7lpwwSPa9cEQKhZo2s';
 
   private currentAccountsTypes = `${this.baseUrl}/current-accounts-related/types`;
+  private currentAccountsAccountsForReceipt = `${this.baseUrl}/current-accounts-related/accounts-for-receipt`;
+  private currentAccountsFormsOfSettlement = `${this.baseUrl}/current-accounts-related/forms-of-settlement`;
 
   constructor(private http: HttpClient) {}
+
+  private getHeader(): HttpHeaders {
+    const head = new HttpHeaders()
+      .set('content-type', 'application/json')
+      .set('Authorization', `Bearer ${this.token}`);
+    return head;
+  }
 
   getFields(): Observable<any> {
     return of({
@@ -99,6 +116,7 @@ export class FinancialAccountsService {
         name: 'contaLiquidacao',
         label: 'Formas de recebimento (multiple)',
         type: 'select',
+        options: [],
       },
       nomeBanco: {
         name: 'nomeBanco',
@@ -113,6 +131,32 @@ export class FinancialAccountsService {
   }
 
   getCurrentAccountsRelatedTypes(): Observable<IFinancialAccountsType[]> {
-    return this.http.get<IFinancialAccountsType[]>(this.currentAccountsTypes);
+    return this.http.get<IFinancialAccountsType[]>(this.currentAccountsTypes, {
+      headers: this.getHeader(),
+    });
+  }
+
+  listAccountsForReceipt(
+    filters: IFinancialAccountsForReceiptRequestParam
+  ): Observable<IFinancialAccountsForReceipt[]> {
+    return this.http.get<IFinancialAccountsForReceipt[]>(
+      this.currentAccountsAccountsForReceipt,
+      {
+        headers: this.getHeader(),
+        params: <HttpParams>(<unknown>filters),
+      }
+    );
+  }
+
+  listFormsOfSettlement(
+    filters: IFormsOfSettlementParam
+  ): Observable<IFormsOfSettlementFromApi[]> {
+    return this.http.get<IFormsOfSettlementFromApi[]>(
+      this.currentAccountsFormsOfSettlement,
+      {
+        headers: this.getHeader(),
+        params: <HttpParams>(<unknown>filters),
+      }
+    );
   }
 }
