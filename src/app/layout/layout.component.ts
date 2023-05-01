@@ -35,6 +35,11 @@ export class LayoutComponent implements OnInit {
       pathName: 'Calendario Mes',
       iconName: 'monetization_on',
     },
+    {
+      linkTo: '/financial-accounts/new',
+      pathName: 'Contas financeiras',
+      iconName: 'monetization_on',
+    },
   ];
 
   menuItens = [

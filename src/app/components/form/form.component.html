@@ -20,10 +20,10 @@
       </ng-container>
     </div>
   </form> -->
-  <ng-container *ngFor="let data of vm.fields | keyvalue">
-    <!-- <pre>{{ data | json }}</pre> -->
-    <!-- <pre> [fieldAttributes]="getFieldAttributes(field.key)"</pre> -->
-    <div class="row">
+  <div class="row">
+    <ng-container *ngFor="let data of vm.fields | keyvalue">
+      <!-- <pre>{{ data | json }}</pre> -->
+      <!-- <pre> [fieldAttributes]="getFieldAttributes(field.key)"</pre> -->
       <app-field
         [class]="getFieldClass(data.key)"
         [field]="data.value"
@@ -31,6 +31,6 @@
         [fieldAttributes]="getFieldAttributes(data.key)"
         [form]="form"
       ></app-field>
-    </div>
-  </ng-container>
+    </ng-container>
+  </div>
 </ng-container>

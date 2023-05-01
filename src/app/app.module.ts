@@ -35,6 +35,7 @@ import { EmployeeFormComponent } from './views/employees/employee-form/employee-
 import { FormComponent } from './components/form/form.component';
 import { CalendarOverviewComponent } from './views/calendar-overview/calendar-overview.component';
 import { CalendarMonthComponent } from './views/calendar-month/calendar-month.component';
+import { FinancialAccountFormComponent } from './views/financial-accounts/financial-account-form/financial-account-form.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,7 @@ import { CalendarMonthComponent } from './views/calendar-month/calendar-month.co
     FormComponent,
     CalendarOverviewComponent,
     CalendarMonthComponent,
+    FinancialAccountFormComponent,
   ],
   imports: [
     BrowserModule,

@@ -23,7 +23,7 @@ import {
   FieldsValidatorsConfig,
   FormFieldContext,
 } from 'src/app/models';
-import { Field, FieldAttrs } from 'src/app/models/field';
+import { Field, FieldAttrs, FieldTypes } from 'src/app/models/field';
 
 @Component({
   selector: 'app-form-generator',
@@ -68,7 +68,7 @@ export class FormGeneratorComponent implements OnInit {
 
   toFormGroup(fields: Field[] = []) {
     const formPivot: FormGroup = this.form;
-    const fieldsType = [
+    const fieldsType: FieldTypes[] = [
       'text',
       'select',
       'textarea',
