@@ -109,7 +109,7 @@ export class FinancialAccountsService {
   }
 
   getCurrentClinic() {
-    return of({ label: 'Telemedicina', value: 100 });
+    return of({ label: 'Telemedicina', value: '100' });
   }
 
   getCurrentAccountsRelatedTypes(): Observable<IFinancialAccountsType[]> {

@@ -175,7 +175,7 @@ export class FormComponent implements OnInit {
         const validators = validations[fieldName] || [Validators.required];
 
         this.form.get(fieldName)?.addValidators(validators);
-        this.form.get(fieldName)?.updateValueAndValidity();
+        // this.form.get(fieldName)?.updateValueAndValidity();
 
         return;
       }
@@ -185,12 +185,9 @@ export class FormComponent implements OnInit {
   }
 
   setUpFormAttributes() {
-    // debugger;
     const mappedAttributes = Object.entries(this._fieldsAttributes$.getValue());
     mappedAttributes.forEach(([fieldName, attributes]: any) => {
-      // debugger;
       const fieldNoExists = !this._fields$.getValue()[fieldName];
-      // debugger;
 
       if (fieldNoExists) return;
 
@@ -314,5 +311,11 @@ export class FormComponent implements OnInit {
   getFieldAttributes(fieldName: string) {
     return this._fieldsAttributes$.getValue()[fieldName];
   }
+
+  //KeyValue sort by key, bypass
+  unsorted(a: any, b: any): number {
+    return 0;
+  }
+
   ngAfterViewInit() {}
 }
