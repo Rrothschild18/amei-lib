@@ -2,11 +2,16 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import {
+  BankResponse,
+  IBankFilterRequestParam,
+  IBankFromApi,
+  IBankRequestParam,
   IFinancialAccountsForReceipt,
   IFinancialAccountsForReceiptRequestParam,
   IFinancialAccountsType,
   IFormsOfSettlementFromApi,
   IFormsOfSettlementParam,
+  httpGetOptions,
 } from '../interfaces';
 
 @Injectable({
@@ -15,11 +20,13 @@ import {
 export class FinancialAccountsService {
   baseUrl: string = 'https://amei-dev.amorsaude.com.br/api/v1';
   token: string =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6InVzdWFyaW8yQGVtYWlsLmNvbSIsImZ1bGxOYW1lIjoiVVNVQVJJTyAyIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4Mjk1ODkzMCwiZXhwIjoxNjgyOTg3NzMwfQ.2S7P6yMbW0qSM1c9TwxqmkaNP7lpwwSPa9cEQKhZo2s';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6InVzdWFyaW8yQGVtYWlsLmNvbSIsImZ1bGxOYW1lIjoiVVNVQVJJTyAyIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4Mjk4ODY1MywiZXhwIjoxNjgzMDE3NDUzfQ.vZa-ylHRkBi6TcXaNqegKSn_S5m2DkNDPclcj2S6fb8';
 
   private currentAccountsTypes = `${this.baseUrl}/current-accounts-related/types`;
   private currentAccountsAccountsForReceipt = `${this.baseUrl}/current-accounts-related/accounts-for-receipt`;
   private currentAccountsFormsOfSettlement = `${this.baseUrl}/current-accounts-related/forms-of-settlement`;
+  private currentAccountsBanksFilter = `${this.baseUrl}/contas-correntes/bancos/filtro`;
+  private currentAccountsBanks = `${this.baseUrl}/contas-correntes/bancos`;
 
   constructor(private http: HttpClient) {}
 
@@ -158,5 +165,28 @@ export class FinancialAccountsService {
         params: <HttpParams>(<unknown>filters),
       }
     );
+  }
+
+  listBanksWithFilters(
+    filters: IBankFilterRequestParam
+  ): Observable<BankResponse> {
+    return this.http.get<BankResponse>(`${this.currentAccountsBanksFilter}/`, {
+      headers: this.getHeader(),
+      params: <HttpParams>(<unknown>filters),
+    });
+  }
+
+  listBanks(filters?: IBankRequestParam): Observable<IBankFromApi[]> {
+    let options: httpGetOptions = {
+      headers: this.getHeader(),
+    };
+
+    if (filters)
+      options = {
+        ...options,
+        params: <HttpParams>(<unknown>filters),
+      };
+
+    return this.http.get<IBankFromApi[]>(this.currentAccountsBanks, options);
   }
 }

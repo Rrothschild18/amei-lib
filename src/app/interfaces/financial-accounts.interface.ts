@@ -4,6 +4,8 @@ import {
   FieldsColumnsConfig,
   FieldsValidatorsConfig,
 } from '../models';
+import { SortDirection } from '@angular/material/sort';
+import { HttpHeaders, HttpContext, HttpParams } from '@angular/common/http';
 
 export interface IFinancialAccountsType {
   id: number;
@@ -67,6 +69,78 @@ export enum ETextAccountReceiveForms {
   PIX = 'PIX',
   CARTAO_DEBITO = 'Cartão de Débito',
   CARTAO_CREDITO = 'Cartão de Crédito',
+}
+
+// Banks
+
+export interface IBankRequestParam {
+  name?: string;
+  unityId?: number;
+  sortBy?: string;
+  sortDirection?: string;
+}
+
+export interface IBankFilterRequestParam {
+  page: number;
+  limit: number;
+  name?: string;
+  sortBy?: string;
+  sortDirection?: string;
+}
+
+export interface IBankFilterParam {
+  page?: number;
+  limit?: number;
+  bankName?: string;
+  bankCode?: string;
+  sortBy?: string;
+  sortDirection?: SortDirection;
+}
+
+export interface BankResponse {
+  items: IBankFromApi[];
+  meta: any;
+}
+
+export interface IBankFromApi {
+  id: number;
+  codigoBanco: string;
+  nomeBanco: string;
+  flgAtivo: string;
+}
+
+export interface IBankToApi {
+  bankCode: string;
+  bankName: string;
+}
+
+export interface IBankCreateResponse {
+  flagDeError: boolean;
+  codigo: number;
+  mensagem: string;
+  id: number;
+}
+
+export interface httpGetOptions {
+  headers?:
+    | HttpHeaders
+    | {
+        [header: string]: string | string[];
+      };
+  context?: HttpContext;
+  observe?: 'body';
+  params?:
+    | HttpParams
+    | {
+        [param: string]:
+          | string
+          | number
+          | boolean
+          | ReadonlyArray<string | number | boolean>;
+      };
+  reportProgress?: boolean;
+  responseType?: 'json';
+  withCredentials?: boolean;
 }
 
 export enum ENumberAccountReceiveForms {

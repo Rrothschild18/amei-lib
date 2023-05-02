@@ -20,6 +20,7 @@ import {
   filter,
   map,
   shareReplay,
+  startWith,
   switchMap,
   takeUntil,
   tap,
@@ -69,6 +70,21 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
     contaLiquidacao: {
       col: 4,
     },
+    bancoId: {
+      col: 4,
+    },
+    agencia: {
+      col: 4,
+    },
+    numero: {
+      col: 4,
+    },
+    titulo: {
+      col: 4,
+    },
+    documento: {
+      col: 4,
+    },
   });
 
   financialAccountsValidators$ =
@@ -107,8 +123,12 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
   disableUnityFormField$!: Subscription;
 
   //FormEvents
-  accountTypePhysicalBox$!: Observable<boolean>;
-  loadPhysicalBoxFields$!: Subscription;
+  accountTypeIsPhysicalBox$!: Observable<boolean>;
+  loadPhysicalBoxFieldsSubs$!: Subscription;
+
+  //FormEvents
+  accountTypeIsBankAccount$!: Observable<boolean>;
+  loadBankAccountFieldsSubs$!: Subscription;
 
   constructor(
     private financialAccountService: FinancialAccountsService,
@@ -131,16 +151,46 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
     this.getCurrentClinic();
     this.setUnityFieldDisabled();
     this.getAccountTypes();
+
+    this.isAccountTypePhysical();
+    this.isAccountTypeBank();
+
     this.watchAccountTypeValuePhysicalAndEnableFields();
     this.watchAccountTypeValuePhysicalAndFetchFormReceipts();
-    this.watchAccountTypeValueBank();
+
+    this.watchAccountTypeValueBankAndEnableFields();
+    this.watchAccountTypeValuePhysicalAndFetchBanks();
+
     this.watchAccountTypeValueCard();
   }
 
   ngOnDestroy(): void {
     this.fieldsSubscription$ && this.fieldsSubscription$.unsubscribe();
     this.disableUnityFormField$ && this.disableUnityFormField$.unsubscribe();
-    this.loadPhysicalBoxFields$ && this.loadPhysicalBoxFields$.unsubscribe();
+    this.loadPhysicalBoxFieldsSubs$ &&
+      this.loadPhysicalBoxFieldsSubs$.unsubscribe();
+  }
+
+  isAccountTypePhysical() {
+    this.accountTypeIsPhysicalBox$ = this.formService.formValues.pipe(
+      filter(
+        (formResponse) =>
+          formResponse?.['fieldName'] === 'tipoContaId' &&
+          formResponse?.['value'] === '1'
+      ),
+      map(() => true)
+    );
+  }
+
+  isAccountTypeBank() {
+    this.accountTypeIsBankAccount$ = this.formService.formValues.pipe(
+      filter(
+        (formResponse) =>
+          formResponse?.['fieldName'] === 'tipoContaId' &&
+          formResponse?.['value'] === '3'
+      ),
+      map(() => true)
+    );
   }
 
   ngAfterViewInit() {
@@ -195,15 +245,7 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
             },
           });
         }
-
-        // this.getAccountFormReceipts();
       });
-  }
-
-  getAccountFormReceipts() {
-    this.financialAccountService.listAccountsForReceipt(
-      this.formValues['tipoContaId']
-    );
   }
 
   setUnityFieldDisabled() {
@@ -226,31 +268,29 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
   }
 
   watchAccountTypeValuePhysicalAndEnableFields() {
-    this.accountTypePhysicalBox$ = this.formService.formValues.pipe(
-      filter(
-        (formResponse) =>
-          formResponse?.['fieldName'] && formResponse?.['value'] === '1'
-      ),
-      map(() => true)
+    this.loadPhysicalBoxFieldsSubs$ = this.accountTypeIsPhysicalBox$.subscribe(
+      () => {
+        this.financialAccountsFieldsNames$.next([
+          'unidadeId',
+          'tipoContaId',
+          'nome',
+          'contaLiquidacao',
+        ]);
+      }
     );
-
-    this.loadPhysicalBoxFields$ = this.accountTypePhysicalBox$.subscribe(() => {
-      const state = this.financialAccountsFieldsNames$.getValue();
-      this.financialAccountsFieldsNames$.next([
-        ...state,
-        'nome',
-        'contaLiquidacao',
-      ]);
-    });
   }
 
   watchAccountTypeValuePhysicalAndFetchFormReceipts() {
-    this.accountTypePhysicalBox$
+    combineLatest({
+      physicalBox: this.accountTypeIsPhysicalBox$.pipe(startWith(false)),
+      bank: this.accountTypeIsBankAccount$.pipe(startWith(false)),
+    })
       .pipe(
+        filter(({ physicalBox, bank }) => physicalBox || bank),
         switchMap(() => {
           return this.financialAccountService
             .listFormsOfSettlement({
-              tipoOperacaoId: this.formValues['tipoContaId'],
+              tipoOperacaoId: 1,
             })
             .pipe(
               map((formSettlements) =>
@@ -264,7 +304,6 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
       )
       .subscribe((formSettlements) => {
         const currentState = this.financialAccountsFields$.getValue();
-        debugger;
         if (
           currentState.contaLiquidacao &&
           currentState.contaLiquidacao.options
@@ -284,7 +323,58 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
 
   watchAccountTypeValueCard() {}
 
-  watchAccountTypeValueBank() {}
+  watchAccountTypeValueBankAndEnableFields() {
+    this.loadBankAccountFieldsSubs$ = this.accountTypeIsBankAccount$.subscribe(
+      () => {
+        this.financialAccountsFieldsNames$.next([
+          'unidadeId',
+          'tipoContaId',
+          'nome',
+          'contaLiquidacao',
+          'bancoId',
+          'agencia',
+          'numero',
+          'titulo',
+          'documento',
+        ]);
+      }
+    );
+  }
+
+  watchAccountTypeValuePhysicalAndFetchBanks() {
+    this.accountTypeIsBankAccount$
+      .pipe(
+        switchMap(() => {
+          return this.financialAccountService
+            .listBanksWithFilters({
+              page: 1,
+              limit: 999,
+            })
+            .pipe(
+              map((banks) =>
+                banks.items.map((bank) => ({
+                  label: bank.nomeBanco,
+                  value: `${bank.id}`,
+                }))
+              )
+            );
+        })
+      )
+      .subscribe((banks) => {
+        const currentState = this.financialAccountsFields$.getValue();
+        if (currentState.bancoId && currentState.bancoId.options) {
+          this.financialAccountsFields$.next({
+            ...currentState,
+            bancoId: {
+              ...currentState.bancoId,
+              options: [...banks],
+            },
+          });
+        }
+
+        this.formRefs.first.form.get('contaLiquidacao')?.setValue(['1']);
+      });
+  }
 
   filterObject(
     fields: FieldsConfig<FinancialAccount>,
