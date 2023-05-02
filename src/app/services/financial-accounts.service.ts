@@ -8,6 +8,7 @@ import {
   IBankRequestParam,
   IFinancialAccountsForReceipt,
   IFinancialAccountsForReceiptRequestParam,
+  IFinancialAccountsModality,
   IFinancialAccountsType,
   IFormsOfSettlementFromApi,
   IFormsOfSettlementParam,
@@ -20,13 +21,14 @@ import {
 export class FinancialAccountsService {
   baseUrl: string = 'https://amei-dev.amorsaude.com.br/api/v1';
   token: string =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6InVzdWFyaW8yQGVtYWlsLmNvbSIsImZ1bGxOYW1lIjoiVVNVQVJJTyAyIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4Mjk4ODY1MywiZXhwIjoxNjgzMDE3NDUzfQ.vZa-ylHRkBi6TcXaNqegKSn_S5m2DkNDPclcj2S6fb8';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6InVzdWFyaW8yQGVtYWlsLmNvbSIsImZ1bGxOYW1lIjoiVVNVQVJJTyAyIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4MzAyOTEyMCwiZXhwIjoxNjgzMDU3OTIwfQ.YAuYH3iiehQm4G0zXFVigFB7HDNL6gy_i5HHHmwjTUE';
 
   private currentAccountsTypes = `${this.baseUrl}/current-accounts-related/types`;
   private currentAccountsAccountsForReceipt = `${this.baseUrl}/current-accounts-related/accounts-for-receipt`;
   private currentAccountsFormsOfSettlement = `${this.baseUrl}/current-accounts-related/forms-of-settlement`;
   private currentAccountsBanksFilter = `${this.baseUrl}/contas-correntes/bancos/filtro`;
   private currentAccountsBanks = `${this.baseUrl}/contas-correntes/bancos`;
+  private currentAccountsModalities = `${this.baseUrl}/current-accounts-related/modalities`;
 
   constructor(private http: HttpClient) {}
 
@@ -65,7 +67,7 @@ export class FinancialAccountsService {
       },
       nome: {
         name: 'nome',
-        label: 'Sobrenome',
+        label: 'Nome de Identificação',
         type: 'text',
       },
       contaRecebimentoId: {
@@ -125,16 +127,16 @@ export class FinancialAccountsService {
         type: 'select',
         options: [],
       },
-      nomeBanco: {
-        name: 'nomeBanco',
-        label: 'Address',
-        type: 'text',
-      },
+      // nomeBanco: {
+      //   name: 'nomeBanco',
+      //   label: 'Address',
+      //   type: 'text',
+      // },
     });
   }
 
   getCurrentClinic() {
-    return of({ label: 'Telemedicina', value: '100' });
+    return of({ label: 'Telemedicina', value: '1' });
   }
 
   getCurrentAccountsRelatedTypes(): Observable<IFinancialAccountsType[]> {
@@ -188,5 +190,14 @@ export class FinancialAccountsService {
       };
 
     return this.http.get<IBankFromApi[]>(this.currentAccountsBanks, options);
+  }
+
+  listModalities(): Observable<IFinancialAccountsModality[]> {
+    return this.http.get<IFinancialAccountsModality[]>(
+      this.currentAccountsModalities,
+      {
+        headers: this.getHeader(),
+      }
+    );
   }
 }

@@ -63,14 +63,6 @@ export interface IFormsOfSettlementFromApi {
   tipoOperacao: string;
 }
 
-export enum ETextAccountReceiveForms {
-  EMPTY = '',
-  DINHEIRO = 'Dinheiro',
-  PIX = 'PIX',
-  CARTAO_DEBITO = 'Cartão de Débito',
-  CARTAO_CREDITO = 'Cartão de Crédito',
-}
-
 // Banks
 
 export interface IBankRequestParam {
@@ -121,6 +113,12 @@ export interface IBankCreateResponse {
   id: number;
 }
 
+export interface IFinancialAccountsModality {
+  id: number;
+  modalidade: string;
+  flagAtivo: string;
+}
+
 export interface httpGetOptions {
   headers?:
     | HttpHeaders
@@ -143,6 +141,14 @@ export interface httpGetOptions {
   withCredentials?: boolean;
 }
 
+export enum ETextAccountReceiveForms {
+  EMPTY = '',
+  DINHEIRO = 'Dinheiro',
+  PIX = 'PIX',
+  CARTAO_DEBITO = 'Cartão de Débito',
+  CARTAO_CREDITO = 'Cartão de Crédito',
+}
+
 export enum ENumberAccountReceiveForms {
   DINHEIRO = 1,
   PIX = 2,
@@ -155,6 +161,17 @@ export enum EFormsOfSettlementOperationType {
   DESPESAS = 2,
 }
 
+export enum EFinancialAccountType {
+  CAIXA_FISICO = '1',
+  CONTA_BANCARIA = '2',
+  CARTAO = '3',
+}
+
+export enum EFinancialAccountModality {
+  CC_RECEBIMENTO = 1,
+  CC_PAGAMENTO = 2,
+  CD_RECEBIMENTO = 3,
+}
 export type FinancialAccountFieldNames = FieldsArrayName<FinancialAccount>;
 
 export type FinancialAccountColumns = FieldsColumnsConfig<FinancialAccount>;
