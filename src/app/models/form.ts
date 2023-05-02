@@ -32,7 +32,6 @@ export interface FieldConfig<T, FieldConfigKey extends keyof T> {
   placeholder?: string;
   options?: { label: string; value: string }[];
 }
-
 export interface FormFieldContext {
   field: Field;
   formGroupRef: FormGroup;

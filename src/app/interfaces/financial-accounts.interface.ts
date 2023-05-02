@@ -150,10 +150,10 @@ export enum ETextAccountReceiveForms {
 }
 
 export enum ENumberAccountReceiveForms {
-  DINHEIRO = 1,
-  PIX = 2,
-  CARTAO_DEBITO = 7,
-  CARTAO_CREDITO = 8,
+  DINHEIRO = '1',
+  PIX = '2',
+  CARTAO_DEBITO = '7',
+  CARTAO_CREDITO = '8',
 }
 
 export enum EFormsOfSettlementOperationType {
@@ -168,9 +168,9 @@ export enum EFinancialAccountType {
 }
 
 export enum EFinancialAccountModality {
-  CC_RECEBIMENTO = 1,
-  CC_PAGAMENTO = 2,
-  CD_RECEBIMENTO = 3,
+  CC_RECEBIMENTO = '1',
+  CC_PAGAMENTO = '2',
+  CD_RECEBIMENTO = '3',
 }
 export type FinancialAccountFieldNames = FieldsArrayName<FinancialAccount>;
 

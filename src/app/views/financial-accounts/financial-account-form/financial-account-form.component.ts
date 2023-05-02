@@ -31,7 +31,9 @@ import {
 } from 'src/app/components/form-view/form-view.service';
 import { FormComponent } from 'src/app/components/form/form.component';
 import {
+  EFinancialAccountModality,
   EFinancialAccountType,
+  ENumberAccountReceiveForms,
   FinancialAccount,
   FinancialAccountAttributes,
   FinancialAccountColumns,
@@ -58,56 +60,7 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
       'tipoContaId',
     ]);
 
-  financialAccountsColumns$ = new BehaviorSubject<FinancialAccountColumns>({
-    unidadeId: {
-      col: 4,
-    },
-    tipoContaId: {
-      col: 4,
-    },
-    nome: {
-      col: 4,
-    },
-    contaLiquidacao: {
-      col: 4,
-    },
-    bancoId: {
-      col: 4,
-    },
-    agencia: {
-      col: 4,
-    },
-    numero: {
-      col: 4,
-    },
-    titulo: {
-      col: 4,
-    },
-    documento: {
-      col: 4,
-    },
-    modalidadeId: {
-      col: 4,
-    },
-    contaRecebimentoId: {
-      col: 4,
-    },
-    flagSplit: {
-      col: 2,
-    },
-    flagTef: {
-      col: 2,
-    },
-    diasCreditoConta: {
-      col: 4,
-    },
-    melhorDiaCompra: {
-      col: 4,
-    },
-    diaVencimento: {
-      col: 4,
-    },
-  });
+  financialAccountsColumns$ = new BehaviorSubject<FinancialAccountColumns>({});
 
   financialAccountsValidators$ =
     new BehaviorSubject<FinancialAccountValidators>({
@@ -119,13 +72,12 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
       contaLiquidacao: {
         multiple: true,
       },
+      tipoContaId: {
+        hideRequiredMarker: true,
+      },
     });
 
-  fieldsSubscription$!: Subscription;
-
   financialAccountsFields$ = new BehaviorSubject<FinancialAccountFields>({});
-
-  destroy$ = new Subject();
 
   @ViewChildren(FormComponent)
   formRefs!: QueryList<FormComponent>;
@@ -142,31 +94,17 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
     shareReplay({ bufferSize: 1, refCount: true })
   );
 
-  disableUnityFormField$!: Subscription;
-
   //FormEvents
   accountTypeIsPhysicalBox$!: Observable<boolean>;
-  loadPhysicalBoxFieldsSubs$!: Subscription;
-
-  //FormEvents
   accountTypeIsBank$!: Observable<boolean>;
-  loadBankAccountFieldsSubs$!: Subscription;
-
-  //FormEvents
   accountTypeIsCard$!: Observable<boolean>;
-  loadCardFieldsSubs$!: Subscription;
 
-  //FormEvents
   isModalityCreditPayments$!: Observable<boolean>;
-  loadModalityCreditPaymentsSubs$!: Subscription;
-
-  //FormEvents
   isModalityCreditReceipts$!: Observable<boolean>;
-  loadModalityCreditReceiptsFieldsSubs$!: Subscription;
-
-  //FormEvents
   isModalityDebitReceipts$!: Observable<boolean>;
-  loadModalityDebitReceiptsFieldsSubs$!: Subscription;
+
+  private subscriptionsSink$ = new Subscription();
+  private destroy$ = new Subject();
 
   constructor(
     private financialAccountService: FinancialAccountsService,
@@ -185,12 +123,14 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
       }
     );
 
+    this.setUpFieldColumns();
+
     this.getFinancialAccountsFields();
     this.getCurrentClinic();
     this.setUnityFieldDisabled();
     this.getAccountTypes();
 
-    //On form value changes
+    //computed properties
     this.isAccountTypePhysical();
     this.isAccountTypeCard();
     this.isAccountTypeBank();
@@ -213,14 +153,14 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
     this.watchAccountModalityDebitReceiptsAndEnableFields();
   }
 
+  ngAfterViewInit() {
+    this.formService.setFormRefs(this.formRefs);
+  }
+
   ngOnDestroy(): void {
-    this.fieldsSubscription$ && this.fieldsSubscription$.unsubscribe();
-    this.disableUnityFormField$ && this.disableUnityFormField$.unsubscribe();
-    this.loadPhysicalBoxFieldsSubs$ &&
-      this.loadPhysicalBoxFieldsSubs$.unsubscribe();
-    this.loadBankAccountFieldsSubs$ &&
-      this.loadBankAccountFieldsSubs$.unsubscribe();
-    this.loadCardFieldsSubs$ && this.loadCardFieldsSubs$.unsubscribe();
+    this.destroy$.complete();
+    this.destroy$.unsubscribe();
+    this.subscriptionsSink$.unsubscribe();
   }
 
   isAccountTypePhysical() {
@@ -237,9 +177,9 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
   isAccountTypeBank() {
     this.accountTypeIsBank$ = this.formService.formValues.pipe(
       filter(
-        (formResponse) =>
-          formResponse?.['fieldName'] === 'tipoContaId' &&
-          formResponse?.['value'] === '2'
+        ({ fieldName, value }) =>
+          fieldName === 'tipoContaId' &&
+          value === EFinancialAccountType.CONTA_BANCARIA
       ),
       map(() => true)
     );
@@ -248,9 +188,8 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
   isAccountTypeCard() {
     this.accountTypeIsCard$ = this.formService.formValues.pipe(
       filter(
-        (formResponse) =>
-          formResponse?.['fieldName'] === 'tipoContaId' &&
-          formResponse?.['value'] === '3'
+        ({ fieldName, value }) =>
+          fieldName === 'tipoContaId' && value === EFinancialAccountType.CARTAO
       ),
       map(() => true)
     );
@@ -259,9 +198,9 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
   isModalityCreditPayments() {
     this.isModalityCreditPayments$ = this.formService.formValues.pipe(
       filter(
-        (formResponse) =>
-          formResponse?.['fieldName'] === 'modalidadeId' &&
-          formResponse?.['value'] === '2'
+        ({ fieldName, value }) =>
+          fieldName === 'modalidadeId' &&
+          value === EFinancialAccountModality.CC_PAGAMENTO
       ),
       map(() => true)
     );
@@ -270,9 +209,9 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
   isModalityCreditReceipts() {
     this.isModalityCreditReceipts$ = this.formService.formValues.pipe(
       filter(
-        (formResponse) =>
-          formResponse?.['fieldName'] === 'modalidadeId' &&
-          formResponse?.['value'] === '1'
+        ({ fieldName, value }) =>
+          fieldName === 'modalidadeId' &&
+          value === EFinancialAccountModality.CC_RECEBIMENTO
       ),
       map(() => true)
     );
@@ -281,21 +220,18 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
   isModalityDebitReceipts() {
     this.isModalityDebitReceipts$ = this.formService.formValues.pipe(
       filter(
-        (formResponse) =>
-          formResponse?.['fieldName'] === 'modalidadeId' &&
-          formResponse?.['value'] === '3'
+        ({ fieldName, value }) =>
+          fieldName === 'modalidadeId' &&
+          value === EFinancialAccountModality.CD_RECEBIMENTO
       ),
       map(() => true)
     );
   }
 
-  ngAfterViewInit() {
-    this.formService.setFormRefs(this.formRefs);
-  }
-
   getFinancialAccountsFields() {
-    this.fieldsSubscription$ = this.financialAccountService
+    this.financialAccountService
       .getFields()
+      .pipe(takeUntil(this.destroy$))
       .subscribe((fields) => this.financialAccountsFields$.next(fields));
   }
 
@@ -306,12 +242,12 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
       .subscribe((clinic) => {
         const currentState = this.financialAccountsFields$.getValue();
 
-        if (currentState.unidadeId && currentState.unidadeId.options) {
+        if (currentState.unidadeId) {
           this.financialAccountsFields$.next({
             ...currentState,
             unidadeId: {
               ...currentState.unidadeId,
-              options: [...currentState.unidadeId.options, clinic],
+              options: [clinic],
             },
           });
         }
@@ -334,12 +270,12 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
       .subscribe((accountTypes) => {
         const currentState = this.financialAccountsFields$.getValue();
 
-        if (currentState.tipoContaId && currentState.tipoContaId.options) {
+        if (currentState.tipoContaId) {
           this.financialAccountsFields$.next({
             ...currentState,
             tipoContaId: {
               ...currentState.tipoContaId,
-              options: [...currentState.tipoContaId.options, ...accountTypes],
+              options: [...accountTypes],
             },
           });
         }
@@ -347,26 +283,30 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
   }
 
   setUnityFieldDisabled() {
-    this.disableUnityFormField$ = combineLatest({
+    const disableUnityFormField$ = combineLatest({
       loadedOptions: this.hasLoadedUnityOptions$,
       hasForm: this.formService.formRefs,
-    }).subscribe(() => {
-      this.formRefs.first.form.get('unidadeId')?.setValue('1');
-      //Detect changes because field errors are getting error  NG0100: Expression has changed after it was checked
-      //Fields need refactor as ViewModel or a specific service to deal with changes
-      this.cdRef.detectChanges();
-      const state = this.financialAccountsAttributes$.getValue();
-      this.financialAccountsAttributes$.next({
-        ...state,
-        unidadeId: {
-          disabled: true,
-        },
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.formRefs.first.form.get('unidadeId')?.setValue('1');
+        //Detect changes because field errors are getting error  NG0100: Expression has changed after it was checked
+        //Fields need refactor as ViewModel State or a specific service to deal with changes
+        this.cdRef.detectChanges();
+        const state = this.financialAccountsAttributes$.getValue();
+        this.financialAccountsAttributes$.next({
+          ...state,
+          unidadeId: {
+            disabled: true,
+          },
+        });
       });
-    });
+
+    this.subscriptionsSink$.add(disableUnityFormField$);
   }
 
   watchAccountTypeValuePhysicalAndEnableFields() {
-    this.loadPhysicalBoxFieldsSubs$ = this.accountTypeIsPhysicalBox$.subscribe(
+    const loadPhysicalBoxFieldsSubs$ = this.accountTypeIsPhysicalBox$.subscribe(
       () => {
         this.financialAccountsFieldsNames$.next([
           'unidadeId',
@@ -376,6 +316,8 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
         ]);
       }
     );
+
+    this.subscriptionsSink$.add(loadPhysicalBoxFieldsSubs$);
   }
 
   watchAccountTypeValuePhysicalAndFetchFormReceipts() {
@@ -386,6 +328,7 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
       debitReceipt: this.isModalityDebitReceipts$.pipe(startWith(false)),
     })
       .pipe(
+        takeUntil(this.destroy$),
         filter(
           ({ physicalBox, bank, creditReceipt, debitReceipt }) =>
             physicalBox || bank || creditReceipt || debitReceipt
@@ -422,23 +365,30 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
           });
         }
 
-        if (this.formValues['modalidadeId'] === '1') {
-          this.formRefs.first.form.get('contaLiquidacao')?.setValue(['8']);
+        const { modalidadeId } = this.formValues;
+        const receiptsFieldRef =
+          this.formRefs.first.form.get('contaLiquidacao');
+
+        if (modalidadeId === EFinancialAccountModality.CC_RECEBIMENTO) {
+          receiptsFieldRef?.setValue([
+            ENumberAccountReceiveForms.CARTAO_CREDITO,
+          ]);
           return;
         }
 
-        if (this.formValues['modalidadeId'] === '3') {
-          debugger;
-          this.formRefs.first.form.get('contaLiquidacao')?.setValue(['7']);
+        if (modalidadeId === EFinancialAccountModality.CD_RECEBIMENTO) {
+          receiptsFieldRef?.setValue([
+            ENumberAccountReceiveForms.CARTAO_DEBITO,
+          ]);
           return;
         }
 
-        this.formRefs.first.form.get('contaLiquidacao')?.setValue(['1']);
+        receiptsFieldRef?.setValue([ENumberAccountReceiveForms.DINHEIRO]);
       });
   }
 
   watchAccountTypeValueBankAndEnableFields() {
-    this.loadBankAccountFieldsSubs$ = this.accountTypeIsBank$.subscribe(() => {
+    const loadBankAccountFieldsSubs$ = this.accountTypeIsBank$.subscribe(() => {
       this.financialAccountsFieldsNames$.next([
         'unidadeId',
         'tipoContaId',
@@ -451,6 +401,8 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
         'documento',
       ]);
     });
+
+    this.subscriptionsSink$.add(loadBankAccountFieldsSubs$);
   }
 
   watchAccountTypeValueBankAndFetchBanksAccounts() {
@@ -485,18 +437,15 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
             },
           });
         }
-
-        this.formRefs.first.form.get('contaLiquidacao')?.setValue(['1']);
       });
   }
 
   watchAccountTypeValueCardAndEnableFields() {
-    this.loadCardFieldsSubs$ = this.accountTypeIsCard$.subscribe(() => {
+    const loadCardFieldsSubs$ = this.accountTypeIsCard$.subscribe(() => {
       this.financialAccountsFieldsNames$.next([
         'unidadeId',
         'tipoContaId',
         'nome',
-        // 'contaLiquidacao',
         'modalidadeId',
         'contaRecebimentoId',
         'flagTef',
@@ -504,11 +453,14 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
         'diasCreditoConta',
       ]);
     });
+
+    this.subscriptionsSink$.add(loadCardFieldsSubs$);
   }
 
   watchAccountTypeValueCardAndFetchModalities() {
     this.accountTypeIsCard$
       .pipe(
+        takeUntil(this.destroy$),
         switchMap(() => {
           return this.financialAccountService.listModalities().pipe(
             map((modalities) =>
@@ -540,6 +492,7 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
   watchAccountTypeValueCardAndFetchAccountsFormReceipts() {
     this.accountTypeIsCard$
       .pipe(
+        takeUntil(this.destroy$),
         switchMap(() => {
           return this.financialAccountService
             .listAccountsForReceipt({
@@ -577,7 +530,7 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
   }
 
   watchAccountModalityCreditPaymentsAndEnableFields() {
-    this.loadModalityCreditPaymentsSubs$ =
+    const loadModalityCreditPaymentsSubs$ =
       this.isModalityCreditPayments$.subscribe(() => {
         this.financialAccountsFieldsNames$.next([
           'unidadeId',
@@ -593,10 +546,12 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
           'diaVencimento',
         ]);
       });
+
+    this.subscriptionsSink$.add(loadModalityCreditPaymentsSubs$);
   }
 
   watchAccountModalityCreditReceiptsAndEnableFields() {
-    this.loadModalityCreditReceiptsFieldsSubs$ =
+    const loadModalityCreditReceiptsFieldsSubs$ =
       this.isModalityCreditReceipts$.subscribe(() => {
         this.financialAccountsFieldsNames$.next([
           'unidadeId',
@@ -611,10 +566,12 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
           'diasCreditoConta',
         ]);
       });
+
+    this.subscriptionsSink$.add(loadModalityCreditReceiptsFieldsSubs$);
   }
 
   watchAccountModalityDebitReceiptsAndEnableFields() {
-    this.loadModalityDebitReceiptsFieldsSubs$ =
+    const loadModalityDebitReceiptsFieldsSubs$ =
       this.isModalityDebitReceipts$.subscribe(() => {
         this.financialAccountsFieldsNames$.next([
           'unidadeId',
@@ -629,6 +586,67 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
           'diasCreditoConta',
         ]);
       });
+
+    this.subscriptionsSink$.add(loadModalityDebitReceiptsFieldsSubs$);
+  }
+
+  setUpFieldColumns() {
+    const currentState = this.financialAccountsColumns$.getValue();
+
+    if (Object.values(currentState)) {
+      this.financialAccountsColumns$.next({
+        unidadeId: {
+          col: 4,
+        },
+        tipoContaId: {
+          col: 4,
+        },
+        nome: {
+          col: 4,
+        },
+        contaLiquidacao: {
+          col: 4,
+        },
+        bancoId: {
+          col: 4,
+        },
+        agencia: {
+          col: 4,
+        },
+        numero: {
+          col: 4,
+        },
+        titulo: {
+          col: 4,
+        },
+        documento: {
+          col: 4,
+        },
+        modalidadeId: {
+          col: 4,
+        },
+        contaRecebimentoId: {
+          col: 4,
+        },
+        flagSplit: {
+          col: 2,
+        },
+        flagTef: {
+          col: 2,
+        },
+        diasCreditoConta: {
+          col: 4,
+        },
+        melhorDiaCompra: {
+          col: 4,
+        },
+        diaVencimento: {
+          col: 4,
+        },
+      });
+    }
+
+    return;
   }
 
   filterObject(

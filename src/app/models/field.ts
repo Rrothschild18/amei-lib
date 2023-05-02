@@ -61,6 +61,7 @@ export interface IBasicInputAttributes {
   indeterminate?: boolean;
   min?: Date;
   max?: Date;
+  hideRequiredMarker?: boolean;
 }
 
 export interface ITextareaAttributes extends IBasicInputAttributes {

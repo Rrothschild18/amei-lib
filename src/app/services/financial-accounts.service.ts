@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import {
   BankResponse,
+  FinancialAccountFields,
   IBankFilterRequestParam,
   IBankFromApi,
   IBankRequestParam,
@@ -21,7 +22,7 @@ import {
 export class FinancialAccountsService {
   baseUrl: string = 'https://amei-dev.amorsaude.com.br/api/v1';
   token: string =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6InVzdWFyaW8yQGVtYWlsLmNvbSIsImZ1bGxOYW1lIjoiVVNVQVJJTyAyIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4MzAyOTEyMCwiZXhwIjoxNjgzMDU3OTIwfQ.YAuYH3iiehQm4G0zXFVigFB7HDNL6gy_i5HHHmwjTUE';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6InVzdWFyaW8yQGVtYWlsLmNvbSIsImZ1bGxOYW1lIjoiVVNVQVJJTyAyIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4MzA1ODA2NywiZXhwIjoxNjgzMDg2ODY3fQ.ehyDzM9o8ufXnNfs8qP-Jg7tl7EhaXqVLIoDLhJkgMY';
 
   private currentAccountsTypes = `${this.baseUrl}/current-accounts-related/types`;
   private currentAccountsAccountsForReceipt = `${this.baseUrl}/current-accounts-related/accounts-for-receipt`;
@@ -39,8 +40,8 @@ export class FinancialAccountsService {
     return head;
   }
 
-  getFields(): Observable<any> {
-    return of({
+  getFields(): Observable<FinancialAccountFields> {
+    return of(<FinancialAccountFields>{
       unidadeId: {
         name: 'unidadeId',
         label: 'Unidade',
