@@ -13,6 +13,7 @@ import { EmployeeFormComponent } from './views/employees/employee-form/employee-
 import { CalendarOverviewComponent } from './views/calendar-overview/calendar-overview.component';
 import { CalendarMonthComponent } from './views/calendar-month/calendar-month.component';
 import { FinancialAccountFormComponent } from './views/financial-accounts/financial-account-form/financial-account-form.component';
+import { FinancialAccountFormTwoComponent } from './views/financial-accounts/financial-account-form-two/financial-account-form-two.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -31,6 +32,10 @@ const routes: Routes = [
   { path: 'calendar', component: CalendarOverviewComponent },
   { path: 'calendar-month', component: CalendarOverviewComponent },
   { path: 'financial-accounts/new', component: FinancialAccountFormComponent },
+  {
+    path: 'financial-accounts-two/new',
+    component: FinancialAccountFormTwoComponent,
+  },
 ];
 
 @NgModule({

@@ -1,9 +1,36 @@
 import { FormControl, FormGroup, ValidatorFn } from '@angular/forms';
-import { Field, FieldAttrs, FieldTypes } from './field';
+import {
+  Field,
+  FieldAttrs,
+  FieldTypes,
+  IBasicInputAttributes,
+  ISelectAttributes,
+  ITextareaAttributes,
+} from './field';
 
 export type FieldsAttributesConfig<T extends {} = any> = {
   [key in keyof T]?: FieldAttrs;
 };
+
+// export type FieldsAttributesConfig<T extends {} = any> = {
+//   [K in keyof T]?: T[K] extends { type: infer Type }
+//     ? Type extends 'select'
+//       ? ISelectAttributes
+//       : IBasicInputAttributes
+//     : IBasicInputAttributes;
+// };
+
+// export type FieldsAttributesConfig<T extends {} = any> = {
+//   [K in keyof T]?: T[K] extends { type: infer Type }
+//     ? Type extends 'select'
+//       ? ISelectAttributes
+//       : Type extends 'textarea'
+//       ? ITextareaAttributes
+//       : Type extends 'text'
+//       ? IBasicInputAttributes
+//       : never
+//     : never;
+// };
 
 export type FieldsValidatorsConfig<T extends {} = any> = {
   [key in keyof T]?: ValidatorFn[];

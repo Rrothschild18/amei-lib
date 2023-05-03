@@ -32,7 +32,10 @@
     </header>
   </mat-toolbar>
 
-  <mat-sidenav-container class="w-100 h-100 d-flex" [hasBackdrop]="false">
+  <mat-sidenav-container
+    class="w-100 h-100 d-flex bg-black"
+    [hasBackdrop]="false"
+  >
     <mat-sidenav [(opened)]="isOpen">
       <mat-nav-list>
         <mat-list-item *ngFor="let link of links">

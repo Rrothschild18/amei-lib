@@ -40,6 +40,11 @@ export class LayoutComponent implements OnInit {
       pathName: 'Contas financeiras',
       iconName: 'monetization_on',
     },
+    {
+      linkTo: '/financial-accounts-two/new',
+      pathName: 'Contas financeiras 2',
+      iconName: 'monetization_on',
+    },
   ];
 
   menuItens = [
