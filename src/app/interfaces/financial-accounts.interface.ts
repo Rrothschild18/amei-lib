@@ -6,6 +6,92 @@ import {
 } from '../models';
 import { SortDirection } from '@angular/material/sort';
 import { HttpHeaders, HttpContext, HttpParams } from '@angular/common/http';
+export interface IFinancialAccountRequestParam {
+  page: number;
+  limit: number;
+  id?: number;
+  nome?: string;
+  tipoContaId?: number;
+  tipoConta?: string;
+  modalidadeId?: number;
+  modalidade?: string;
+  bandeira?: string;
+  unidadeId?: number;
+  unidade?: string;
+  flagTef?: boolean;
+  flagSplit?: boolean;
+  sortBy?: string;
+  sortDirection?: string;
+}
+
+export interface IFinancialAccountFilterParam {
+  page?: number;
+  limit?: number;
+  name?: string;
+  financialAccountTypeId?: number;
+  modalityId?: number;
+  bankId?: number;
+  active?: boolean;
+  sortBy?: string;
+  sortDirection?: SortDirection;
+}
+
+export interface FinancialAccountResponse {
+  items: IFinancialAccountFromApi[];
+  meta: any;
+}
+export interface IFinancialAccountFromApi {
+  id: number;
+  nome: string;
+  tipoContaId: number;
+  tipoConta: string;
+  unidadeId: number;
+  unidade: string;
+  contaLiquidacao: IFormsOfSettlementFromApi[] | number[];
+  bancoId: number | null;
+  banco: string | null;
+  agencia: string | null;
+  numero: string | null;
+  titulo: string | null;
+  documento: string | null;
+  modalidadeId: number | null;
+  modalidade: string | null;
+  contaRecebimentoId: number | null;
+  contaRecebimento: string | null;
+  bandeiraId: number | null;
+  bandeira: string | null;
+  descontoPercentual: number | null;
+  diaVencimento: number | null;
+  diasCreditoConta: number | null;
+  flagSplit: string | null;
+  flagTef: string | null;
+  melhorDiaCompra: number | null;
+  // funcionario: IEmployeeFromApi[] | null;
+  funcionario: IFinancialAccountEmployeesFromApi[] | null;
+}
+
+export interface IFinancialAccountEmployeesFromApi {
+  id: number;
+  contaCorrenteId: number;
+  funcionarioId: number;
+  nome: string;
+  cpf: string | null;
+  funcao: string | null;
+  setorId: number | null;
+  setor: string | null;
+  selecionado: boolean;
+}
+export interface IFormsOfSettlementFromApi {
+  id: number;
+  formaLiquidacao: ETextAccountReceiveForms;
+  formaLiquidacaoId: number;
+  tipoOperacaoId: EFormsOfSettlementOperationType;
+  tipoOperacao: string;
+}
+export interface FinancialAccountResponse {
+  items: IFinancialAccountFromApi[];
+  meta: any;
+}
 
 export interface IFinancialAccountsType {
   id: number;

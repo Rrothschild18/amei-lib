@@ -4,9 +4,12 @@ import { Observable, of } from 'rxjs';
 import {
   BankResponse,
   FinancialAccountFields,
+  FinancialAccountResponse,
   IBankFilterRequestParam,
   IBankFromApi,
   IBankRequestParam,
+  IFinancialAccountFromApi,
+  IFinancialAccountRequestParam,
   IFinancialAccountsForReceipt,
   IFinancialAccountsForReceiptRequestParam,
   IFinancialAccountsModality,
@@ -20,9 +23,9 @@ import {
   providedIn: 'root',
 })
 export class FinancialAccountsService {
-  baseUrl: string = 'https://amei-dev.amorsaude.com.br/api/v1';
+  baseUrl: string = 'https://amei-homolog.amorsaude.com.br/api/v1';
   token: string =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6InVzdWFyaW8yQGVtYWlsLmNvbSIsImZ1bGxOYW1lIjoiVVNVQVJJTyAyIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4MzE0NDkyMSwiZXhwIjoxNjgzMTczNzIxfQ.3-yGI_heJBXXMOcE5J4ui6rZhQCXvEMh1T3m0Eg3jXU';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4OTU5NjY3NywiZXhwIjoxNjg5NjI1NDc3fQ.yYie4VwCpytafK4mEXWf5DdY7rp52JVH2TVI2FCAOn0';
 
   private currentAccountsTypes = `${this.baseUrl}/current-accounts-related/types`;
   private currentAccountsAccountsForReceipt = `${this.baseUrl}/current-accounts-related/accounts-for-receipt`;
@@ -30,6 +33,7 @@ export class FinancialAccountsService {
   private currentAccountsBanksFilter = `${this.baseUrl}/contas-correntes/bancos/filtro`;
   private currentAccountsBanks = `${this.baseUrl}/contas-correntes/bancos`;
   private currentAccountsModalities = `${this.baseUrl}/current-accounts-related/modalities`;
+  private currentAccountRoute = `${this.baseUrl}/current-accounts`;
 
   constructor(private http: HttpClient) {}
 
@@ -137,7 +141,7 @@ export class FinancialAccountsService {
   }
 
   getCurrentClinic() {
-    return of({ label: 'Telemedicina', value: '1' });
+    return of({ label: 'Telemedicina', value: 183 });
   }
 
   getCurrentAccountsRelatedTypes(): Observable<IFinancialAccountsType[]> {
@@ -196,6 +200,27 @@ export class FinancialAccountsService {
   listModalities(): Observable<IFinancialAccountsModality[]> {
     return this.http.get<IFinancialAccountsModality[]>(
       this.currentAccountsModalities,
+      {
+        headers: this.getHeader(),
+      }
+    );
+  }
+
+  listFinancialAccountsWithFilters(
+    filters: IFinancialAccountRequestParam
+  ): Observable<FinancialAccountResponse> {
+    return this.http.get<FinancialAccountResponse>(
+      `${this.currentAccountRoute}`,
+      {
+        headers: this.getHeader(),
+        params: <HttpParams>(<unknown>filters),
+      }
+    );
+  }
+
+  getFinancialAccountById(id: number): Observable<IFinancialAccountFromApi> {
+    return this.http.get<IFinancialAccountFromApi>(
+      `${this.currentAccountRoute}/${id}`,
       {
         headers: this.getHeader(),
       }

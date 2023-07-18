@@ -275,7 +275,7 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
             ...currentState,
             tipoContaId: {
               ...currentState.tipoContaId,
-              options: [...accountTypes],
+              options: accountTypes,
             },
           });
         }

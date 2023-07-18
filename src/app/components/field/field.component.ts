@@ -9,21 +9,14 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Field, FieldAttrs } from 'src/app/models/field';
-import {
-  BehaviorSubject,
-  Observable,
-  Subscription,
-  combineLatest,
-  distinctUntilChanged,
-  map,
-  of,
-  startWith,
-  switchMap,
-} from 'rxjs';
+import { Subscription, distinctUntilChanged } from 'rxjs';
 import { FieldConfig } from 'src/app/models';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
+/** TODO
+ * Update field to OnPush and ViewModel
+ *
+ */
 @Component({
   selector: 'app-field',
   templateUrl: './field.component.html',
@@ -31,7 +24,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
 })
 export class FieldComponent implements OnInit, OnDestroy {
-  @Input() field!: FieldConfig<{}, keyof {}> | Field;
+  @Input() field!: FieldConfig<{}> | Field;
   @Input() form!: FormGroup;
   @Input() fieldFormControl!: AbstractControl | null;
   //ngx-mask not included

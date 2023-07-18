@@ -36,6 +36,10 @@ const routes: Routes = [
     path: 'financial-accounts-two/new',
     component: FinancialAccountFormTwoComponent,
   },
+  {
+    path: 'financial-accounts-two/:id/edit',
+    component: FinancialAccountFormTwoComponent,
+  },
 ];
 
 @NgModule({
