@@ -135,12 +135,10 @@ export class EmployeeFormComponent implements OnInit {
       disabled: true,
     },
     birthDate: {
-      // disabled: true,
       min: new Date(),
     },
     civilStatus: {
       multiple: true,
-      // min: new Date(),
     },
   });
 
@@ -154,12 +152,8 @@ export class EmployeeFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.componentStore$.subscribe(({ fieldName, value }: FormValue) => {
-      if (!fieldName && !value) {
-        return {};
-      }
-
-      return (this.formValues = { ...this.formValues, [fieldName]: value });
+    this.componentStore$.subscribe((formValue: FormValue) => {
+      return (this.formValues = { ...this.formValues });
     });
 
     this.fields$.subscribe((fields) => {

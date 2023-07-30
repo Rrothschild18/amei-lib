@@ -1,17 +1,5 @@
 <section class="PatientForm">
-  <!-- <pre>
-    <h6>PatientForm Values</h6>
-    {{ values | json }} 
-  </pre>
-  <pre>
-    <h6>URL</h6>
-    {{ mode$ | async }} 
-  </pre> -->
-  <app-form-view
-    entity="Patient"
-    [mode]="mode$ | async"
-    (fetchSuccess)="onFetchSuccess($event)"
-  >
+  <app-form-view entity="Patient" [mode]="mode$ | async">
     <ng-template #header>
       <div class="container">
         <div class="d-flex justify-content-between">
@@ -30,27 +18,20 @@
         </div>
       </div>
     </ng-template>
-    <ng-template
-      #body
-      let-fields="fields"
-      let-result="result"
-      let-formStore="formStore"
-    >
-      <!-- <pre>{{ result | json }}</pre>
-      <pre>{{ fields | json }}</pre> -->
+    <ng-template #body let-fields="fields" let-result="result">
       <div class="container h-100 d-flex flex-column align-items-center mb-5">
         <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
           <div class="row">
             <div class="col-12">
               <h5 class="mb-4">Patient personal information</h5>
 
-              <app-form-generator
+              <app-form
                 [fields]="filterObject(fields, patientPersonalFields)"
                 [columns]="patientPersonalColumns"
                 [fieldsValidators]="patientPersonalValidators"
                 #personalForm
               >
-              </app-form-generator>
+              </app-form>
             </div>
           </div>
         </div>
@@ -58,7 +39,7 @@
           <div class="row">
             <div class="col-12">
               <h5 class="mb-4">Patient additional information</h5>
-              <app-form-generator
+              <app-form
                 [fields]="filterObject(fields, patientAdditionalFields)"
                 [columns]="patientAdditionalColumns"
                 [fieldsValidators]="patientAdditionalValidators$ | async"
@@ -69,30 +50,18 @@
                   name="cep"
                   let-field="field"
                   let-form="formGroupRef"
-                  let-fieldRef="formControlRef"
                 >
                   <div class="col-4" [formGroup]="form">
                     <mat-form-field class="w-100" appearance="fill">
                       <mat-label>{{
                         field.placeholder || field.label
                       }}</mat-label>
-                      <input
-                        matInput
-                        [formControlName]="field.name"
-                        (input)="
-                          handle2({
-                            event: $event,
-                            form: this.form,
-                            fieldControl: fieldRef,
-                            formStore
-                          })
-                        "
-                      />
+                      <input matInput [formControlName]="field.name" />
                       <mat-spinner
                         class="loading"
                         [diameter]="30"
                         matSuffix
-                        *ngIf="fetchingCep"
+                        *ngIf="isFetchingCep"
                       ></mat-spinner>
                       <mat-error
                         *ngIf="form.get(field.name)?.errors"
@@ -104,7 +73,7 @@
                     </mat-form-field>
                   </div>
                 </ng-template>
-              </app-form-generator>
+              </app-form>
             </div>
           </div>
         </div>

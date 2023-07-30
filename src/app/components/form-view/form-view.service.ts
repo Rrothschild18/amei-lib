@@ -31,9 +31,12 @@ export class FormViewService {
     this.values$.next(emittedFormValue);
   }
 
+  onFormChanges2(emittedFormValue: { [key: string]: any }) {
+    this.values$.next(emittedFormValue);
+  }
+
   setFormRefs(forms: QueryList<FormGeneratorComponent | FormComponent>) {
     this.formRefs$.next(forms);
-    debugger;
   }
 
   ngOnDestroy() {

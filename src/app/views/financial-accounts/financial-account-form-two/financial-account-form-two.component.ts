@@ -187,12 +187,8 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
     this.watchAccountModalityDebitReceiptsAndEnableFields();
 
     this.formValuesSubscription$ = this.formService.formValues.subscribe(
-      ({ fieldName, value }) => {
-        if (!fieldName && !value) {
-          return {};
-        }
-
-        return (this.formValues = { ...this.formValues, [fieldName]: value });
+      (values) => {
+        return (this.formValues = { ...values });
       }
     );
 
@@ -387,12 +383,9 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
 
   isAccountTypePhysical() {
     this.accountTypeIsPhysicalBox$ = this.formService.formValues.pipe(
-      filter(
-        ({ fieldName, value }) =>
-          fieldName === 'tipoContaId' &&
-          value === +EFinancialAccountType.CAIXA_FISICO
-      ),
-      map(({ value }) => value === +EFinancialAccountType.CAIXA_FISICO),
+      filter((formValues) => formValues['tipoContaId']),
+      map((formValues) => formValues['tipoContaId']),
+      map((fieldValue) => fieldValue === +EFinancialAccountType.CAIXA_FISICO),
       tap(() => {
         this.formValues = Object.keys(this.formValues).filter((key) =>
           ['unidadeId', 'tipoContaId', 'nome', 'contaLiquidacao'].find(
@@ -406,9 +399,9 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
   isAccountTypeBank() {
     this.accountTypeIsBank$ = this.formService.formValues.pipe(
       filter(
-        ({ fieldName, value }) =>
-          fieldName === 'tipoContaId' &&
-          value === +EFinancialAccountType.CONTA_BANCARIA
+        (formValues) =>
+          formValues['tipoContaId'] &&
+          formValues['tipoContaId'] === +EFinancialAccountType.CONTA_BANCARIA
       ),
       map(() => true)
     );
@@ -417,8 +410,9 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
   isAccountTypeCard() {
     this.accountTypeIsCard$ = this.formService.formValues.pipe(
       filter(
-        ({ fieldName, value }) =>
-          fieldName === 'tipoContaId' && value === +EFinancialAccountType.CARTAO
+        (formValues) =>
+          formValues['tipoContaId'] &&
+          formValues['tipoContaId'] === +EFinancialAccountType.CARTAO
       ),
       map(() => true)
     );
@@ -427,9 +421,9 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
   isModalityCreditPayments() {
     this.isModalityCreditPayments$ = this.formService.formValues.pipe(
       filter(
-        ({ fieldName, value }) =>
-          fieldName === 'modalidadeId' &&
-          value === +EFinancialAccountModality.CC_PAGAMENTO
+        (formValues) =>
+          formValues['modalidadeId'] &&
+          formValues['modalidadeId'] === +EFinancialAccountModality.CC_PAGAMENTO
       ),
       map(() => true)
     );
@@ -438,9 +432,10 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
   isModalityCreditReceipts() {
     this.isModalityCreditReceipts$ = this.formService.formValues.pipe(
       filter(
-        ({ fieldName, value }) =>
-          fieldName === 'modalidadeId' &&
-          value === EFinancialAccountModality.CC_RECEBIMENTO
+        (formValues) =>
+          formValues['modalidadeId'] &&
+          formValues['modalidadeId'] ===
+            EFinancialAccountModality.CC_RECEBIMENTO
       ),
       map(() => true)
     );
@@ -449,9 +444,10 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
   isModalityDebitReceipts() {
     this.isModalityDebitReceipts$ = this.formService.formValues.pipe(
       filter(
-        ({ fieldName, value }) =>
-          fieldName === 'modalidadeId' &&
-          value === EFinancialAccountModality.CD_RECEBIMENTO
+        (formValues) =>
+          formValues['modalidadeId'] &&
+          formValues['modalidadeId'] ===
+            EFinancialAccountModality.CD_RECEBIMENTO
       ),
       map(() => true)
     );

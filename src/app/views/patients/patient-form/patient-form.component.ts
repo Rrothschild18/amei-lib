@@ -1,3 +1,4 @@
+import { FormComponent } from 'src/app/components/form/form.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PatientStateModel } from './../../../store/patients/patient.model';
 import { Entities } from './../../../store/entities/entities.namespace';
@@ -56,13 +57,13 @@ export class PatientFormComponent implements OnInit {
   fetchingCep: boolean = false;
 
   @ViewChildren('personalForm')
-  personalForm!: QueryList<FormGeneratorComponent>;
+  personalForm!: QueryList<FormComponent>;
 
   @ViewChildren('additionalForm')
-  additionalForm!: QueryList<FormGeneratorComponent>;
+  additionalForm!: QueryList<FormComponent>;
 
-  @ViewChildren(FormGeneratorComponent)
-  formRefs!: QueryList<FormGeneratorComponent>;
+  @ViewChildren(FormComponent)
+  formRefs!: QueryList<FormComponent>;
 
   isFetchingCep = false;
   successFullRequestToViaCep = true;
@@ -237,7 +238,6 @@ export class PatientFormComponent implements OnInit {
     return {
       address: {
         onBlur: () => {
-          this.isFetchingCep = true;
           //CallBack to fetch ViaCep. Updates state with injected service
         },
         onClick: () => {},
@@ -329,10 +329,10 @@ export class PatientFormComponent implements OnInit {
       .pipe(
         filter(
           (fieldEvent: FormValue) =>
-            fieldEvent['fieldName'] === 'cep' &&
-            fieldEvent['value']?.length === 8
+            fieldEvent['cep'] && fieldEvent['cep']?.length === 8
         ),
         tap(() => {
+          this.isFetchingCep = true;
           const previousState = this.patientAdditionalAttributes$.getValue();
           this.patientAdditionalAttributes$.next({
             ...previousState,
@@ -345,7 +345,7 @@ export class PatientFormComponent implements OnInit {
           debugger;
         }),
         delay(2000),
-        map((fieldEvent) => fieldEvent['value']),
+        map((fieldEvent) => fieldEvent['cep']),
         switchMap((cepValue) =>
           this.http.get(`https://viacep.com.br/ws/${cepValue}/json/`)
         ),
@@ -360,7 +360,7 @@ export class PatientFormComponent implements OnInit {
           };
         }),
         tap((parsedResult) => {
-          // this.fetchingCep = false;
+          this.isFetchingCep = false;
           const previousState = this.patientAdditionalAttributes$.getValue();
 
           this.patientAdditionalAttributes$.next({
@@ -373,17 +373,8 @@ export class PatientFormComponent implements OnInit {
           });
           this.additionalForm.first.form.patchValue(parsedResult);
         })
-        // catchError((error) => {
-        //   console.log(error);
-
-        //   debugger;
-
-        //   return throwError(() => '1234');
-        // })
       )
-      .subscribe(() => {
-        // this.disableCepFields();
-      });
+      .subscribe(() => {});
   }
 
   disableCepFields() {

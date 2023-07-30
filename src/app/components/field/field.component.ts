@@ -1,64 +1,32 @@
-import { Dispatch } from '@ngxs-labs/dispatch-decorator';
-import { FormViewService } from 'src/app/components/form-view/form-view.service';
-import {
-  Component,
-  Input,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { ControlContainer, FormGroupDirective } from '@angular/forms';
 import { Field, FieldAttrs } from 'src/app/models/field';
-import { Subscription, distinctUntilChanged } from 'rxjs';
 import { FieldConfig } from 'src/app/models';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 
-/** TODO
- * Update field to OnPush and ViewModel
- *
- */
 @Component({
   selector: 'app-field',
   templateUrl: './field.component.html',
   styleUrls: ['./field.component.scss'],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
+  viewProviders: [
+    {
+      provide: ControlContainer,
+      useExisting: FormGroupDirective,
+    },
+  ],
 })
-export class FieldComponent implements OnInit, OnDestroy {
+export class FieldComponent implements OnInit {
   @Input() field!: FieldConfig<{}> | Field;
-  @Input() form!: FormGroup;
-  @Input() fieldFormControl!: AbstractControl | null;
-  //ngx-mask not included
+  //TODO ngx-mask not included
   @Input() fieldAttributes: FieldAttrs | undefined;
 
-  private subSinks: Subscription = new Subscription();
+  constructor(private controlContainer: ControlContainer) {}
 
-  get isValid() {
-    return this.form.controls[this.field.name].valid;
-  }
+  ngOnInit(): void {}
 
-  constructor(private formService: FormViewService) {}
-
-  ngOnInit(): void {
-    this.setUpFieldChange();
-  }
-
-  ngOnDestroy() {
-    this.subSinks.unsubscribe();
-  }
-
-  ngAfterViewInit() {}
-
-  setUpFieldChange(): void {
-    const fieldValueSubscription = this.fieldFormControl?.valueChanges
-      .pipe(distinctUntilChanged())
-      .subscribe((changedValue) => {
-        this.formService.formValues.next({
-          fieldName: this.field.name,
-          value: changedValue,
-        });
-      });
-
-    this.subSinks.add(fieldValueSubscription);
+  get fieldRef() {
+    return this.controlContainer.control?.get(this.field.name);
   }
 
   //TODO map errors with an object, destruct arguments and accept custom errors messages

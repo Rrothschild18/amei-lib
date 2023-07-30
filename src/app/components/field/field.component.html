@@ -1,4 +1,4 @@
-<div [ngSwitch]="field.type" [formGroup]="form">
+<div [ngSwitch]="field.type">
   <ng-container *ngSwitchCase="'text'">
     <mat-form-field
       class="w-100"
@@ -22,8 +22,8 @@
         matSuffix
         *ngIf="!!fieldAttributes?.isLoading"
       ></mat-spinner>
-      <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
-        showError(form.get(field.name)?.errors)
+      <mat-error *ngIf="fieldRef?.errors" class="me-2">{{
+        showError(fieldRef?.errors)
       }}</mat-error>
     </mat-form-field>
   </ng-container>
@@ -46,8 +46,8 @@
         [pattern]="fieldAttributes?.pattern ?? ''"
         [readonly]="!!fieldAttributes?.readonly"
       />
-      <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
-        showError(form.get(field.name)?.errors)
+      <mat-error *ngIf="fieldRef?.errors" class="me-2">{{
+        showError(fieldRef?.errors)
       }}</mat-error>
     </mat-form-field>
   </ng-container>
@@ -77,8 +77,8 @@
         matSuffix
         *ngIf="!!fieldAttributes?.isLoading"
       ></mat-spinner>
-      <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
-        showError(form.get(field.name)?.errors)
+      <mat-error *ngIf="fieldRef?.errors" class="me-2">{{
+        showError(fieldRef?.errors)
       }}</mat-error>
     </mat-form-field>
   </ng-container>
@@ -100,8 +100,8 @@
         [pattern]="fieldAttributes?.pattern ?? ''"
         [readonly]="!!fieldAttributes?.readonly"
       ></textarea>
-      <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
-        showError(form.get(field.name)?.errors)
+      <mat-error *ngIf="fieldRef?.errors" class="me-2">{{
+        showError(fieldRef?.errors)
       }}</mat-error>
     </mat-form-field>
   </ng-container>
@@ -147,14 +147,14 @@
         <mat-hint>MM/DD/YYYY</mat-hint>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
-        <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
-          showError(form.get(field.name)?.errors)
-        }}</mat-error>
+        <!-- <mat-error *ngIf="fieldRef?.errors" class="me-2">{{
+          showError(fieldRef?.errors)
+        }}</mat-error> -->
       </mat-form-field>
     </div>
   </ng-container>
 
-  <!-- <ng-container *ngSwitchCase="'checkboxGroup'">
+  <ng-container *ngSwitchCase="'checkboxGroup'">
     <div class="w-100" [formGroupName]="field.name">
       <mat-checkbox
         labelPosition="before"
@@ -165,7 +165,7 @@
         {{ option.label }}
       </mat-checkbox>
     </div>
-  </ng-container> -->
+  </ng-container>
 
   <ng-container *ngSwitchCase="'checkbox'">
     <mat-checkbox

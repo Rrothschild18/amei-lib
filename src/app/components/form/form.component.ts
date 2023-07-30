@@ -1,8 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ContentChildren,
   Input,
   OnInit,
+  QueryList,
+  TemplateRef,
 } from '@angular/core';
 import {
   FormControl,
@@ -11,14 +14,25 @@ import {
   Validators,
 } from '@angular/forms';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
-import { BehaviorSubject, Observable, combineLatest, tap } from 'rxjs';
 import {
+  BehaviorSubject,
+  Observable,
+  Subscription,
+  combineLatest,
+  distinctUntilChanged,
+  tap,
+} from 'rxjs';
+import {
+  Field,
   FieldColumnConfigTypes,
   FieldsAttributesConfig,
   FieldsColumnsConfig,
   FieldsConfig,
   FieldsValidatorsConfig,
+  FormFieldContext,
 } from 'src/app/models';
+import { FormViewService } from '../form-view/form-view.service';
+import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.directive';
 
 export type FormViewModel = {
   fields: FieldsConfig<{}>;
@@ -105,7 +119,12 @@ export class FormComponent implements OnInit {
 
   form: FormGroup = this.fb.group({});
 
-  constructor(private fb: FormBuilder) {}
+  private subSinks: Subscription = new Subscription();
+
+  @ContentChildren(NgTemplateNameDirective)
+  _templates!: QueryList<NgTemplateNameDirective>;
+
+  constructor(private fb: FormBuilder, private formService: FormViewService) {}
 
   ngOnInit(): void {
     this.vm$ = combineLatest({
@@ -119,7 +138,11 @@ export class FormComponent implements OnInit {
       tap(() => this.setUpFormAttributes())
     );
 
-    // this.setUpFormGroups();
+    this.setUpFormChange();
+  }
+
+  ngOnDestroy() {
+    this.subSinks.unsubscribe();
   }
 
   get hasFormValues(): boolean {
@@ -230,6 +253,18 @@ export class FormComponent implements OnInit {
     return checkBoxGroup;
   }
 
+  setUpFormChange(): void {
+    const formValueSubscription = this.form.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe((changedValue) => {
+        this.formService.onFormChanges2({
+          ...changedValue,
+        });
+      });
+
+    this.subSinks.add(formValueSubscription);
+  }
+
   calculateDiffBetweenControlsAndFields(): [string[], string[]] {
     const currentControlsKeys = Object.keys(this.form.controls);
     const incomingFieldsKeys = Object.keys(this._fields$.getValue());
@@ -249,22 +284,32 @@ export class FormComponent implements OnInit {
     return [addedKeysFromIncomingFields, deletedKeysFromControls];
   }
 
+  getTemplateRefByName(name: string): TemplateRef<any> | null {
+    const dir = this._templates.find((dir) => dir.name === name);
+
+    return dir ? dir.template : null;
+  }
+
+  fieldContext(field: Field): FormFieldContext {
+    return {
+      field,
+      formGroupRef: this.form as FormGroup,
+      formControlRef: this.form.get(field.name) as FormControl,
+    };
+  }
+
   deleteKeysFromFormControl(keys: string[]) {
     keys.forEach((key) => this.form.removeControl(key));
   }
 
-  getFieldClass(index: any) {
+  getFieldClass(field: Field) {
     if (typeof this._columns$.getValue() === 'string') {
       return `col-${this._columns$.getValue()}`;
     }
 
-    const v = Array.isArray(this._columns$.getValue())
-      ? this.handleColumnsByIndex(index)
-      : this.handleColumnsByField(index);
-
     return Array.isArray(this._columns$.getValue())
-      ? this.handleColumnsByIndex(index)
-      : this.handleColumnsByField(index);
+      ? this.handleColumnsByIndex(field.name)
+      : this.handleColumnsByField(field.name);
   }
 
   handleColumnsByField(index: any) {
@@ -317,5 +362,15 @@ export class FormComponent implements OnInit {
     return 0;
   }
 
-  ngAfterViewInit() {}
+  //Todo validate all on submit
+  validateAllFormFields(formGroup?: FormGroup) {
+    Object.keys(this.form.controls).forEach((field) => {
+      const control = this.form.get(field);
+      if (control instanceof FormControl) {
+        control.markAsTouched({ onlySelf: true });
+      } else if (control instanceof FormGroup) {
+        // this.validateAllFormFields(control);
+      }
+    });
+  }
 }
