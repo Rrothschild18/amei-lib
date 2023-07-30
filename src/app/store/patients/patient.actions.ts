@@ -100,4 +100,9 @@ export const PatientActions = {
     static readonly type = '[Patient Filters] Patch Entity Filters';
     constructor(public payload: any) {}
   },
+
+  SetEntityFilters: class SethEntityFilters {
+    static readonly type = '[Patient Filters] Set Entity Filters';
+    constructor(public payload: any) {}
+  },
 };

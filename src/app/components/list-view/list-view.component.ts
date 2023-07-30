@@ -8,16 +8,15 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import {
   Observable,
-  first,
-  tap,
-  switchMap,
-  combineLatest,
-  distinctUntilChanged,
   debounceTime,
+  withLatestFrom,
+  filter,
+  startWith,
+  tap,
 } from 'rxjs';
 import { Entities } from 'src/app/store/entities/entities.namespace';
 
@@ -53,23 +52,14 @@ export class ListViewComponent implements OnInit {
 
   routeParams$: Observable<any> = this.activeRoute.queryParams;
 
-  filters!: FormGroup;
-
-  onFirstLoad: Observable<any> = combineLatest([
-    this.filters$,
-    this.routeParams$,
-    this.isLoading$,
-  ]).pipe(
-    first(([, , isLoading]) => !isLoading),
-    tap(([filters, params]) => {
-      this.store.dispatch(
-        new Entities[this.entity as EntityKey].PatchEntityFilters({
-          ...filters,
-          ...params,
-        })
-      );
-    })
-  );
+  filters: FormGroup = new FormGroup({
+    nomeoucpf: new FormControl(
+      this.activeRoute.snapshot.queryParamMap.get('nomeoucpf')
+    ),
+    ativo: new FormControl(
+      this.activeRoute.snapshot.queryParamMap.get('ativo')
+    ),
+  });
 
   constructor(
     private store: Store,
@@ -77,44 +67,51 @@ export class ListViewComponent implements OnInit {
     private router: Router,
     private activeRoute: ActivatedRoute
   ) {
-    this.appRef.isStable
+    this.router.events
       .pipe(
-        first((stable) => stable),
-        switchMap(() => this.onFirstLoad)
+        filter((event) => event instanceof NavigationEnd),
+        withLatestFrom(
+          this.activeRoute.queryParams,
+          this.filters$,
+          this.filters.valueChanges.pipe(startWith({}))
+        ),
+        tap(() => {
+          debugger;
+        })
       )
-      .subscribe();
+      .subscribe(([event, params, state, filters, a]: any) => {
+        const hasParams = !!Object.keys(params).length;
 
-    // this.filters = new FormGroup({
-    //   nomeoucpf: new FormControl(
-    //     this.activeRoute.snapshot.queryParamMap.get('nomeoucpf')
-    //   ),
-    //   ativo: new FormControl(
-    //     this.activeRoute.snapshot.queryParamMap.get('ativo')
-    //   ),
-    // });
+        debugger;
 
-    // this.filters.valueChanges.pipe(debounceTime(250)).subscribe((filters) => {
-    //   const nonEmptyFilter = Object.entries(filters).reduce(
-    //     (acc: { [key: string]: any }, [key, value]) => {
-    //       if (value) {
-    //         acc[key] = value;
-    //       }
-    //       return acc;
-    //     },
-    //     {}
-    //   );
+        if (hasParams) {
+          this.filters.patchValue({ params }, { emitEvent: false });
+          this.store.dispatch(new Entities['Patient'].SetEntityFilters(params));
+          return;
+        }
 
-    //   this.updateUrl();
-
-    //   this.store.dispatch(
-    //     new Entities['Patient'].PatchEntityFilters(nonEmptyFilter)
-    //   );
-    // });
+        if (!hasParams) {
+          this.store.dispatch(new Entities['Patient'].SetEntityFilters({}));
+          this.filters.setValue({}, { emitEvent: false });
+        }
+      });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.filters.valueChanges.pipe(debounceTime(500)).subscribe((filters) => {
+      const filteredFilters = Object.entries(filters).reduce(
+        (acc: any, [key, value]: any) => {
+          if (value !== '' && value !== undefined) {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {}
+      );
 
-  ngOnChanges() {}
+      this.updateUrl(filteredFilters);
+    });
+  }
 
   get hasBodySlot(): boolean {
     return !!this.body;
@@ -158,16 +155,24 @@ export class ListViewComponent implements OnInit {
     // this.store.dispatch(new Entities['Patient'].PatchEntityFilters({}));
   }
 
-  updateUrl() {
-    const queryParams = {
-      nomeoucpf: this.filters.value.nomeoucpf,
-      ativo: this.filters.value.ativo,
-    };
+  updateUrl(params: any) {
+    // const queryParams = {
+    //   nomeoucpf: this.filters.value.nomeoucpf,
+    //   ativo: this.filters.value.ativo,
+    // };
 
-    this.router.navigate([], {
-      relativeTo: this.activeRoute,
-      queryParams: queryParams,
-      queryParamsHandling: 'merge',
-    });
+    debugger;
+
+    if (Object.keys(params).length) {
+      this.router.navigate([], {
+        relativeTo: this.activeRoute,
+        queryParams: params,
+        queryParamsHandling: '',
+      });
+
+      return;
+    }
+
+    this.router.navigate([], { relativeTo: this.activeRoute, queryParams: {} });
   }
 }

@@ -141,7 +141,7 @@ export class PatientState {
   @Action(Entities['Patient'].FetchEntityByIdSuccess)
   FetchPatientByIdSuccess(
     ctx: StateContext<PatientStateModel>,
-    action: typeof Entities['Patient']['FetchPatientById']
+    action: (typeof Entities)['Patient']['FetchPatientById']
   ) {
     const state = ctx.getState();
 
@@ -277,6 +277,18 @@ export class PatientState {
     ctx.patchState({
       ...state,
       filters: { ...state.filters, ...action.payload },
+    });
+
+    return ctx.dispatch(new Entities['Patient'].FetchAllEntities());
+  }
+
+  @Action(Entities['Patient'].SetEntityFilters)
+  setEntityFilters(ctx: StateContext<PatientStateModel>, action: any) {
+    const state = ctx.getState();
+
+    ctx.patchState({
+      ...state,
+      filters: action.payload,
     });
 
     return ctx.dispatch(new Entities['Patient'].FetchAllEntities());

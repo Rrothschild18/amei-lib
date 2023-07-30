@@ -25,7 +25,7 @@ import {
 export class FinancialAccountsService {
   baseUrl: string = 'https://amei-homolog.amorsaude.com.br/api/v1';
   token: string =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4OTU5NjY3NywiZXhwIjoxNjg5NjI1NDc3fQ.yYie4VwCpytafK4mEXWf5DdY7rp52JVH2TVI2FCAOn0';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4OTc2OTQzMywiZXhwIjoxNjg5Nzk4MjMzfQ.bCD03u7aMwGTX6HaqH48zO4iqvaFrz58oJtzX3smAMI';
 
   private currentAccountsTypes = `${this.baseUrl}/current-accounts-related/types`;
   private currentAccountsAccountsForReceipt = `${this.baseUrl}/current-accounts-related/accounts-for-receipt`;

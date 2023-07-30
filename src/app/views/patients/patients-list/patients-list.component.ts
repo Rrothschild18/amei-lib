@@ -25,12 +25,6 @@ import { Entities } from 'src/app/store/entities/entities.namespace';
 export class PatientsListComponent implements OnInit {
   displayedColumns!: string[];
 
-  filters$: Observable<any> = this.store.select(
-    (state: any) => state['Patient'].filters
-  );
-
-  searchNameValue$: Observable<string> | undefined;
-
   constructor(
     private router: Router,
     private activeRoute: ActivatedRoute,
@@ -38,40 +32,6 @@ export class PatientsListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {}
-
-  ngAfterViewInit() {
-    // this.searchNameValue$ = combineLatest({
-    //   filtersStore: this.filters$,
-    //   filterLocal:
-    //     this.filters.valueChanges.pipe(
-    //       debounceTime(500),
-    //       distinctUntilChanged()
-    //     ) || of({}),
-    // }).pipe(
-    //   tap(async ({ filterLocal }) => {
-    //     debugger;
-    //     await this.router.navigate([], {
-    //       //Trim blank spaces and set them to undefined || delete key
-    //       queryParams: {
-    //         ...filterLocal,
-    //       },
-    //       relativeTo: this.activeRoute,
-    //     });
-    //   }),
-    //   map(({ filterLocal }) => filterLocal.nomeoucpf || '')
-    // );
-    // this.activeRoute.queryParams
-    //   .pipe(
-    //     tap((params) => {
-    //       debugger;
-    //       console.log(params);
-    //     })
-    //   )
-    //   .subscribe((params) => {
-    //     debugger;
-    //     this.filters.patchValue(params);
-    //   });
-  }
 
   fetchSuccess(payload: any): void {
     this.displayedColumns = Object.keys(payload.fields);

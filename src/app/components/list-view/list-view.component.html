@@ -5,12 +5,12 @@
     <h6>Filters State</h6>
     <pre>{{ filters$ | async | json }}</pre>
   </div>
-  <div
-    *ngIf="isLoading$ | async"
-    class="position-absolute top-50 start-50 translate-middle"
-  >
-    <mat-spinner class="spinner" diameter="100"></mat-spinner>
-  </div>
+
+  <ng-container *ngIf="isLoading$ | async">
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <mat-spinner class="spinner" diameter="100"></mat-spinner>
+    </div>
+  </ng-container>
 
   <ng-template
     *ngIf="hasHeaderSlot; else defaultHeader"
@@ -52,8 +52,6 @@
             >
               <mat-label>Ativo</mat-label>
               <mat-select formControlName="ativo">
-                <!-- <mat-option>Todos</mat-option> -->
-                <!-- <mat-option [value]="true">Obito</mat-option> -->
                 <mat-option [value]="true">Ativo</mat-option>
                 <mat-option [value]="false">Inativo</mat-option>
               </mat-select>
@@ -81,6 +79,12 @@
     </div>
   </ng-template>
 
+  <ng-container *ngIf="!(results$ | async).length && !(isLoading$ | async)">
+    <div class="d-flex align-items-center justify-content-center">
+      <h6>Nenhum item encontrado.</h6>
+    </div>
+  </ng-container>
+
   <ng-template
     *ngIf="hasBodySlot"
     [ngTemplateOutlet]="renderBodySlot"
@@ -90,10 +94,4 @@
       isLoading: isLoading$ | async
     }"
   ></ng-template>
-
-  <!-- <div *ngIf="!isFetching">
-    <div>
-      <h6>Nenhum item encontrado.</h6>
-    </div>
-  </div> -->
 </section>

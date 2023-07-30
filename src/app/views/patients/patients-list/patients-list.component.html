@@ -1,14 +1,5 @@
 <div class="container">
   <app-list-view entity="Patient">
-    <!-- <ng-template #header let-entity="entity">
-      <div class="d-flex justify-content-between align-items-center w-100 my-5">
-        <ul class="list-unstyled d-flex">
-          <li class="me-2">Home</li>
-        </ul>
-        <button mat-button class="bg-warning">Enviar</button>
-      </div>
-    </ng-template> -->
-
     <ng-template
       #body
       let-fields="fields"
@@ -56,7 +47,7 @@
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let element">
             <button
-              (click)="redirectToEdit(element.uuid)"
+              (click)="redirectToEdit(element.uuid || element.id)"
               color="primary"
               mat-icon-button
               aria-label="edit"
