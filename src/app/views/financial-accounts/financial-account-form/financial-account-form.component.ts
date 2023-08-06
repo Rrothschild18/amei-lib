@@ -247,7 +247,7 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
             ...currentState,
             unidadeId: {
               ...currentState.unidadeId,
-              options: [clinic],
+              options: [...clinic],
             },
           });
         }

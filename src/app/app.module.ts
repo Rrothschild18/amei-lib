@@ -37,6 +37,7 @@ import { CalendarOverviewComponent } from './views/calendar-overview/calendar-ov
 import { CalendarMonthComponent } from './views/calendar-month/calendar-month.component';
 import { FinancialAccountFormComponent } from './views/financial-accounts/financial-account-form/financial-account-form.component';
 import { FinancialAccountFormTwoComponent } from './views/financial-accounts/financial-account-form-two/financial-account-form-two.component';
+import { FilterObjectPipe } from './pipes/filter-object.pipe';
 
 @NgModule({
   declarations: [
@@ -68,6 +69,7 @@ import { FinancialAccountFormTwoComponent } from './views/financial-accounts/fin
     CalendarMonthComponent,
     FinancialAccountFormComponent,
     FinancialAccountFormTwoComponent,
+    FilterObjectPipe,
   ],
   imports: [
     BrowserModule,

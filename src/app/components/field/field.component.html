@@ -2,7 +2,7 @@
   <ng-container *ngSwitchCase="'text'">
     <mat-form-field
       class="w-100"
-      appearance="fill"
+      appearance="outline"
       [hideRequiredMarker]="!!fieldAttributes?.hideRequiredMarker"
     >
       <mat-label>{{ field.placeholder || field.label }}</mat-label>
@@ -31,7 +31,7 @@
   <ng-container *ngSwitchCase="'email'">
     <mat-form-field
       class="w-100"
-      appearance="fill"
+      appearance="outline"
       [hideRequiredMarker]="!!fieldAttributes?.hideRequiredMarker"
     >
       <mat-label>{{ field.placeholder || field.label }}</mat-label>
@@ -55,7 +55,7 @@
   <ng-container *ngSwitchCase="'select'">
     <mat-form-field
       class="w-100"
-      appearance="fill"
+      appearance="outline"
       [hideRequiredMarker]="!!fieldAttributes?.hideRequiredMarker"
     >
       <mat-label>{{ field.label }}</mat-label>
@@ -86,7 +86,7 @@
   <ng-container *ngSwitchCase="'textarea'">
     <mat-form-field
       class="w-100"
-      appearance="fill"
+      appearance="outline"
       [hideRequiredMarker]="!!fieldAttributes?.hideRequiredMarker"
     >
       <mat-label>{{ field.name }}</mat-label>
@@ -125,7 +125,7 @@
   <ng-container *ngSwitchCase="'date'">
     <div>
       <mat-form-field
-        appearance="fill"
+        appearance="outline"
         class="w-100"
         [hideRequiredMarker]="!!fieldAttributes?.hideRequiredMarker"
       >

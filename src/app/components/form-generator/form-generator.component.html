@@ -7,10 +7,7 @@
     >
       <ng-template #default>
         <div [class]="getFieldClass(field.name)">
-          <app-field
-            [field]="field"
-            [fieldAttributes]="getFieldAttributes(field.name)"
-          ></app-field>
+          <app-field [field]="field" [fieldAttributes]="{}"></app-field>
         </div>
       </ng-template>
     </ng-container>

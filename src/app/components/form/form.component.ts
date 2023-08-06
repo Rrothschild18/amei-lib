@@ -3,8 +3,10 @@ import {
   Component,
   ContentChildren,
   Input,
+  OnDestroy,
   OnInit,
   QueryList,
+  SimpleChanges,
   TemplateRef,
 } from '@angular/core';
 import {
@@ -19,8 +21,13 @@ import {
   Observable,
   Subscription,
   combineLatest,
+  debounceTime,
   distinctUntilChanged,
+  share,
+  skip,
+  takeWhile,
   tap,
+  withLatestFrom,
 } from 'rxjs';
 import {
   Field,
@@ -37,8 +44,9 @@ import { NgTemplateNameDirective } from 'src/app/directives/ng-template-name.dir
 export type FormViewModel = {
   fields: FieldsConfig<{}>;
   columns: FieldsColumnsConfig;
-  fieldsValidators: FieldsValidatorsConfig;
-  fieldsAttributes: FieldsAttributesConfig;
+  validators: FieldsValidatorsConfig;
+  attributes: FieldsAttributesConfig;
+  values: any;
 };
 
 @Component({
@@ -48,17 +56,17 @@ export type FormViewModel = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
 })
-export class FormComponent implements OnInit {
+export class FormComponent implements OnInit, OnDestroy {
   @Input() set fieldsAttributes(value: FieldsAttributesConfig | null) {
     const hasAttributes = !!Object.keys(value || {}).length;
 
     if (hasAttributes) {
-      this._fieldsAttributes$.next({ ...value });
+      this._attributes$.next({ ...value });
       return;
     }
 
     if (!hasAttributes) {
-      this._fieldsAttributes$.next({});
+      this._attributes$.next({});
       return;
     }
   }
@@ -67,12 +75,12 @@ export class FormComponent implements OnInit {
     const hasValidations = !!Object.keys(value || {}).length;
 
     if (hasValidations) {
-      this._fieldsValidators$.next({ ...value });
+      this._validators$.next({ ...value });
       return;
     }
 
     if (!hasValidations) {
-      this._fieldsValidators$.next({});
+      this._validators$.next({});
       return;
     }
   }
@@ -105,15 +113,65 @@ export class FormComponent implements OnInit {
     }
   }
 
-  private _fieldsAttributes$ = new BehaviorSubject<FieldsAttributesConfig>({});
-  private _fieldsValidators$ = new BehaviorSubject<FieldsValidatorsConfig>({});
+  @Input() set values(value: any) {
+    const hasValues = !!Object.keys(value || {}).length;
+
+    if (hasValues) {
+      this._values$.next({ ...value });
+      return;
+    }
+
+    if (!hasValues) {
+      this._values$.next({});
+      return;
+    }
+  }
+
   private _fields$ = new BehaviorSubject<FieldsConfig>({} as FieldsConfig);
+  private _values$ = new BehaviorSubject<any>({});
+  private _attributes$ = new BehaviorSubject<FieldsAttributesConfig>({});
+  private _validators$ = new BehaviorSubject<FieldsValidatorsConfig>({});
   private _columns$ = new BehaviorSubject<FieldsColumnsConfig>({});
 
-  readonly fields$ = this._fields$.asObservable();
-  readonly columns$ = this._columns$.asObservable();
-  readonly fieldsAttributes$ = this._fieldsAttributes$.asObservable();
-  readonly fieldsValidators$ = this._fieldsValidators$.asObservable();
+  readonly fields$ = this._fields$
+    .asObservable()
+    .pipe(
+      distinctUntilChanged(
+        (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
+      )
+    );
+
+  readonly columns$ = this._columns$
+    .asObservable()
+    .pipe(
+      distinctUntilChanged(
+        (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
+      )
+    );
+
+  readonly attributes$ = this._attributes$
+    .asObservable()
+    .pipe(
+      distinctUntilChanged(
+        (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
+      )
+    );
+
+  readonly validators$ = this._validators$
+    .asObservable()
+    .pipe(
+      distinctUntilChanged(
+        (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
+      )
+    );
+
+  readonly values$ = this._values$
+    .asObservable()
+    .pipe(
+      distinctUntilChanged(
+        (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
+      )
+    );
 
   vm$!: Observable<FormViewModel>;
 
@@ -128,15 +186,17 @@ export class FormComponent implements OnInit {
 
   ngOnInit(): void {
     this.vm$ = combineLatest({
-      fields: this.fields$,
-      columns: this.columns$,
-      fieldsAttributes: this.fieldsAttributes$,
-      fieldsValidators: this.fieldsValidators$,
-    }).pipe(
-      tap(() => this.setUpFormGroups()),
-      tap(() => this.setUpFormGroupsValidators()),
-      tap(() => this.setUpFormAttributes())
-    );
+      fields: this.fields$.pipe(
+        tap(() => this.setUpForm()),
+        tap(() => {
+          this.setUpFormValues();
+        })
+      ),
+      columns: this.columns$, //TODO create an pipe
+      attributes: this.attributes$.pipe(tap(() => this.setUpFormAttributes())),
+      validators: this.validators$.pipe(tap(() => this.setUpFormValidators())),
+      values: this.values$.pipe(tap(() => this.setUpFormValues())),
+    });
 
     this.setUpFormChange();
   }
@@ -149,11 +209,10 @@ export class FormComponent implements OnInit {
     return !!Object.values(this.form.value).length;
   }
 
-  setUpFormGroups() {
+  setUpForm() {
     const [keysToAdd, keysToDelete] =
       this.calculateDiffBetweenControlsAndFields();
 
-    //TODO Delete values keys from stores
     this.deleteKeysFromFormControl(keysToDelete);
 
     const mappedFields = Object.entries(this._fields$.getValue());
@@ -174,41 +233,50 @@ export class FormComponent implements OnInit {
       const fieldType = field?.type ?? 'text';
 
       if (fieldsType.includes(fieldType)) {
-        this.form.addControl(fieldName, new FormControl(''));
+        this.form.addControl(fieldName, new FormControl(''), {
+          emitEvent: false,
+        });
       }
 
       if (fieldType === 'checkboxGroup') {
         const checkBoxGroupConfig = this.setUpCheckboxControl(fieldName, field);
 
-        this.form.addControl(fieldName, this.fb.group(checkBoxGroupConfig));
+        this.form.addControl(fieldName, this.fb.group(checkBoxGroupConfig), {
+          emitEvent: false,
+        });
       }
     }
   }
 
-  setUpFormGroupsValidators() {
-    const validations = this._fieldsValidators$.getValue();
+  //TODO => Need to setUp validators required as default whenever fields changes or not
+  setUpFormValidators() {
+    const validations = this._validators$.getValue();
     const mappedFields = Object.entries(this._fields$.getValue());
 
     mappedFields.forEach(([fieldName, field]: any) => {
       const existValidation = validations[fieldName];
 
+      // debugger;
       if (existValidation) {
         this.form.get(fieldName)?.clearValidators();
+        this.form.get(fieldName)?.updateValueAndValidity();
 
         const validators = validations[fieldName] || [Validators.required];
 
         this.form.get(fieldName)?.addValidators(validators);
-        // this.form.get(fieldName)?.updateValueAndValidity();
+        this.form.get(fieldName)?.updateValueAndValidity();
 
         return;
       }
+      // debugger;
 
       this.form.get(fieldName)?.addValidators([Validators.required]);
+      this.form.get(fieldName)?.updateValueAndValidity();
     });
   }
 
   setUpFormAttributes() {
-    const mappedAttributes = Object.entries(this._fieldsAttributes$.getValue());
+    const mappedAttributes = Object.entries(this._attributes$.getValue());
     mappedAttributes.forEach(([fieldName, attributes]: any) => {
       const fieldNoExists = !this._fields$.getValue()[fieldName];
 
@@ -233,6 +301,43 @@ export class FormComponent implements OnInit {
     });
 
     return;
+  }
+
+  setUpFormValues() {
+    /**
+     * This method has the purpose to merge incoming values fetched from api
+     * with current form value keys.
+     * I need to figure out some way better to diff those objects and correctly merge data
+     */
+
+    const currentFormKeys = Object.keys(this.form.value);
+    const currentValuesKeys = Object.keys(this._values$.getValue());
+
+    debugger;
+
+    let newFormValue = currentFormKeys.reduce((acc: any, curr: string) => {
+      const v =
+        this._values$.getValue()[curr] !== this.form.value[curr] &&
+        this.form.value[curr] !== '';
+      // debugger;
+
+      // console.log('patched Value');
+
+      return {
+        ...acc,
+        [curr]: v ? this.form.value[curr] : this._values$.getValue()[curr],
+      };
+    }, {});
+
+    newFormValue = { ...newFormValue };
+
+    // debugger;
+    this.form.patchValue(
+      { ...newFormValue }
+      // {
+      //   emitEvent: false,
+      // }
+    );
   }
 
   setUpCheckboxControl(fieldName: string, field: any) {
@@ -354,7 +459,7 @@ export class FormComponent implements OnInit {
   }
 
   getFieldAttributes(fieldName: string) {
-    return this._fieldsAttributes$.getValue()[fieldName];
+    return this._attributes$.getValue()[fieldName];
   }
 
   //KeyValue sort by key, bypass
@@ -372,5 +477,9 @@ export class FormComponent implements OnInit {
         // this.validateAllFormFields(control);
       }
     });
+  }
+
+  trackByFn(index: number, item: any): number {
+    return item.key;
   }
 }

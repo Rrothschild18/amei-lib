@@ -29,9 +29,8 @@ export class FieldComponent implements OnInit {
     return this.controlContainer.control?.get(this.field.name);
   }
 
-  //TODO map errors with an object, destruct arguments and accept custom errors messages
+  //TODO create an pipe for errors, or use filter Object
   showError(error: any) {
-    console.log(error);
     if (error.required) return 'Este campo é obrigatório';
     if (error.email) return 'E-mail inválido';
     if (error.max) return `Número máximo de caracteres é ${error.max.max}`;

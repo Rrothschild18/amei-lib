@@ -1,17 +1,16 @@
-<ng-container>{{ vm$ | async }}</ng-container>
 <section class="container">
   <h2 class="mb-5">Contas financeiras</h2>
 
   <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
     <ng-container *ngIf="financialAccountsFields$ | async as fields">
       <app-form
+        #financialAccountsForm
         [fields]="
-          filterObject(fields, financialAccountsFieldsNames$.getValue())
+          fields | filterObject : (financialAccountsFieldsNames$ | async)
         "
         [columns]="financialAccountsColumns$ | async"
         [fieldsValidators]="financialAccountsValidators$ | async"
         [fieldsAttributes]="financialAccountsAttributes$ | async"
-        #financialAccountsForm
       >
       </app-form>
     </ng-container>
@@ -19,3 +18,27 @@
     <pre>{{ formValues | json }}</pre>
   </div>
 </section>
+
+<!-- [values]="{
+  unidadeId: 183,
+  tipoContaId: 2,
+  nome: 'Raul Rothschild',
+  contaLiquidacao: [11, 8, 10],
+  bancoId: '392',
+  agencia: '0001',
+  numero: '24592',
+  titulo: 'Raul Tonello Rothschild',
+  documento: '39.526.098-0'
+}" -->
+
+<!-- [values]="{
+  unidadeId: 183,
+  tipoContaId: 2,
+  nome: 'Raul Rothschild',
+  contaLiquidacao: [11, 8, 10],
+  bancoId: 392,
+  agencia: ' 0001',
+  numero: 1232,
+  titulo: 'Raul Rothschild',
+  documento: '39.526.098-0'
+}" -->

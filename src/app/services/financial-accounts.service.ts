@@ -25,7 +25,7 @@ import {
 export class FinancialAccountsService {
   baseUrl: string = 'https://amei-homolog.amorsaude.com.br/api/v1';
   token: string =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY5MDczMzA3MywiZXhwIjoxNjkwNzYxODczfQ.yAYjmLy4jWUnMUHQmSW7nIfmUX0Y7cAY6yBc3qXcToo';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY5MTMzNDE2MywiZXhwIjoxNjkxMzYyOTYzfQ.JIVaAmOLkMThBXV3CRSbgpJcosG8PlrKb2EKFqpsbtM';
 
   private currentAccountsTypes = `${this.baseUrl}/current-accounts-related/types`;
   private currentAccountsAccountsForReceipt = `${this.baseUrl}/current-accounts-related/accounts-for-receipt`;
@@ -50,98 +50,109 @@ export class FinancialAccountsService {
         name: 'unidadeId',
         label: 'Unidade',
         type: 'select',
+        initialValue: null,
         options: [],
       },
       tipoContaId: {
         name: 'tipoContaId',
         label: 'Tipo de conta',
         type: 'select',
+        initialValue: null,
         options: [],
       },
       modalidadeId: {
         name: 'modalidadeId',
         label: 'Modalidade',
         type: 'select',
+        initialValue: [],
         options: [],
       },
       bancoId: {
         name: 'bancoId',
         label: 'Banco',
         type: 'select',
+        initialValue: [],
         options: [],
       },
       nome: {
         name: 'nome',
         label: 'Nome de Identificação',
         type: 'text',
+        initialValue: '',
       },
       contaRecebimentoId: {
         name: 'contaRecebimentoId',
         label: 'Conta para recebimento',
         type: 'select',
+        initialValue: [],
         options: [],
       },
       flagTef: {
         name: 'flagTef',
         label: 'TEF',
         type: 'checkbox',
+        initialValue: false,
       },
       flagSplit: {
         name: 'flagSplit',
         label: 'SPLIT',
         type: 'checkbox',
+        initialValue: false,
       },
       agencia: {
         name: 'agencia',
         label: 'Agência',
         type: 'text',
+        initialValue: '',
       },
       numero: {
         name: 'numero',
         label: 'Número da conta (NUMER0)',
         type: 'text',
+        initialValue: '',
       },
       titulo: {
         name: 'titulo',
         label: 'Titular',
         type: 'text',
+        initialValue: '',
       },
       documento: {
         name: 'documento',
         label: 'Documento',
         type: 'text',
+        initialValue: '',
       },
       diaVencimento: {
         name: 'diaVencimento',
         label: 'Dia do vencimento (numero)',
         type: 'text',
+        initialValue: '',
       },
       melhorDiaCompra: {
         name: 'melhorDiaCompra',
         label: 'Melhor dia para compra (numero)',
         type: 'text',
+        initialValue: '',
       },
       diasCreditoConta: {
         name: 'diasCreditoConta',
         label: 'Dias para crédito (numero)',
         type: 'text',
+        initialValue: '',
       },
       contaLiquidacao: {
         name: 'contaLiquidacao',
         label: 'Formas de recebimento (multiple)',
         type: 'select',
+        initialValue: [],
         options: [],
       },
-      // nomeBanco: {
-      //   name: 'nomeBanco',
-      //   label: 'Address',
-      //   type: 'text',
-      // },
     });
   }
 
   getCurrentClinic() {
-    return of({ label: 'Telemedicina', value: 183 });
+    return of([{ label: 'Telemedicina', value: 183 }]);
   }
 
   getCurrentAccountsRelatedTypes(): Observable<IFinancialAccountsType[]> {
@@ -163,7 +174,7 @@ export class FinancialAccountsService {
   }
 
   listFormsOfSettlement(
-    filters: IFormsOfSettlementParam
+    filters?: IFormsOfSettlementParam
   ): Observable<IFormsOfSettlementFromApi[]> {
     return this.http.get<IFormsOfSettlementFromApi[]>(
       this.currentAccountsFormsOfSettlement,
