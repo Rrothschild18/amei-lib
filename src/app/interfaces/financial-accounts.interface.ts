@@ -47,7 +47,7 @@ export interface IFinancialAccountFromApi {
   tipoConta: string;
   unidadeId: number;
   unidade: string;
-  contaLiquidacao: IFormsOfSettlementFromApi[] | number[];
+  contaLiquidacao: IFormsOfSettlementFromApi[];
   bancoId: number | null;
   banco: string | null;
   agencia: string | null;

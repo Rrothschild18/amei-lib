@@ -419,7 +419,7 @@ export class FinancialAccountFormComponent implements OnInit, OnDestroy {
                 banks.items
                   .map((bank) => ({
                     label: bank.nomeBanco,
-                    value: `${bank.id}`,
+                    value: bank.id,
                   }))
                   .sort((a: any, b: any) => a.label.localeCompare(b.label))
               )

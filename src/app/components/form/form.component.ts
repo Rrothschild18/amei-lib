@@ -233,17 +233,13 @@ export class FormComponent implements OnInit, OnDestroy {
       const fieldType = field?.type ?? 'text';
 
       if (fieldsType.includes(fieldType)) {
-        this.form.addControl(fieldName, new FormControl(''), {
-          emitEvent: false,
-        });
+        this.form.addControl(fieldName, new FormControl(''));
       }
 
       if (fieldType === 'checkboxGroup') {
         const checkBoxGroupConfig = this.setUpCheckboxControl(fieldName, field);
 
-        this.form.addControl(fieldName, this.fb.group(checkBoxGroupConfig), {
-          emitEvent: false,
-        });
+        this.form.addControl(fieldName, this.fb.group(checkBoxGroupConfig));
       }
     }
   }
@@ -318,7 +314,8 @@ export class FormComponent implements OnInit, OnDestroy {
     let newFormValue = currentFormKeys.reduce((acc: any, curr: string) => {
       const v =
         this._values$.getValue()[curr] !== this.form.value[curr] &&
-        this.form.value[curr] !== '';
+        this.form.value[curr] !== '' &&
+        this.form.value[curr] !== undefined;
       // debugger;
 
       // console.log('patched Value');

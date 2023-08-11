@@ -2,12 +2,9 @@ import { FinancialAccount } from './../../../interfaces/financial-accounts.inter
 import { AutocompleteOption } from 'src/app/components/autocomplete/multiselect-autocomplete.interface';
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit,
-  QueryList,
-  ViewChildren,
 } from '@angular/core';
 import { Validators } from '@angular/forms';
 import {
@@ -15,22 +12,20 @@ import {
   BehaviorSubject,
   distinctUntilChanged,
   filter,
-  shareReplay,
   Observable,
   Subject,
   map,
   takeUntil,
   combineLatest,
-  startWith,
   switchMap,
-  iif,
   of,
   catchError,
   tap,
   withLatestFrom,
-  debounceTime,
   concatMap,
-  first,
+  combineLatestWith,
+  debounceTime,
+  timer,
 } from 'rxjs';
 import {
   FormValue,
@@ -54,13 +49,6 @@ import {
 import { FieldsConfig, FieldsArrayName, FieldConfig } from 'src/app/models';
 import { FinancialAccountsService } from 'src/app/services/financial-accounts.service';
 import { ActivatedRoute } from '@angular/router';
-
-/** TODO
- *
- * Form need to update its value when fields change.
- * Dynamic forms are accumulating previous forms fields due its non-reactivity
- *
- */
 
 @Component({
   selector: 'app-financial-account-form-two',
@@ -90,20 +78,11 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
       },
       tipoContaId: {
         hideRequiredMarker: true,
-        // disabled: true,
       },
-      unidadeId: {
-        // disabled: true,
-      },
+      unidadeId: {},
     });
 
   financialAccountsFields$ = new BehaviorSubject<FinancialAccountFields>({});
-
-  hasLoadedUnityOptions$ = this.financialAccountsFields$.pipe(
-    distinctUntilChanged(),
-    filter((fields) => !!fields.unidadeId?.options?.length),
-    shareReplay({ bufferSize: 1, refCount: true })
-  );
 
   //FormEvents
   accountTypeIsPhysicalBox$!: Observable<boolean>;
@@ -129,19 +108,14 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
     { label: ETextAccountReceiveForms; value: string | number }[]
   >;
 
-  allComboBoxHaveBeenLoaded!: Observable<boolean>;
-
   private subscriptionsSink$ = new Subscription();
   private destroy$ = new Subject();
 
   isEditMode$!: Observable<boolean>;
   isCreateMode$!: Observable<boolean>;
 
-  vm$!: Observable<any>;
-
   constructor(
     private financialAccountService: FinancialAccountsService,
-    private cdRef: ChangeDetectorRef,
     public formService: FormViewService,
     private route: ActivatedRoute
   ) {}
@@ -152,9 +126,6 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
     this.setUpFormFieldColumns();
     this.setUpFormAttributes();
 
-    //Fetch field config
-
-    this.getFinancialAccountsFields();
     //Set up fields for each service
 
     //Fetch comboboxes
@@ -170,12 +141,32 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
     );
 
     this.isEditMode$ = this.route.url.pipe(
-      map((url) => url[url.length - 1].path === 'edit')
+      filter((url) => url[url.length - 1].path === 'edit'),
+      map(() => true)
     );
 
     this.isCreateMode$ = this.route.url.pipe(
-      map((url) => url[url.length - 1].path === 'new')
+      filter((url) => url[url.length - 1].path === 'new'),
+      map(() => true)
     );
+
+    // computed
+    this.isAccountTypeCard();
+    this.isAccountTypePhysical();
+    this.isAccountTypeBank();
+    this.isModalityCreditPayments();
+    this.isModalityCreditReceipts();
+    this.isModalityDebitReceipts();
+
+    this.watchAccountTypeValuePhysicalAndEnableFields();
+    this.watchAccountTypeValueBankAndEnableFields();
+    this.watchAccountTypeValueCardAndEnableFields();
+
+    this.watchAccountTypeValueCardAndFetchAccountsFormReceipts();
+
+    this.watchAccountModalityCreditPaymentsAndEnableFields();
+    this.watchAccountModalityCreditReceiptsAndEnableFields();
+    this.watchAccountModalityDebitReceiptsAndEnableFields();
 
     this.isCreateMode$
       .pipe(
@@ -205,126 +196,65 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
             {} as FieldsConfig<FinancialAccount>
           );
 
-          debugger;
           this.financialAccountsFields$.next(f);
         })
       )
       .subscribe();
 
-    this.isEditMode$.subscribe(() => {
-      //do logic here
-    });
+    this.isEditMode$
+      .pipe(
+        concatMap(() =>
+          this.financialAccountService
+            .getFinancialAccountById(
+              +this.route.snapshot.paramMap.get('id')!! ?? 223
+            )
+            .pipe(
+              map((v) => ({
+                ...v,
+                contaLiquidacao: v['contaLiquidacao'].map(
+                  (i: any) => i.formaLiquidacaoId
+                ),
+              })),
+              tap((v) => this.financialAccount$.next(v))
+            )
+        ),
+        switchMap(() => {
+          return this.fetchAllCombos().pipe(
+            withLatestFrom(this.financialAccountsFields$),
+            tap(([combos, fields]) => {
+              const f = Object.values(fields).reduce(
+                (
+                  acc: FieldsConfig<FinancialAccount>,
+                  curr: FieldConfig<FinancialAccount>
+                ) => {
+                  const v = acc;
+                  const c = curr;
+                  const cc = combos[curr.name] as FieldConfig<any>;
 
-    // computed
-    this.isAccountTypeCard();
-    this.isAccountTypePhysical();
-    this.isAccountTypeBank();
-    this.isModalityCreditPayments();
-    this.isModalityCreditReceipts();
-    this.isModalityDebitReceipts();
+                  if (!cc)
+                    return {
+                      ...acc,
+                      [curr.name]: { ...curr },
+                    };
 
-    this.watchAccountTypeValuePhysicalAndEnableFields();
-    this.watchAccountTypeValueBankAndEnableFields();
+                  return {
+                    ...acc,
+                    [curr.name]: { ...curr, options: cc },
+                  };
+                },
+                {} as FieldsConfig<FinancialAccount>
+              );
 
-    this.watchAccountTypeValueCardAndEnableFields();
-    this.watchAccountTypeValueCardAndFetchAccountsFormReceipts();
-
-    this.watchAccountModalityCreditPaymentsAndEnableFields();
-    this.watchAccountModalityCreditReceiptsAndEnableFields();
-    this.watchAccountModalityDebitReceiptsAndEnableFields();
+              this.financialAccountsFields$.next(f);
+            })
+          );
+        })
+      )
+      .subscribe(() => {});
   }
 
   ngOnDestroy(): void {
     this.subscriptionsSink$.unsubscribe();
-  }
-
-  startEditFlow(): Observable<any> {
-    return this.financialAccountService
-      .getFinancialAccountById(+this.route.snapshot.paramMap.get('id')!! ?? 223)
-      .pipe(
-        map((v) => ({
-          ...v,
-          contaLiquidacao: v['contaLiquidacao'].map(
-            (i: any) => i.formaLiquidacaoId
-          ),
-        })),
-        tap((v) => this.financialAccount$.next(v)),
-        switchMap(() => {
-          return combineLatest({
-            fields: this.fetchAllCombos().pipe(
-              withLatestFrom(this.financialAccountsFields$),
-              map(([combos, fields]) => {
-                const f = Object.values(fields).reduce(
-                  (
-                    acc: FieldConfig<FinancialAccount>,
-                    curr: FieldConfig<FinancialAccount>
-                  ) => {
-                    const v = acc;
-                    const c = curr;
-                    const cc = combos[curr.name] as FieldConfig<any>;
-
-                    if (!cc)
-                      return {
-                        ...acc,
-                        [curr.name]: { ...curr },
-                      };
-
-                    return {
-                      ...acc,
-                      [curr.name]: { ...curr, options: cc },
-                    };
-                  },
-                  {} as FieldConfig<FinancialAccount>
-                );
-
-                debugger;
-                return f;
-              })
-            ),
-            validators: this.financialAccountsValidators$,
-            columns: this.financialAccountsColumns$,
-            attributes: this.financialAccountsAttributes$,
-          });
-        })
-      );
-  }
-
-  startCreateFlow(): Observable<any> {
-    return combineLatest({
-      fields: this.fetchAllCombos().pipe(
-        withLatestFrom(this.financialAccountsFields$),
-        map(([combos, fields]) => {
-          const f = Object.values(fields).reduce(
-            (
-              acc: FieldConfig<FinancialAccount>,
-              curr: FieldConfig<FinancialAccount>
-            ) => {
-              const v = acc;
-              const c = curr;
-              const cc = combos[curr.name] as FieldConfig<any>;
-
-              if (!cc)
-                return {
-                  ...acc,
-                  [curr.name]: { ...curr },
-                };
-
-              return {
-                ...acc,
-                [curr.name]: { ...curr, options: cc },
-              };
-            },
-            {} as FieldConfig<FinancialAccount>
-          );
-
-          debugger;
-          return f;
-        })
-      ),
-      validators: this.financialAccountsValidators$,
-      columns: this.financialAccountsColumns$,
-      attributes: this.financialAccountsAttributes$,
-    });
   }
 
   fetchAllCombos(): Observable<Record<string, unknown>> {
@@ -378,7 +308,7 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
           banks.items
             .map((bank) => ({
               label: bank.nomeBanco,
-              value: `${bank.id}`,
+              value: bank.id,
             }))
             .sort((a: any, b: any) => a.label.localeCompare(b.label))
         )
@@ -413,7 +343,7 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
           accounts
             .map((account) => ({
               label: account.banco,
-              value: `${account.id}`,
+              value: account.id,
             }))
             .sort((a: any, b: any) => a.label.localeCompare(b.label))
         )
@@ -438,7 +368,10 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
       filter((formValues) => formValues['tipoContaId']),
       map((formValues) => formValues['tipoContaId']),
       map((fieldValue) => fieldValue === +EFinancialAccountType.CAIXA_FISICO),
-      filter((isPhysicalBox) => isPhysicalBox)
+      filter((isPhysicalBox) => isPhysicalBox),
+      tap((v) => {
+        console.log({ v });
+      })
       // distinctUntilChanged()
     );
   }
@@ -448,6 +381,7 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
       filter((formValues) => formValues['tipoContaId']),
       map((formValues) => formValues['tipoContaId']),
       map((fieldValue) => fieldValue === +EFinancialAccountType.CONTA_BANCARIA),
+      tap((v) => {}),
       filter((isBank) => isBank)
       // distinctUntilChanged()
     );
@@ -518,13 +452,6 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
     );
   }
 
-  getFinancialAccountsFields() {
-    this.financialAccountService
-      .getFields()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((fields) => this.financialAccountsFields$.next(fields));
-  }
-
   watchAccountTypeValuePhysicalAndEnableFields() {
     const loadPhysicalBoxFieldsSubs$ = this.accountTypeIsPhysicalBox$.subscribe(
       () => {
@@ -536,7 +463,6 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
         ]);
       }
     );
-
     this.subscriptionsSink$.add(loadPhysicalBoxFieldsSubs$);
   }
 
@@ -765,7 +691,12 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
     return;
   }
 
-  setUpFormFields() {}
+  setUpFormFields() {
+    this.financialAccountService
+      .getFields()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((fields) => this.financialAccountsFields$.next(fields));
+  }
 
   setUpFormAttributes() {}
 

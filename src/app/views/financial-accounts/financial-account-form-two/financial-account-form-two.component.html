@@ -1,24 +1,31 @@
 <section class="container">
   <h2 class="mb-5">Contas financeiras</h2>
-
   <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
-    <ng-container *ngIf="financialAccountsFields$ | async as fields">
-      <app-form
-        #financialAccountsForm
-        [fields]="
-          fields | filterObject : (financialAccountsFieldsNames$ | async)
-        "
-        [columns]="financialAccountsColumns$ | async"
-        [fieldsValidators]="financialAccountsValidators$ | async"
-        [fieldsAttributes]="financialAccountsAttributes$ | async"
-      >
-      </app-form>
-    </ng-container>
+    <!-- <pre>{{
+      financialAccountsFields$
+        | async
+        | filterObject : (financialAccountsFieldsNames$ | async)
+        | json
+    }}</pre> -->
+    <app-form
+      [fields]="
+        financialAccountsFields$
+          | async
+          | filterObject : (financialAccountsFieldsNames$ | async)
+      "
+      [columns]="financialAccountsColumns$ | async"
+      [fieldsValidators]="financialAccountsValidators$ | async"
+      [fieldsAttributes]="financialAccountsAttributes$ | async"
+      [values]="financialAccount$ | async"
+    >
+    </app-form>
 
     <pre>{{ formValues | json }}</pre>
   </div>
 </section>
-
+<!-- [fields]="
+filterObject(fields, financialAccountsFieldsNames$.getValue())
+" -->
 <!-- [values]="{
   unidadeId: 183,
   tipoContaId: 2,
