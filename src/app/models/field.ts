@@ -48,6 +48,7 @@ export type FieldTypes =
 export interface IBasicInputAttributes {
   name?: string;
   value?: any;
+  mask?: string;
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;

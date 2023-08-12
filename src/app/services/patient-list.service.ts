@@ -8,7 +8,7 @@ import { combineLatest, lastValueFrom, map, Observable } from 'rxjs';
 export class PatientListService {
   baseURL = 'https://amei-dev.amorsaude.com.br/api/v1';
   token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY4OTc2OTQzMywiZXhwIjoxNjg5Nzk4MjMzfQ.bCD03u7aMwGTX6HaqH48zO4iqvaFrz58oJtzX3smAMI';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY5MTc4MjExNywiZXhwIjoxNjkxODEwOTE3fQ.kRLjqzARItAZQ1XAPKySQY-js9zwgyp_op2BLuzMiW8';
 
   constructor(private http: HttpClient) {}
 

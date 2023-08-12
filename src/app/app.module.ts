@@ -38,6 +38,12 @@ import { CalendarMonthComponent } from './views/calendar-month/calendar-month.co
 import { FinancialAccountFormComponent } from './views/financial-accounts/financial-account-form/financial-account-form.component';
 import { FinancialAccountFormTwoComponent } from './views/financial-accounts/financial-account-form-two/financial-account-form-two.component';
 import { FilterObjectPipe } from './pipes/filter-object.pipe';
+import { PatientFormTwoComponent } from './views/patients/patient-form-two/patient-form-two/patient-form-two.component';
+import { IConfig, NgxMaskModule } from 'ngx-mask';
+
+export const options: Partial<IConfig> | (() => Partial<IConfig>) = {
+  validation: true,
+};
 
 @NgModule({
   declarations: [
@@ -70,6 +76,7 @@ import { FilterObjectPipe } from './pipes/filter-object.pipe';
     FinancialAccountFormComponent,
     FinancialAccountFormTwoComponent,
     FilterObjectPipe,
+    PatientFormTwoComponent,
   ],
   imports: [
     BrowserModule,
@@ -82,6 +89,7 @@ import { FilterObjectPipe } from './pipes/filter-object.pipe';
       developmentMode: true,
     }),
     NgxsLoggerPluginModule.forRoot(),
+    NgxMaskModule.forRoot(options),
   ],
   providers: [],
   bootstrap: [AppComponent],

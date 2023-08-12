@@ -186,12 +186,7 @@ export class FormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.vm$ = combineLatest({
-      fields: this.fields$.pipe(
-        tap(() => this.setUpForm()),
-        tap(() => {
-          this.setUpFormValues();
-        })
-      ),
+      fields: this.fields$.pipe(tap(() => this.setUpForm())),
       columns: this.columns$, //TODO create an pipe
       attributes: this.attributes$.pipe(tap(() => this.setUpFormAttributes())),
       validators: this.validators$.pipe(tap(() => this.setUpFormValidators())),
@@ -199,6 +194,16 @@ export class FormComponent implements OnInit, OnDestroy {
     });
 
     this.setUpFormChange();
+
+    this.formService.formValues
+      .pipe(
+        distinctUntilChanged(
+          (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
+        )
+      )
+      .subscribe((values) => {
+        this._values$.next(values);
+      });
   }
 
   ngOnDestroy() {

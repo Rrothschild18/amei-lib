@@ -1,0 +1,59 @@
+<section class="PatientForm d-block">
+  <div class="container rounded">
+    <div class="d-flex justify-content-between">
+      <h2>Some / Breadcrumb / Some / Breadcrumb</h2>
+      <div>
+        <button mat-flat-button color="accent" class="me-3">RESET</button>
+        <button mat-flat-button>SALVAR</button>
+      </div>
+    </div>
+
+    <!-- {{ formValues | json }} -->
+
+    <section class="section-1">
+      <h4>Dados Gerais</h4>
+
+      <app-form
+        [fields]="
+          patientFields$ | async | filterObject : (generalFieldsNames$ | async)
+        "
+        [columns]="patientGeneralColumns$ | async"
+        [fieldsValidators]="patientGeneralValidators$ | async"
+        [fieldsAttributes]="patientGeneralAttributes$ | async"
+      >
+      </app-form>
+    </section>
+
+    <section class="section-1">
+      <h4>Contato</h4>
+      <app-form
+        [fields]="
+          patientFields$ | async | filterObject : (contactFieldsNames$ | async)
+        "
+        [columns]="patientContactColumns$ | async"
+        [fieldsValidators]="patientContactValidators$ | async"
+        [fieldsAttributes]="patientContactAttributes$ | async"
+      >
+      </app-form>
+    </section>
+
+    <section class="section-1">
+      <h4>Endereco</h4>
+
+      <app-form
+        [fields]="
+          patientFields$ | async | filterObject : (addressFieldsNames$ | async)
+        "
+        [columns]="patientAddressColumns$ | async"
+        [fieldsValidators]="patientAddressValidators$ | async"
+        [fieldsAttributes]="patientAddressAttributes$ | async"
+      >
+      </app-form>
+    </section>
+  </div>
+</section>
+
+<!-- { "cpf": "46625288825", "nome": "Raul", "sobrenome": "Tonello Rothschild",
+"nomeSocial": "Mogli", "rg": "39526098-x", "dataNascimento":
+"1998-02-18T02:00:00.000Z", "nomeMae": "Clarisa", "naturalidade": "Sao Paulo",
+"dataCadastro": "2023-08-17T03:00:00.000Z" } -->

@@ -14,6 +14,7 @@ import { CalendarOverviewComponent } from './views/calendar-overview/calendar-ov
 import { CalendarMonthComponent } from './views/calendar-month/calendar-month.component';
 import { FinancialAccountFormComponent } from './views/financial-accounts/financial-account-form/financial-account-form.component';
 import { FinancialAccountFormTwoComponent } from './views/financial-accounts/financial-account-form-two/financial-account-form-two.component';
+import { PatientFormTwoComponent } from './views/patients/patient-form-two/patient-form-two/patient-form-two.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -25,8 +26,8 @@ const routes: Routes = [
     component: ProfessionalProceduresComponent,
   },
   { path: 'professionals/new', component: ProfessionalFormComponent },
-  { path: 'patients/new', component: PatientFormComponent },
-  { path: 'patients/:id/edit', component: PatientFormComponent },
+  { path: 'patients/new', component: PatientFormTwoComponent },
+  { path: 'patients/:id/edit', component: PatientFormTwoComponent },
 
   { path: 'employees/new', component: EmployeeFormComponent },
   { path: 'calendar', component: CalendarOverviewComponent },

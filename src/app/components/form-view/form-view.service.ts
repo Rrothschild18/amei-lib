@@ -1,5 +1,5 @@
 import { Injectable, QueryList, ViewChildren } from '@angular/core';
-import { BehaviorSubject, Subject, Observable } from 'rxjs';
+import { BehaviorSubject, Subject, Observable, startWith } from 'rxjs';
 import { FormGeneratorComponent } from '../form-generator/form-generator.component';
 import { FormComponent } from '../form/form.component';
 
@@ -17,7 +17,7 @@ export class FormViewService {
 
   constructor() {}
 
-  get formValues(): Subject<FormValue> {
+  get formValues(): BehaviorSubject<FormValue> {
     return this.values$;
   }
 
@@ -32,7 +32,7 @@ export class FormViewService {
   }
 
   onFormChanges2(emittedFormValue: { [key: string]: any }) {
-    this.values$.next(emittedFormValue);
+    this.values$.next({ ...this.values$.getValue(), ...emittedFormValue });
   }
 
   setFormRefs(forms: QueryList<FormGeneratorComponent | FormComponent>) {
