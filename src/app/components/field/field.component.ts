@@ -18,7 +18,6 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 })
 export class FieldComponent implements OnInit {
   @Input() field!: FieldConfig<{}> | Field;
-  //TODO ngx-mask not included
   @Input() fieldAttributes: FieldAttrs | undefined;
 
   constructor(private controlContainer: ControlContainer) {}

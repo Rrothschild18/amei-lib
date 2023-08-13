@@ -2,6 +2,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Patient } from '../interfaces';
+import {
+  IExpertiseArea,
+  IProcedureSimpleFromApi,
+} from '../views/professional-procedures/generalTypesForThatView';
 
 @Injectable({
   providedIn: 'root',
@@ -9,8 +13,7 @@ import { Patient } from '../interfaces';
 export class PatientService {
   baseUrl: string = 'https://amei-homolog.amorsaude.com.br/api/v1';
   patientsRoute = `${this.baseUrl}/pacientes`;
-  token: string =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpbzJAZW1haWwuY29tIiwiZnVsbE5hbWUiOiJOb21lIDIgU29icmVub21lIiwibG9nZ2VkQ2xpbmljIjpudWxsLCJyb2xlIjoidXNlciIsImlhdCI6MTY5MTg2OTg2OCwiZXhwIjoxNjkxODk4NjY4fQ.5_eHCrLenXFKPgalRewqkk8pJZGnbW3E-JWCpFw_C5M';
+  token: string = '';
 
   constructor(private http: HttpClient) {}
 
@@ -25,6 +28,15 @@ export class PatientService {
       .set('content-type', 'application/json')
       .set('Authorization', `Bearer ${this.token}`);
     return head;
+  }
+
+  getProceduresExample(): Observable<IProcedureSimpleFromApi[]> {
+    return this.http.get<IProcedureSimpleFromApi[]>(
+      `${this.baseUrl}/procedimentos?specialtyIds=532&limit=200`,
+      {
+        headers: this.getHeader(),
+      }
+    );
   }
 
   getPatientFields(): Observable<any> {
@@ -329,6 +341,11 @@ export class PatientService {
       estado: {
         name: 'estado',
         label: 'Estado',
+        type: 'text',
+      },
+      procedures: {
+        name: 'procedures',
+        label: 'Procedimentos',
         type: 'text',
       },
     });

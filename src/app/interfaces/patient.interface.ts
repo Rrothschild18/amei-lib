@@ -48,6 +48,9 @@ export interface Patient {
 
   //Observacoes
   observacoes: string;
+
+  //
+  procedures: number[];
 }
 
 export type PatientFields = FieldsConfig<Patient>;
@@ -76,7 +79,14 @@ export type PatientContactFields = FieldsConfig<PatientContact>;
 
 export type PatientAddress = Pick<
   Patient,
-  'cep' | 'endereco' | 'numero' | 'complemento' | 'bairro' | 'cidade' | 'estado'
+  | 'cep'
+  | 'endereco'
+  | 'numero'
+  | 'complemento'
+  | 'bairro'
+  | 'cidade'
+  | 'estado'
+  | 'procedures'
 >;
 
 export type PatientAddressFieldNames = FieldsArrayName<PatientAddress>;

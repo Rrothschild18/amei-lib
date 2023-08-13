@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { Employee } from '../interfaces';
-import { FieldsConfig } from '../models';
 
 @Injectable({
   providedIn: 'root',

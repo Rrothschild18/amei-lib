@@ -39,7 +39,7 @@ import { FinancialAccountFormComponent } from './views/financial-accounts/financ
 import { FinancialAccountFormTwoComponent } from './views/financial-accounts/financial-account-form-two/financial-account-form-two.component';
 import { FilterObjectPipe } from './pipes/filter-object.pipe';
 import { PatientFormTwoComponent } from './views/patients/patient-form-two/patient-form-two/patient-form-two.component';
-import { IConfig, NgxMaskModule } from 'ngx-mask';
+import { NgxMaskModule, IConfig } from 'ngx-mask';
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = {
   validation: true,

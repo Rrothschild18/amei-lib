@@ -1,3 +1,4 @@
+import { IProcedureSimpleFromApi } from './../../../professional-procedures/generalTypesForThatView';
 import {
   PatientAddressAttributes,
   PatientAddressColumns,
@@ -68,6 +69,8 @@ export class PatientFormTwoComponent implements OnInit {
   patientGeneralFields$ = new BehaviorSubject<PatientGeneralFields>({});
 
   origins$!: Observable<AutocompleteOption[]>;
+  procedures$!: Observable<AutocompleteOption[]>;
+  procedures: AutocompleteOption[] = [];
 
   // Contact Form
   contactFieldsNames$ = new BehaviorSubject<PatientContactFieldNames>([]);
@@ -108,6 +111,8 @@ export class PatientFormTwoComponent implements OnInit {
     this.setUpContactColumns();
     this.setUpAddressColumns();
 
+    this.setUpGeneralAttributes();
+    this.setUpContactAttributes();
     this.setUpAddressAttributes();
 
     this.fetchAllComboBox();
@@ -136,9 +141,17 @@ export class PatientFormTwoComponent implements OnInit {
           this.formService.formValues.next(patient);
         })
       )
-      .subscribe(() => {});
+      .subscribe(() => {
+        const state = this.patientGeneralAttributes$.getValue();
+        this.patientGeneralAttributes$.next({
+          ...state,
+          cpf: { disabled: true },
+        });
+      });
 
     this.subSink$.add(isEditSubs);
+
+    this.procedures$ = this.fetchProcedures();
   }
 
   initializeGeneralFields() {
@@ -191,6 +204,7 @@ export class PatientFormTwoComponent implements OnInit {
     this.addressFieldsNames$.next([
       'cep',
       'estado',
+      'procedures',
       'cidade',
       'bairro',
       'endereco',
@@ -368,6 +382,36 @@ export class PatientFormTwoComponent implements OnInit {
     });
   }
 
+  setUpGeneralAttributes() {
+    if (Object.values(this.patientAddressAttributes$.getValue()).length) {
+      return;
+    }
+
+    this.patientGeneralAttributes$.next({
+      cpf: {
+        mask: '000.000.000-00',
+      },
+    });
+  }
+
+  setUpContactAttributes() {
+    if (Object.values(this.patientContactAttributes$.getValue()).length) {
+      return;
+    }
+
+    this.patientContactAttributes$.next({
+      telefone: {
+        mask: '(00) 0 0000-0000',
+      },
+      celular: {
+        mask: '(00) 0 0000-0000',
+      },
+      celularAlternativo: {
+        mask: '(00) 0 0000-0000',
+      },
+    });
+  }
+
   setUpAddressAttributes() {
     if (Object.values(this.patientAddressAttributes$.getValue()).length) {
       return;
@@ -376,7 +420,7 @@ export class PatientFormTwoComponent implements OnInit {
     this.patientAddressAttributes$.next({
       cep: {
         mask: '00000-000',
-        maxlength: 8,
+        maxlength: 9,
       },
     });
   }
@@ -491,5 +535,21 @@ export class PatientFormTwoComponent implements OnInit {
       .subscribe();
 
     this.subSink$.add(subs);
+  }
+
+  fetchProcedures(): Observable<AutocompleteOption[]> {
+    return this.patientService.getProceduresExample().pipe(
+      map((procedures: IProcedureSimpleFromApi[]) => {
+        return procedures.map((procedure: any) => ({
+          label: procedure.nome,
+          value: procedure.id,
+        }));
+      }),
+      tap((procedures) => (this.procedures = procedures))
+    );
+  }
+
+  onSelectedProcedures($event: Observable<AutocompleteOption[]>) {
+    $event.subscribe((v) => (this.procedures = v));
   }
 }
