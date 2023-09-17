@@ -92,7 +92,7 @@ export class ListViewComponent implements OnInit {
 
         if (!hasParams) {
           this.store.dispatch(new Entities['Patient'].SetEntityFilters({}));
-          this.filters.setValue({}, { emitEvent: false });
+          this.filters.setValue({ nomteoucpf: '' }, { emitEvent: false });
         }
       });
   }

@@ -13,7 +13,6 @@ import {
 export class PatientService {
   baseUrl: string = 'https://amei-homolog.amorsaude.com.br/api/v1';
   patientsRoute = `${this.baseUrl}/pacientes`;
-  token: string = '';
 
   constructor(private http: HttpClient) {}
 
@@ -24,9 +23,7 @@ export class PatientService {
   }
 
   private getHeader(): HttpHeaders {
-    const head = new HttpHeaders()
-      .set('content-type', 'application/json')
-      .set('Authorization', `Bearer ${this.token}`);
+    const head = new HttpHeaders().set('content-type', 'application/json');
     return head;
   }
 

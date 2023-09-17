@@ -24,7 +24,6 @@ import {
 })
 export class FinancialAccountsService {
   baseUrl: string = 'https://amei-homolog.amorsaude.com.br/api/v1';
-  token: string = '';
 
   private currentAccountsTypes = `${this.baseUrl}/current-accounts-related/types`;
   private currentAccountsAccountsForReceipt = `${this.baseUrl}/current-accounts-related/accounts-for-receipt`;
@@ -37,9 +36,7 @@ export class FinancialAccountsService {
   constructor(private http: HttpClient) {}
 
   private getHeader(): HttpHeaders {
-    const head = new HttpHeaders()
-      .set('content-type', 'application/json')
-      .set('Authorization', `Bearer ${this.token}`);
+    const head = new HttpHeaders().set('content-type', 'application/json');
     return head;
   }
 

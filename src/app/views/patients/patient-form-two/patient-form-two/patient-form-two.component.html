@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <!-- {{ formValues | json }} -->
+    {{ formValues | json }}
     {{ procedures | json }}
 
     <section class="section-1">
@@ -49,22 +49,6 @@
         [fieldsValidators]="patientAddressValidators$ | async"
         [fieldsAttributes]="patientAddressAttributes$ | async"
       >
-        <!-- <ng-template name="cep" let-field="field" let-form="formGroupRef">
-          <div class="col-4" [formGroup]="form">
-            <mat-form-field class="w-100" appearance="outline">
-              <mat-label>{{ field.placeholder || field.label }}</mat-label>
-              <input matInput [formControlName]="field.name" mask="00000-000" />
-              <mat-spinner
-                class="loading"
-                [diameter]="30"
-                matSuffix
-              ></mat-spinner>
-              <mat-error *ngIf="form.get(field.name)?.errors" class="me-2">{{
-                form.get(field.name)?.errors
-              }}</mat-error>
-            </mat-form-field>
-          </div>
-        </ng-template> -->
         <ng-template
           name="procedures"
           let-field="field"

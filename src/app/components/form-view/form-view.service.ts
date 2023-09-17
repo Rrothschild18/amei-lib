@@ -1,5 +1,5 @@
-import { Injectable, QueryList, ViewChildren } from '@angular/core';
-import { BehaviorSubject, Subject, Observable, startWith } from 'rxjs';
+import { Injectable, OnDestroy, QueryList } from '@angular/core';
+import { BehaviorSubject, Subject, Observable } from 'rxjs';
 import { FormGeneratorComponent } from '../form-generator/form-generator.component';
 import { FormComponent } from '../form/form.component';
 
@@ -8,7 +8,7 @@ export interface FormValue {
 }
 
 @Injectable()
-export class FormViewService {
+export class FormViewService implements OnDestroy {
   private values$ = new BehaviorSubject<FormValue>({});
 
   private formRefs$ = new Subject<
@@ -28,10 +28,6 @@ export class FormViewService {
   }
 
   onFormChanges(emittedFormValue: { [key: string]: any }) {
-    this.values$.next(emittedFormValue);
-  }
-
-  onFormChanges2(emittedFormValue: { [key: string]: any }) {
     this.values$.next({ ...this.values$.getValue(), ...emittedFormValue });
   }
 
@@ -41,5 +37,9 @@ export class FormViewService {
 
   ngOnDestroy() {
     this.values$.unsubscribe();
+    this.values$ && this.values$.complete();
+
+    this.formRefs$.unsubscribe();
+    this.formRefs$ && this.formRefs$.complete();
   }
 }

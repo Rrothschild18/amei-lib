@@ -359,7 +359,7 @@ export class FormComponent implements OnInit, OnDestroy {
     const formValueSubscription = this.form.valueChanges
       .pipe(distinctUntilChanged())
       .subscribe((changedValue) => {
-        this.formService.onFormChanges2({
+        this.formService.onFormChanges({
           ...changedValue,
         });
       });

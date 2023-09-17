@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -40,6 +40,7 @@ import { FinancialAccountFormTwoComponent } from './views/financial-accounts/fin
 import { FilterObjectPipe } from './pipes/filter-object.pipe';
 import { PatientFormTwoComponent } from './views/patients/patient-form-two/patient-form-two/patient-form-two.component';
 import { NgxMaskModule, IConfig } from 'ngx-mask';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = {
   validation: true,
@@ -91,7 +92,9 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {
     NgxsLoggerPluginModule.forRoot(),
     NgxMaskModule.forRoot(options),
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
