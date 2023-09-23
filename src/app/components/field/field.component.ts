@@ -1,4 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {
+  AfterContentInit,
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+} from '@angular/core';
 import { ControlContainer, FormGroupDirective } from '@angular/forms';
 import { Field, FieldAttrs } from 'src/app/models/field';
 import { FieldConfig } from 'src/app/models';
@@ -9,6 +17,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
   templateUrl: './field.component.html',
   styleUrls: ['./field.component.scss'],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
+  // changeDetection: ChangeDetectionStrategy.OnPush,
   viewProviders: [
     {
       provide: ControlContainer,
@@ -16,13 +25,23 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
     },
   ],
 })
-export class FieldComponent implements OnInit {
+export class FieldComponent implements OnInit, AfterViewInit {
   @Input() field!: FieldConfig<{}> | Field;
   @Input() fieldAttributes: FieldAttrs | undefined;
 
-  constructor(private controlContainer: ControlContainer) {}
+  constructor(
+    private controlContainer: ControlContainer,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {}
+
+  ngAfterViewInit() {
+    this.controlContainer.valueChanges?.subscribe((v) => {
+      // this.cdRef.detectChanges();
+      // debugger;
+    });
+  }
 
   get fieldRef() {
     return this.controlContainer.control?.get(this.field.name);

@@ -6,7 +6,6 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { Validators } from '@angular/forms';
 import {
   Subscription,
   BehaviorSubject,
@@ -23,9 +22,6 @@ import {
   tap,
   withLatestFrom,
   concatMap,
-  combineLatestWith,
-  debounceTime,
-  timer,
 } from 'rxjs';
 import {
   FormValue,
@@ -54,12 +50,16 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'app-financial-account-form-two',
   templateUrl: './financial-account-form-two.component.html',
   styleUrls: ['./financial-account-form-two.component.scss'],
-  providers: [{ provide: FormViewService }],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [FormViewService],
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
   formValues: FormValue = {};
+  formValues2: FormValue = {};
+
   formValuesSubscription$!: Subscription;
+  formValuesSubscription2$!: Subscription;
+
   financialAccountsFieldsNames$ =
     new BehaviorSubject<FinancialAccountFieldNames>([
       'unidadeId',
@@ -140,6 +140,10 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
       (values) => (this.formValues = values)
     );
 
+    this.formValuesSubscription2$ = this.formService.formValues2.subscribe(
+      (values) => (this.formValues2 = values)
+    );
+
     this.isEditMode$ = this.route.url.pipe(
       filter((url) => url[url.length - 1].path === 'edit'),
       map(() => true)
@@ -218,7 +222,7 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
               tap((v) => this.financialAccount$.next(v))
             )
         ),
-        switchMap(() => {
+        concatMap(() => {
           return this.fetchAllCombos().pipe(
             withLatestFrom(this.financialAccountsFields$),
             tap(([combos, fields]) => {
@@ -250,7 +254,7 @@ export class FinancialAccountFormTwoComponent implements OnInit, OnDestroy {
           );
         })
       )
-      .subscribe(() => {});
+      .subscribe();
   }
 
   ngOnDestroy(): void {

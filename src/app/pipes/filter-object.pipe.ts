@@ -12,11 +12,11 @@ export class FilterObjectPipe implements PipeTransform {
       return {}; // Return the entire object if models are null or empty
     }
 
-    if (models === null) {
+    if (models === null || !models.length) {
       return fields; // Return the entire object if models are null or empty
     }
 
-    if (!models || !models.length) {
+    if (!models) {
       throw new Error('Please provide an array of model');
     }
 

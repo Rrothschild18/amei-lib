@@ -2,10 +2,7 @@
   <form [formGroup]="form">
     <div class="row">
       <ng-container
-        *ngFor="
-          let field of vm.fields | keyvalue : unsorted;
-          trackBy: trackByFn
-        "
+        *ngFor="let field of vm.fields | keyvalue : unsorted"
         [ngTemplateOutlet]="getTemplateRefByName(field.key) || default"
         [ngTemplateOutletContext]="fieldContext(field.value)"
       >

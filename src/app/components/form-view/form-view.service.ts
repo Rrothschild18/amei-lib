@@ -1,5 +1,6 @@
+import { FilterObjectPipe } from './../../pipes/filter-object.pipe';
 import { Injectable, OnDestroy, QueryList } from '@angular/core';
-import { BehaviorSubject, Subject, Observable } from 'rxjs';
+import { BehaviorSubject, Subject, Observable, map, combineLatest } from 'rxjs';
 import { FormGeneratorComponent } from '../form-generator/form-generator.component';
 import { FormComponent } from '../form/form.component';
 
@@ -15,10 +16,27 @@ export class FormViewService implements OnDestroy {
     QueryList<FormGeneratorComponent | FormComponent>
   >();
 
-  constructor() {}
+  private formsKeys$ = new BehaviorSubject<
+    Record<string, { [key: string]: any }>
+  >({});
+
+  constructor(private filterObject: FilterObjectPipe) {}
 
   get formValues(): BehaviorSubject<FormValue> {
     return this.values$;
+  }
+
+  get formValues2(): Observable<FormValue> {
+    return combineLatest({
+      keys: this.formsKeys$.pipe(
+        map((keys) => Object.values(keys).flat() as unknown as string[])
+      ),
+      values: this.values$,
+    }).pipe(
+      map(({ keys, values }) =>
+        this.filterObject.transform<any>(values || {}, keys || [])
+      )
+    );
   }
 
   get formRefs(): Observable<
@@ -37,9 +55,12 @@ export class FormViewService implements OnDestroy {
 
   ngOnDestroy() {
     this.values$.unsubscribe();
-    this.values$ && this.values$.complete();
-
     this.formRefs$.unsubscribe();
-    this.formRefs$ && this.formRefs$.complete();
+  }
+
+  setFormKeys<T>(formName: string, keys: (keyof T)[]) {
+    const currentState = this.formsKeys$.getValue();
+
+    this.formsKeys$.next({ ...currentState, [formName]: keys });
   }
 }

@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ContentChildren,
   Input,
@@ -13,6 +14,8 @@ import {
   FormGroup,
   FormBuilder,
   Validators,
+  ControlContainer,
+  FormGroupDirective,
 } from '@angular/forms';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import {
@@ -21,6 +24,7 @@ import {
   Subscription,
   combineLatest,
   debounceTime,
+  delay,
   distinctUntilChanged,
   tap,
 } from 'rxjs';
@@ -52,6 +56,8 @@ export type FormViewModel = {
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
 })
 export class FormComponent implements OnInit, OnDestroy {
+  @Input() name: string = '';
+
   @Input() set fieldsAttributes(value: FieldsAttributesConfig | null) {
     const hasAttributes = !!Object.keys(value || {}).length;
 
@@ -177,7 +183,11 @@ export class FormComponent implements OnInit, OnDestroy {
   @ContentChildren(NgTemplateNameDirective)
   _templates!: QueryList<NgTemplateNameDirective>;
 
-  constructor(private fb: FormBuilder, private formService: FormViewService) {}
+  constructor(
+    private fb: FormBuilder,
+    private formService: FormViewService,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.vm$ = combineLatest({
@@ -185,20 +195,13 @@ export class FormComponent implements OnInit, OnDestroy {
       columns: this.columns$, //TODO create an pipe
       attributes: this.attributes$.pipe(tap(() => this.setUpFormAttributes())),
       validators: this.validators$.pipe(tap(() => this.setUpFormValidators())),
-      values: this.values$.pipe(tap(() => this.setUpFormValues())),
+      values: this.values$.pipe(
+        delay(150),
+        tap(() => this.setUpFormValues())
+      ),
     });
 
     this.setUpFormChange();
-
-    this.formService.formValues
-      .pipe(
-        distinctUntilChanged(
-          (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
-        )
-      )
-      .subscribe((values) => {
-        this._values$.next(values);
-      });
   }
 
   ngOnDestroy() {
@@ -309,16 +312,11 @@ export class FormComponent implements OnInit, OnDestroy {
     const currentFormKeys = Object.keys(this.form.value);
     const currentValuesKeys = Object.keys(this._values$.getValue());
 
-    debugger;
-
     let newFormValue = currentFormKeys.reduce((acc: any, curr: string) => {
       const v =
         this._values$.getValue()[curr] !== this.form.value[curr] &&
         this.form.value[curr] !== '' &&
         this.form.value[curr] !== undefined;
-      // debugger;
-
-      // console.log('patched Value');
 
       return {
         ...acc,
@@ -328,13 +326,7 @@ export class FormComponent implements OnInit, OnDestroy {
 
     newFormValue = { ...newFormValue };
 
-    // debugger;
-    this.form.patchValue(
-      { ...newFormValue }
-      // {
-      //   emitEvent: false,
-      // }
-    );
+    this.form.patchValue({ ...newFormValue });
   }
 
   setUpCheckboxControl(fieldName: string, field: any) {
@@ -357,11 +349,20 @@ export class FormComponent implements OnInit, OnDestroy {
 
   setUpFormChange(): void {
     const formValueSubscription = this.form.valueChanges
-      .pipe(distinctUntilChanged())
+      .pipe(
+        distinctUntilChanged(
+          (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
+        )
+      )
       .subscribe((changedValue) => {
         this.formService.onFormChanges({
           ...changedValue,
         });
+
+        this.formService.setFormKeys(
+          this.name,
+          Object.keys(this.form.controls)
+        );
       });
 
     this.subSinks.add(formValueSubscription);

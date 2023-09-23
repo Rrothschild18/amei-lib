@@ -18,6 +18,7 @@ import {
   BehaviorSubject,
   EMPTY,
   Observable,
+  Subject,
   Subscription,
   catchError,
   concatMap,
@@ -25,7 +26,6 @@ import {
   delay,
   distinctUntilChanged,
   filter,
-  finalize,
   map,
   of,
   switchMap,
@@ -35,7 +35,12 @@ import {
   FormValue,
   FormViewService,
 } from './../../../../components/form-view/form-view.service';
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import {
   EFinancialAccountType,
   PatientFieldGeneralNames,
@@ -57,6 +62,9 @@ import { ActivatedRoute } from '@angular/router';
 export class PatientFormTwoComponent implements OnInit {
   formValues: FormValue = {};
   formValuesSubscription$!: Subscription;
+  formValues2: FormValue = {};
+  formValuesSubscription2$!: Subscription;
+
   subSink$ = new Subscription();
 
   patientFields$!: Observable<PatientFields>;
@@ -89,36 +97,27 @@ export class PatientFormTwoComponent implements OnInit {
   isEditMode$!: Observable<boolean>;
   isCreateMode$!: Observable<boolean>;
 
+  patient$ = new Subject<any>();
+
   constructor(
     public formService: FormViewService,
     private patientService: PatientService,
     private http: HttpClient,
     private route: ActivatedRoute
-  ) {
-    this.formValuesSubscription$ = this.formService.formValues.subscribe(
-      (values) => (this.formValues = { ...this.formValues, ...values })
-    );
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.fetchPatientFields();
+    this.formValuesSubscription$ = this.formService.formValues.subscribe(
+      (values) => {
+        this.formValues = { ...this.formValues, ...values };
+      }
+    );
 
-    this.initializeGeneralFields();
-    this.initializeContactFields();
-    this.initializeAddressFields();
-
-    this.setUpGeneralFieldsColumns();
-    this.setUpContactColumns();
-    this.setUpAddressColumns();
-
-    this.setUpGeneralAttributes();
-    this.setUpContactAttributes();
-    this.setUpAddressAttributes();
-
-    this.fetchAllComboBox();
-    this.fetchOrigins();
-
-    this.watchCEPChanges();
+    this.formValuesSubscription2$ = this.formService.formValues2.subscribe(
+      (values) => {
+        this.formValues2 = { ...this.formValues, ...values };
+      }
+    );
 
     this.isEditMode$ = this.route.url.pipe(
       filter((url) => url[url.length - 1].path === 'edit'),
@@ -137,21 +136,32 @@ export class PatientFormTwoComponent implements OnInit {
             +this.route.snapshot.paramMap.get('id')! ?? 0
           )
         ),
-        tap((patient) => {
-          this.formService.formValues.next(patient);
-        })
+        tap((patient) => this.patient$.next({ ...patient }))
       )
-      .subscribe(() => {
-        const state = this.patientGeneralAttributes$.getValue();
-        this.patientGeneralAttributes$.next({
-          ...state,
-          cpf: { disabled: true },
-        });
-      });
+      .subscribe();
 
     this.subSink$.add(isEditSubs);
 
     this.procedures$ = this.fetchProcedures();
+
+    this.fetchPatientFields();
+
+    this.initializeGeneralFields();
+    this.initializeContactFields();
+    this.initializeAddressFields();
+
+    this.setUpGeneralFieldsColumns();
+    this.setUpContactColumns();
+    this.setUpAddressColumns();
+
+    this.setUpGeneralAttributes();
+    this.setUpContactAttributes();
+    this.setUpAddressAttributes();
+
+    this.fetchAllComboBox();
+    this.fetchOrigins();
+
+    this.watchCEPChanges();
   }
 
   initializeGeneralFields() {
