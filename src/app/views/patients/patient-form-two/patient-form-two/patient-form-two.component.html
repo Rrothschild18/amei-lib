@@ -1,0 +1,77 @@
+<section class="PatientForm d-block">
+  <div class="container rounded">
+    <div class="d-flex justify-content-between">
+      <h2>Some / Breadcrumb / Some / Breadcrumb</h2>
+      <div>
+        <button mat-flat-button color="accent" class="me-3">RESET</button>
+        <button mat-flat-button>SALVAR</button>
+      </div>
+    </div>
+
+    {{ formService.formValues2 | async | json }}
+
+    <section>
+      <h4>Dados Gerais</h4>
+
+      <app-form
+        name="generalInformation"
+        [fields]="
+          patientFields$ | async | filterObject : (generalFieldsNames$ | async)
+        "
+        [columns]="patientGeneralColumns$ | async"
+        [fieldsValidators]="patientGeneralValidators$ | async"
+        [fieldsAttributes]="patientGeneralAttributes$ | async"
+        [values]="patient$ | async"
+      >
+      </app-form>
+    </section>
+
+    <section>
+      <h4>Contato</h4>
+      <app-form
+        name="contact"
+        [fields]="
+          patientFields$ | async | filterObject : (contactFieldsNames$ | async)
+        "
+        [columns]="patientContactColumns$ | async"
+        [fieldsValidators]="patientContactValidators$ | async"
+        [fieldsAttributes]="patientContactAttributes$ | async"
+        [values]="patient$ | async"
+      >
+      </app-form>
+    </section>
+
+    <section>
+      <h4>Endereco</h4>
+
+      <app-form
+        name="address"
+        [fields]="
+          patientFields$ | async | filterObject : (addressFieldsNames$ | async)
+        "
+        [columns]="patientAddressColumns$ | async"
+        [fieldsValidators]="patientAddressValidators$ | async"
+        [fieldsAttributes]="patientAddressAttributes$ | async"
+        [values]="patient$ | async"
+      >
+        <ng-template
+          name="procedures"
+          let-field="field"
+          let-form="formGroupRef"
+        >
+          <app-autocomplete
+            class="col-4"
+            appearance="fill"
+            placeholder="Filtrar procedimentos por"
+            [data]="procedures$ | async"
+            [cacheData]="false"
+            [cacheSelectData]="false"
+            [multiple]="true"
+            (selectedOptions)="onSelectedProcedures($event)"
+          >
+          </app-autocomplete>
+        </ng-template>
+      </app-form>
+    </section>
+  </div>
+</section>

@@ -1,30 +1,83 @@
-<section class="Form">
-  <app-form-view>
-    <ng-template #body let-fields="fields" let-results="results">
-      <div class="container h-100 d-flex align-items-center mb-5">
+<!-- <section class="PatientForm">
+  <app-form-view entity="Patient" [mode]="mode$ | async">
+    <ng-template #header>
+      <div class="container">
+        <div class="d-flex justify-content-between">
+          <h2>Some / Breadcrumb / Some / Breadcrumb</h2>
+          <div>
+            <button
+              mat-flat-button
+              color="accent"
+              class="me-3"
+              (click)="onResetChanges()"
+            >
+              RESET
+            </button>
+            <button mat-flat-button (click)="onSaveChanges()">SALVAR</button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #body let-fields="fields" let-result="result">
+      <div class="container h-100 d-flex flex-column align-items-center mb-5">
         <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
-          <!-- <pre>{{ fields | json }}</pre> -->
           <div class="row">
-            <div class="col-6">
-              <app-form-generator
-                [fields]="filterObject(fields, patientPersonalFields())"
-                (formValues)="handleFormValues($event)"
+            <div class="col-12">
+              <h5 class="mb-4">Patient personal information</h5>
+
+              <app-form
+                [fields]="filterObject(fields, patientPersonalFields)"
+                [columns]="patientPersonalColumns"
+                [fieldsValidators]="patientPersonalValidators"
+                #personalForm
               >
-              </app-form-generator>
+              </app-form>
             </div>
-            <div class="col-6">
-              <app-form-generator
-                [fields]="filterObject(fields, patientAdditionalFields())"
-                (formValues)="handleFormValues($event)"
+          </div>
+        </div>
+        <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
+          <div class="row">
+            <div class="col-12">
+              <h5 class="mb-4">Patient additional information</h5>
+              <app-form
+                [fields]="filterObject(fields, patientAdditionalFields)"
+                [columns]="patientAdditionalColumns"
+                [fieldsValidators]="patientAdditionalValidators$ | async"
+                [fieldsAttributes]="patientAdditionalAttributes$ | async"
+                #additionalForm
               >
-              </app-form-generator>
+                <ng-template
+                  name="cep"
+                  let-field="field"
+                  let-form="formGroupRef"
+                >
+                  <div class="col-4" [formGroup]="form">
+                    <mat-form-field class="w-100" appearance="fill">
+                      <mat-label>{{
+                        field.placeholder || field.label
+                      }}</mat-label>
+                      <input matInput [formControlName]="field.name" />
+                      <mat-spinner
+                        class="loading"
+                        [diameter]="30"
+                        matSuffix
+                        *ngIf="isFetchingCep"
+                      ></mat-spinner>
+                      <mat-error
+                        *ngIf="form.get(field.name)?.errors"
+                        class="me-2"
+                        >{{
+                          showError(form.get(field.name)?.errors)
+                        }}</mat-error
+                      >
+                    </mat-form-field>
+                  </div>
+                </ng-template>
+              </app-form>
             </div>
           </div>
         </div>
       </div>
     </ng-template>
   </app-form-view>
-  <!-- <h1></h1> -->
-
-  <pre>{{ values | json }}</pre>
-</section>
+</section> -->

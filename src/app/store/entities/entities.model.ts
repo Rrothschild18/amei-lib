@@ -9,6 +9,4 @@ export interface EntityFields {
   [key: string]: Field;
 }
 
-export interface EntityResults {
-  [index: number]: { [key: string]: any }; //Entity Result type of
-}
+export type EntityResults = { [key: string]: any }[]; //Entity Result type of

@@ -1,0 +1,385 @@
+{
+  "Patient": {
+    "fields": {
+      "uuid": {
+        "name": "uuid",
+        "label": "uuid",
+        "type": "text"
+      },
+      "isActive": {
+        "name": "isActive",
+        "label": "Is active?",
+        "type": "radio",
+        "options": [
+          {
+            "label": "Yes",
+            "value": true
+          },
+          {
+            "label": "No",
+            "value": false
+          }
+        ]
+      },
+      "fruits": {
+        "name": "fruits",
+        "label": "Fruits",
+        "type": "checkboxGroup",
+        "options": [
+          {
+            "label": "Banana",
+            "value": false
+          },
+          {
+            "label": "Strawberry",
+            "value": false
+          },
+          {
+            "label": "Apple",
+            "value": false
+          },
+          {
+            "label": "Orange",
+            "value": false
+          }
+        ]
+      },
+      "bmw": {
+        "name": "bmw",
+        "label": "bmw",
+        "type": "checkbox"
+      },
+      "ferrari": {
+        "name": "ferrari",
+        "label": "Ferrari?",
+        "type": "checkbox"
+      },
+      "corvette": {
+        "name": "corvette",
+        "label": "Corvette?",
+        "type": "checkbox"
+      },
+      "name": {
+        "name": "name",
+        "label": "Nome",
+        "type": "text"
+      },
+      "lastName": {
+        "name": "lastName",
+        "label": "Sobrenome",
+        "type": "text"
+      },
+      "civilStatus": {
+        "name": "civilStatus",
+        "label": "Civil status",
+        "type": "select",
+        "options": [
+          {
+            "label": "Solteiro",
+            "value": "cb884f43-9a36-4fd8-8a35-f38c798dc5d4"
+          },
+          {
+            "label": "Casado",
+            "value": "927a5852-b3fb-45b8-89cd-c5e1f9e2ee90"
+          },
+          {
+            "label": "Divorciado (a)",
+            "value": "c35b34a6-12b1-42a2-9106-3a4cdd8d8d8b"
+          },
+          {
+            "label": "Viuvo (a)",
+            "value": "938a4b72-1a41-4137-9add-2c9611ea1258"
+          }
+        ]
+      },
+      "document": {
+        "name": "document",
+        "label": "Document",
+        "type": "textarea"
+      },
+      "birthDate": {
+        "name": "birthDate",
+        "label": "Data de nascimento",
+        "type": "date"
+      },
+      "phone": {
+        "name": "phone",
+        "label": "Phone",
+        "type": "text"
+      },
+      "email": {
+        "name": "email",
+        "label": "E-mail",
+        "type": "email"
+      },
+      "games": {
+        "name": "games",
+        "label": "games",
+        "type": "select",
+        "options": [
+          {
+            "label": "Dota 2",
+            "value": "560e8a3f-1176-4f78-8fe7-174ab9fe8aa1"
+          },
+          {
+            "label": "League of Legends",
+            "value": "d6749294-14ce-413c-a180-e78b33285ec6"
+          },
+          {
+            "label": "Rust",
+            "value": "9371c545-ceb4-4215-90d6-9cd1316e2bbd"
+          },
+          {
+            "label": "Warcraft",
+            "value": "eb169d5f-40c1-4176-8b9e-d6b3a385b807"
+          },
+          {
+            "label": "Warzone",
+            "value": "631185e0-fa25-4d6c-ac98-701bda2f772b"
+          }
+        ]
+      },
+      "country": {
+        "name": "country",
+        "label": "Countries",
+        "type": "select",
+        "options": [
+          {
+            "label": "Brazil",
+            "value": "f0d0a6fb-ee32-4039-a358-e84695ca80b8"
+          },
+          {
+            "label": "Ireland",
+            "value": "ca36dad1-1e14-426c-b965-72072eef9487"
+          },
+          {
+            "label": "Australia",
+            "value": "303c7046-5db6-498d-9d1d-0d501b1a1f2e"
+          },
+          {
+            "label": "Canada",
+            "value": "093c9a2e-8c84-4fe7-8caa-08301a143712"
+          },
+          {
+            "label": "Portugal",
+            "value": "f9c83357-addc-4d36-ae31-2d09aed15a54"
+          }
+        ]
+      },
+      "cep": {
+        "name": "cep",
+        "label": "CEP",
+        "type": "text"
+      },
+      "state": {
+        "name": "state",
+        "label": "State",
+        "type": "text"
+      },
+      "city": {
+        "name": "city",
+        "label": "City",
+        "type": "text"
+      },
+      "neighborhood": {
+        "name": "neighborhood",
+        "label": "Neighborhood",
+        "type": "text"
+      },
+      "address": {
+        "name": "address",
+        "label": "Address",
+        "type": "text"
+      },
+      "streetNumber": {
+        "name": "streetNumber",
+        "label": "Street number",
+        "type": "text"
+      },
+      "complement": {
+        "name": "complement",
+        "label": "Complement",
+        "type": "text"
+      }
+    },
+    "results": [
+      {
+        "uuid": "2d4979de-aac6-4cdd-b420-74fb8499cf33",
+        "isActive": true,
+        "name": "Raul",
+        "lastName": "Rothschild",
+        "civilStatus": "cb884f43-9a36-4fd8-8a35-f38c798dc5d4",
+        "email": "raul@gmail.com",
+        "document": "loerem",
+        "birthDate": "1998-02-18T02:00:00.000Z",
+        "games": "560e8a3f-1176-4f78-8fe7-174ab9fe8aa1",
+        "country": "ca36dad1-1e14-426c-b965-72072eef9487",
+        "cep": "14021410",
+        "city": "Ribeirão Preto",
+        "state": "SP",
+        "neighborhood": "City Ribeirão",
+        "address": "Rua Professor Sylvio Marcondes Machado",
+        "streetNumber": "56",
+        "complement": "CASA DE ESQUINA PORTAO VERDE"
+      }
+    ]
+  },
+
+  "games": {
+    "name": "games",
+    "label": "games",
+    "type": "select",
+    "options": [
+      {
+        "label": "Dota 2",
+        "value": "560e8a3f-1176-4f78-8fe7-174ab9fe8aa1"
+      },
+      {
+        "label": "League of Legends",
+        "value": "d6749294-14ce-413c-a180-e78b33285ec6"
+      },
+      {
+        "label": "Rust",
+        "value": "9371c545-ceb4-4215-90d6-9cd1316e2bbd"
+      },
+      {
+        "label": "Warcraft",
+        "value": "eb169d5f-40c1-4176-8b9e-d6b3a385b807"
+      },
+      {
+        "label": "Warzone",
+        "value": "631185e0-fa25-4d6c-ac98-701bda2f772b"
+      }
+    ]
+  },
+
+  "country": {
+    "name": "country",
+    "label": "Countries",
+    "type": "select",
+    "options": [
+      {
+        "label": "Brazil",
+        "value": "f0d0a6fb-ee32-4039-a358-e84695ca80b8"
+      },
+      {
+        "label": "Ireland",
+        "value": "ca36dad1-1e14-426c-b965-72072eef9487"
+      },
+      {
+        "label": "Australia",
+        "value": "303c7046-5db6-498d-9d1d-0d501b1a1f2e"
+      },
+      {
+        "label": "Canada",
+        "value": "093c9a2e-8c84-4fe7-8caa-08301a143712"
+      },
+      {
+        "label": "Portugal",
+        "value": "f9c83357-addc-4d36-ae31-2d09aed15a54"
+      }
+    ]
+  },
+
+  "users": [
+    { "label": "Alice", "value": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d" },
+    { "label": "Bob", "value": "8b7fcb4d-4a7c-4fad-8bdd-2b0d7b3dcb6d" },
+    { "label": "Charlie", "value": "7b6de54d-5c7d-4fed-9bdd-2b0d7b3dcb6d" },
+    { "label": "David", "value": "6b5dcf4d-6d7d-4bad-8bdd-2b0d7b3dcb6d" },
+    { "label": "Eve", "value": "5b4cfb4d-7e7d-4cad-9bdd-2b0d7b3dcb6d" },
+    {
+      "label": "Alice Johnson",
+      "value": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+    },
+    {
+      "label": "Bob Thompson",
+      "value": "8b7fcb4d-4a7c-4fad-8bdd-2b0d7b3dcb6d"
+    },
+    {
+      "label": "Charlie Rodriguez",
+      "value": "7b6de54d-5c7d-4fed-9bdd-2b0d7b3dcb6d"
+    },
+    { "label": "David Kim", "value": "6b5dcf4d-6d7d-4bad-8bdd-2b0d7b3dcb6d" },
+    {
+      "label": "Eve Martinez",
+      "value": "5b4cfb4d-7e7d-4cad-9bdd-2b0d7b3dcb6d"
+    },
+    { "label": "Frank Smith", "value": "4b3ce74d-8f7c-4fed-9bdd-2b0d7b3dcb6d" },
+    { "label": "Grace Lee", "value": "3b2da04d-9e7d-4bad-8bdd-2b0d7b3dcb6d" },
+    { "label": "Henry Davis", "value": "2b1c904d-0a7c-4fad-9bdd-2b0d7b3dcb6d" },
+    {
+      "label": "Isaac Martinez",
+      "value": "1b0b734d-1b7d-4fed-8bdd-2b0d7b3dcb6d"
+    },
+    {
+      "label": "Jessica Brown",
+      "value": "0b9a5c4d-2c7d-4bad-9bdd-2b0d7b3dcb6d"
+    },
+    {
+      "label": "Katherine Johnson",
+      "value": "1b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6e"
+    },
+    {
+      "label": "Larry Thompson",
+      "value": "2b7fcb4d-4a7c-4fad-8bdd-2b0d7b3dcb6e"
+    },
+    {
+      "label": "Maggie Rodriguez",
+      "value": "3b6de54d-5c7d-4fed-9bdd-2b0d7b3dcb6e"
+    },
+    { "label": "Nate Kim", "value": "4b5dcf4d-6d7d-4bad-8bdd-2b0d7b3dcb6e" },
+    {
+      "label": "Olivia Martinez",
+      "value": "5b4cfb4d-7e7d-4cad-9bdd-2b0d7b3dcb6e"
+    },
+    { "label": "Peter Smith", "value": "6b3ce74d-8f7c-4fed-9bdd-2b0d7b3dcb6e" },
+    { "label": "Quinn Lee", "value": "7b2da04d-9e7d-4bad-8bdd-2b0d7b3dcb6e" },
+    {
+      "label": "Alice Johnson",
+      "value": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+    },
+    {
+      "label": "Bob Thompson",
+      "value": "8b7fcb4d-4a7c-4fad-8bdd-2b0d7b3dcb6d"
+    },
+    {
+      "label": "Charlie Rodriguez",
+      "value": "7b6de54d-5c7d-4fed-9bdd-2b0d7b3dcb6d"
+    },
+    { "label": "David Kim", "value": "6b5dcf4d-6d7d-4bad-8bdd-2b0d7b3dcb6d" },
+    {
+      "label": "Eve Martinez",
+      "value": "5b4cfb4d-7e7d-4cad-9bdd-2b0d7b3dcb6d"
+    },
+    { "label": "Frank Smith", "value": "4b3ce74d-8f7c-4fed-9bdd-2b0d7b3dcb6d" },
+    { "label": "Grace Lee", "value": "3b2da04d-9e7d-4bad-8bdd-2b0d7b3dcb6d" },
+    { "label": "Henry Davis", "value": "2b1c904d-0a7c-4fad-9bdd-2b0d7b3dcb6d" },
+    {
+      "label": "Isaac Martinez",
+      "value": "1b0b734d-1b7d-4fed-8bdd-2b0d7b3dcb6d"
+    },
+    {
+      "label": "Jessica Brown",
+      "value": "0b9a5c4d-2c7d-4bad-9bdd-2b0d7b3dcb6d"
+    },
+    {
+      "label": "Katherine Johnson",
+      "value": "1b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6e"
+    },
+    {
+      "label": "Larry Thompson",
+      "value": "2b7fcb4d-4a7c-4fad-8bdd-2b0d7b3dcb6e"
+    },
+    {
+      "label": "Maggie Rodriguez",
+      "value": "3b6de54d-5c7d-4fed-9bdd-2b0d7b3dcb6e"
+    },
+    { "label": "Nate Kim", "value": "4b5dcf4d-6d7d-4bad-8bdd-2b0d7b3dcb6e" },
+    {
+      "label": "Olivia Martinez",
+      "value": "5b4cfb4d-7e7d-4cad-9bdd-2b0d7b3dcb6e"
+    },
+    { "label": "Peter Smith", "value": "6b3ce74d-8f7c-4fed-9bdd-2b0d7b3dcb6e" },
+    { "label": "Quinn Lee", "value": "7b2da04d-9e7d-4bad-8bdd-2b0d7b3dcb6e" }
+  ]
+}

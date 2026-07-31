@@ -7,7 +7,7 @@ import {
   ContentChildren,
   QueryList,
 } from '@angular/core';
-import { CardBodyDirective } from 'src/app/directives/card-body.directive';
+// import { CardBodyDirective } from 'src/app/directives/card-body.directive';
 
 @Component({
   selector: 'app-card-template',
@@ -15,12 +15,12 @@ import { CardBodyDirective } from 'src/app/directives/card-body.directive';
   styleUrls: ['./card-template.component.scss'],
 })
 export class CardTemplateComponent implements OnInit {
-  @ContentChild(CardBodyDirective) content!: CardBodyDirective;
+  // @ContentChild(CardBodyDirective) content!: CardBodyDirective;
   @Input('data') myData!: {};
   @ViewChild(`cardBody`) contentt!: any;
 
-  @ContentChildren(CardBodyDirective)
-  templateList!: QueryList<CardBodyDirective>;
+  // @ContentChildren(CardBodyDirective)
+  // templateList!: QueryList<CardBodyDirective>;
 
   templateListt!: any;
 
@@ -35,10 +35,10 @@ export class CardTemplateComponent implements OnInit {
   ngOnInit(): void {
     let obj: any = {};
 
-    this.templateList?.toArray().forEach((v) => {
-      let index = v.cardBody;
-      obj[index] = v;
-    });
+    // this.templateList?.toArray().forEach((v) => {
+    //   let index = v.cardBody;
+    //   obj[index] = v;
+    // });
 
     this.templateListt = obj;
 

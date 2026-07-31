@@ -1,0 +1,20 @@
+<section class="container">
+  <h2 class="mb-5">Contas financeiras</h2>
+  <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
+    <app-form
+      [fields]="
+        financialAccountsFields$
+          | async
+          | filterObject : (financialAccountsFieldsNames$ | async)
+      "
+      [columns]="financialAccountsColumns$ | async"
+      [fieldsValidators]="financialAccountsValidators$ | async"
+      [fieldsAttributes]="financialAccountsAttributes$ | async"
+      [values]="financialAccount$ | async"
+      name="financialAccounts"
+    >
+    </app-form>
+
+    <pre>{{ formValues2 | json }}</pre>
+  </div>
+</section>

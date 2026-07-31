@@ -1,0 +1,22 @@
+<ng-container *ngIf="vm$ | async as vm">
+  <form [formGroup]="form">
+    <div class="row">
+      <ng-container
+        *ngFor="let field of vm.fields | keyvalue : unsorted"
+        [ngTemplateOutlet]="getTemplateRefByName(field.key) || default"
+        [ngTemplateOutletContext]="fieldContext(field.value)"
+      >
+        <ng-template #default>
+          <app-field
+            [class]="getFieldClass(field.value)"
+            [field]="field.value"
+            [fieldAttributes]="getFieldAttributes(field.key)"
+          ></app-field>
+        </ng-template>
+      </ng-container>
+    </div>
+  </form>
+</ng-container>
+
+<!-- TODO return fieldAttrs -->
+<!-- [fieldAttributes]="attributes$ | async | filterObject : [field.key]" -->

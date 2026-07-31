@@ -1,26 +1,97 @@
 <section class="List">
-  <div *ngIf="isFetching" class="">
-    <mat-spinner class="spinner"></mat-spinner>
+  <div>
+    <h6>Route Params</h6>
+    <pre>{{ routeParams$ | async | json }}</pre>
+    <h6>Filters State</h6>
+    <pre>{{ filters$ | async | json }}</pre>
   </div>
 
+  <ng-container *ngIf="isLoading$ | async">
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <mat-spinner class="spinner" diameter="100"></mat-spinner>
+    </div>
+  </ng-container>
+
   <ng-template
-    *ngIf="hasHeaderSlot() && hasResults()"
-    [ngTemplateOutlet]="renderHeaderSlot()"
+    *ngIf="hasHeaderSlot; else defaultHeader"
+    [ngTemplateOutlet]="renderHeaderSlot"
     [ngTemplateOutletContext]="{ entity: 'Patients' }"
-  ></ng-template>
+    #headerSlot
+  >
+  </ng-template>
 
-  <ng-template
-    *ngIf="hasBodySlot() && hasResults()"
-    [ngTemplateOutlet]="renderBodySlot()"
-    [ngTemplateOutletContext]="{
-      fields: fields$ | async,
-      results: results$ | async
-    }"
-  ></ng-template>
+  <ng-template #defaultHeader>
+    <div class="row mb-5">
+      <div class="col-11">
+        <form [formGroup]="filters">
+          <mat-form-field appearance="fill" class="w-100">
+            <mat-label>Search...</mat-label>
+            <input
+              formControlName="nomeoucpf"
+              matInput
+              placeholder="Search..."
+            />
+          </mat-form-field>
+        </form>
+      </div>
+      <button mat-button [matMenuTriggerFor]="menu" class="col-1 filter-button">
+        Filters
+        <mat-icon>filter_list</mat-icon>
+      </button>
 
-  <div *ngIf="!isFetching && !hasResults()">
-    <div>
+      <mat-menu #menu="matMenu" class="p-2">
+        <section [formGroup]="filters">
+          <div>
+            <mat-label>Status</mat-label>
+            <mat-form-field
+              class="w-100"
+              appearance="fill"
+              (click)="$event.stopPropagation()"
+              appearance="fill"
+              class="w-100"
+            >
+              <mat-label>Ativo</mat-label>
+              <mat-select formControlName="ativo">
+                <mat-option [value]="true">Ativo</mat-option>
+                <mat-option [value]="false">Inativo</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </section>
+        <div class="d-flex justify-content-end">
+          <button
+            mat-stroked-button
+            (click)="clearFilters()"
+            color="primary"
+            class="me-2"
+          >
+            Clean
+          </button>
+          <button
+            mat-flat-button
+            (click)="handleFilter($event)"
+            color="primary"
+          >
+            Filter
+          </button>
+        </div>
+      </mat-menu>
+    </div>
+  </ng-template>
+
+  <ng-container *ngIf="!(results$ | async).length && !(isLoading$ | async)">
+    <div class="d-flex align-items-center justify-content-center">
       <h6>Nenhum item encontrado.</h6>
     </div>
-  </div>
+  </ng-container>
+
+  <ng-template
+    *ngIf="hasBodySlot"
+    [ngTemplateOutlet]="renderBodySlot"
+    [ngTemplateOutletContext]="{
+      fields: fields$ | async,
+      results: results$ | async,
+      isLoading: isLoading$ | async
+    }"
+  ></ng-template>
 </section>

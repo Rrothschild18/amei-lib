@@ -33,4 +33,20 @@ export class ListViewService {
   FetchAllEntities(entityName: string): Observable<any> {
     return this.http.get(`${this.baseURL}/${entityName}`);
   }
+
+  FetchEntityById(entityName: string, entityId: string): Observable<any> {
+    return this.http.get(`${this.baseURL}/${entityName}/${entityId}`);
+  }
+
+  CreateEntity(entityName: string, entity: any): Observable<any> {
+    return this.http.post(`${this.baseURL}/${entityName}`, entity);
+  }
+
+  PatchEntity(
+    entityName: string,
+    entity: any,
+    entityId: string
+  ): Observable<any> {
+    return this.http.patch(`${this.baseURL}/${entityName}/${entityId}`, entity);
+  }
 }

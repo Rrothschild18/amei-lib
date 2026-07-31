@@ -1,0 +1,41 @@
+<div class="container mt-5 d-block">
+  <ng-container *ngFor="let _ of daysOfWeek; let monthWeek = index">
+    <mat-grid-list cols="7" rowHeight="2:1">
+      <mat-grid-tile *ngFor="let __ of daysOfWeek; let dayOfWeek = index">
+        <mat-divider [vertical]="true" class="h-100"></mat-divider>
+
+        <div
+          class="d-flex flex-column justify-content-start align-items-center w-100 h-100 mt-4"
+        >
+          <h6
+            class="calendar-title"
+            *ngIf="monthWeek + dayOfWeek === dayOfWeek"
+          >
+            {{ currentMonthSlots[dayOfWeek].date | date : "EEE" }}.
+          </h6>
+          <h6 class="calendar-title">
+            {{ getMonthDay(monthWeek * NUMBER_OF_DAYS_IN_WEEK + dayOfWeek) }}
+            <span
+              *ngIf="
+                getMonthDay(monthWeek * NUMBER_OF_DAYS_IN_WEEK + dayOfWeek) ===
+                FIRST_MONTH_DAY
+              "
+              >{{
+                currentMonthSlots[
+                  monthWeek * NUMBER_OF_DAYS_IN_WEEK + dayOfWeek
+                ].date | date : "MMM"
+              }}.</span
+            >
+          </h6>
+        </div>
+
+        <mat-divider
+          *ngIf="dayOfWeek === WeekDays.SATURDAY"
+          [vertical]="true"
+          class="h-100"
+        ></mat-divider>
+      </mat-grid-tile>
+      <mat-divider></mat-divider>
+    </mat-grid-list>
+  </ng-container>
+</div>

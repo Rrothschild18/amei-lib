@@ -1,0 +1,47 @@
+<section class="Form">
+  <app-form-view entity="Professional">
+    <ng-template #body let-fields="fields" let-results="results">
+      <div class="container h-100 d-flex align-items-center mb-5">
+        <div class="box shadow-sm bg-white rounded p-4 w-100 mt-5">
+          <div class="row">
+            <pre>{{ fields | json }}</pre>
+            <!-- <div class="col-12">
+              <pre>{{ fields | json }}</pre>
+              <pre>{{ results }}</pre>
+              <app-form-generator
+                [fields]="filterObject(fields, patientPersonalFields)"
+                [columns]="patientPersonalColumns"
+                (formValues)="handleFormValues($event)"
+                [fieldsValidators]="patientPersonalValidators"
+              >
+                <ng-template
+                  name="name"
+                  let-field="field"
+                  let-form="formRef"
+                  let-handleInput="handleInput"
+                  let-handleForm="handleForm"
+                  let-fieldRef="fieldRef"
+                >
+                  <div class="col-6">
+                    <app-field
+                      [field]="field"
+                      [form]="form"
+                      (inputValue)="
+                        handle({
+                          event: $event,
+                          form: this.form,
+                          handleInput: this.handleInput,
+                          handleForm: this.handleForm
+                        })
+                      "
+                    ></app-field>
+                  </div>
+                </ng-template>
+              </app-form-generator>
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </app-form-view>
+</section>

@@ -1,0 +1,60 @@
+<mat-form-field
+  [appearance]="appearance"
+  [floatLabel]="floatingLabel"
+  class="w-100"
+>
+  <mat-label id="labelPlaceholder">{{ placeholder }}</mat-label>
+  <input
+    matInput
+    type="text"
+    id="searchControl"
+    [formControl]="searchControl"
+    [placeholder]="placeholder"
+    [matAutocomplete]="autoCompleteRef"
+  />
+  <mat-spinner
+    [diameter]="30"
+    matSuffix
+    *ngIf="isLoading$ | async"
+  ></mat-spinner>
+  <mat-error
+    class="mt-5 fs-6"
+    *ngIf="searchControl.invalid || searchControl.errors?.['invalid']"
+    >Campo obrigatório*</mat-error
+  >
+</mat-form-field>
+<mat-autocomplete
+  #autoCompleteRef="matAutocomplete"
+  class="w-100"
+  id="autocomplete"
+>
+  <mat-option class="d-none"> </mat-option>
+  <mat-checkbox
+    class="checkbox"
+    id="selectAllOption"
+    [checked]="allSelected$ | async"
+    (change)="onSelectAll()"
+    *ngIf="hasMoreThanOneOption$ | async"
+  >
+    Todos
+  </mat-checkbox>
+
+  <div
+    *ngFor="
+      let option of currentOptions$$ | async | keyvalue;
+      trackBy: trackByFn
+    "
+  >
+    <mat-checkbox
+      [checked]="option.value.selected"
+      class="checkbox"
+      (change)="toggleOption(option.value.value)"
+    >
+      {{ option.value.label }}
+    </mat-checkbox>
+  </div>
+
+  <div *ngIf="searchNotFound$ | async" class="p-3">
+    <h6 class="text-gray-medium m-0">Não foram encontrados resultados</h6>
+  </div>
+</mat-autocomplete>

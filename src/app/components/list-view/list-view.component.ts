@@ -4,18 +4,29 @@ import {
   ContentChild,
   TemplateRef,
   Input,
-  Output,
-  EventEmitter,
   ApplicationRef,
+  ChangeDetectionStrategy,
 } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { Observable, first } from 'rxjs';
+import {
+  Observable,
+  debounceTime,
+  withLatestFrom,
+  filter,
+  startWith,
+  tap,
+} from 'rxjs';
 import { Entities } from 'src/app/store/entities/entities.namespace';
+
+type EntityKey = keyof typeof Entities;
 
 @Component({
   selector: 'app-list-view',
   templateUrl: './list-view.component.html',
   styleUrls: ['./list-view.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListViewComponent implements OnInit {
   @ContentChild('header') header!: TemplateRef<unknown>;
@@ -23,62 +34,145 @@ export class ListViewComponent implements OnInit {
   @Input('url') url!: string;
   @Input('entity') entity!: any;
 
-  fields$!: Observable<any>;
-  results$!: Observable<any>;
+  results$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].results
+  );
 
-  isFetching: boolean = false;
+  fields$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].fields
+  );
 
-  @Output() fetchSuccess: EventEmitter<any> = new EventEmitter();
-  @Output() fetchError: EventEmitter<any> = new EventEmitter();
+  isLoading$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].isLoading
+  );
 
-  constructor(private store: Store, private appRef: ApplicationRef) {
-    this.fields$ = this.store.select((state: any) => {
-      return state[this.entity].fields;
-    });
+  filters$: Observable<any> = this.store.select(
+    (state: any) => state[this.entity].filters
+  );
 
-    this.results$ = this.store.select(
-      (state: any) => state[this.entity].results
-    );
+  routeParams$: Observable<any> = this.activeRoute.queryParams;
 
-    this.appRef.isStable.pipe(first((stable) => stable)).subscribe(() => {
-      type EntityKey = keyof typeof Entities;
-      this.store.dispatch(
-        new Entities[this.entity as EntityKey].FetchAllEntities()
+  filters: FormGroup = new FormGroup({
+    nomeoucpf: new FormControl(
+      this.activeRoute.snapshot.queryParamMap.get('nomeoucpf')
+    ),
+    ativo: new FormControl(
+      this.activeRoute.snapshot.queryParamMap.get('ativo')
+    ),
+  });
+
+  constructor(
+    private store: Store,
+    private appRef: ApplicationRef,
+    private router: Router,
+    private activeRoute: ActivatedRoute
+  ) {
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        withLatestFrom(
+          this.activeRoute.queryParams,
+          this.filters$,
+          this.filters.valueChanges.pipe(startWith({}))
+        ),
+        tap(() => {
+          debugger;
+        })
+      )
+      .subscribe(([event, params, state, filters, a]: any) => {
+        const hasParams = !!Object.keys(params).length;
+
+        debugger;
+
+        if (hasParams) {
+          this.filters.patchValue({ params }, { emitEvent: false });
+          this.store.dispatch(new Entities['Patient'].SetEntityFilters(params));
+          return;
+        }
+
+        if (!hasParams) {
+          this.store.dispatch(new Entities['Patient'].SetEntityFilters({}));
+          this.filters.setValue({ nomteoucpf: '' }, { emitEvent: false });
+        }
+      });
+  }
+
+  ngOnInit(): void {
+    this.filters.valueChanges.pipe(debounceTime(500)).subscribe((filters) => {
+      const filteredFilters = Object.entries(filters).reduce(
+        (acc: any, [key, value]: any) => {
+          if (value !== '' && value !== undefined) {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {}
       );
+
+      this.updateUrl(filteredFilters);
     });
   }
 
-  ngOnInit(): void {}
-
-  hasBodySlot(): boolean {
+  get hasBodySlot(): boolean {
     return !!this.body;
   }
 
-  hasHeaderSlot(): boolean {
+  get hasHeaderSlot(): boolean {
     return !!this.header;
   }
 
-  hasResults() {
-    return !!(this.results$ || []);
-  }
+  // hasResults() {
+  //   return !!(this.results$ || []);
+  // }
 
-  renderHeaderSlot(): TemplateRef<unknown> {
+  get renderHeaderSlot(): TemplateRef<unknown> {
     return this.header;
   }
 
-  renderBodySlot(): TemplateRef<unknown> {
+  get renderBodySlot(): TemplateRef<unknown> {
     return this.body;
   }
 
-  // async fetchList() {
-  //   this.isFetching = true;
+  async handleFilter(event: any): Promise<void> {
+    await this.router.navigate([], {
+      queryParams: {
+        ...this.filters.value,
+      },
+      relativeTo: this.activeRoute,
+    });
+  }
 
-  //   try {
-  //     this.fetchSuccess.emit({ results: this.results$, fields: this.fields$ });
-  //   } catch (e) {
-  //     this.fetchError.emit(e);
-  //   } finally {
-  //     this.isFetching = false;
-  //   }
-  // }
+  clearFilters() {
+    // this.router.navigate([], {
+    //   //Trim blank spaces and set them to undefined || delete key
+    //   queryParams: {},
+    //   relativeTo: this.activeRoute,
+    // });
+
+    this.filters.patchValue({});
+
+    //CREATE AN ACTION TO SET FILTERS
+    // this.store.dispatch(new Entities['Patient'].PatchEntityFilters({}));
+  }
+
+  updateUrl(params: any) {
+    // const queryParams = {
+    //   nomeoucpf: this.filters.value.nomeoucpf,
+    //   ativo: this.filters.value.ativo,
+    // };
+
+    debugger;
+
+    if (Object.keys(params).length) {
+      this.router.navigate([], {
+        relativeTo: this.activeRoute,
+        queryParams: params,
+        queryParamsHandling: '',
+      });
+
+      return;
+    }
+
+    this.router.navigate([], { relativeTo: this.activeRoute, queryParams: {} });
+  }
 }

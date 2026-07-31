@@ -1,24 +1,45 @@
 <div class="FormView">
-  <div *ngIf="isFetching" class="">
-    <mat-spinner class="spinner"></mat-spinner>
+  <!-- <pre>
+    <h6>FieldEventValue</h6>
+    {{ componentStore$ | async | json }}
+  </pre>
+  <pre>
+    <h6>FormViewValues</h6>
+    {{ values | json }}
+  </pre> -->
+  <div
+    *ngIf="isLoading$ | async"
+    class="position-absolute top-50 start-50 translate-middle"
+  >
+    <mat-spinner class="spinner" diameter="100"></mat-spinner>
   </div>
 
   <ng-template
-    *ngIf="hasHeaderSlot() && hasResults()"
+    *ngIf="hasHeaderSlot && hasResults"
     [ngTemplateOutlet]="renderHeaderSlot()"
     [ngTemplateOutletContext]="{ entity: 'Patients' }"
   ></ng-template>
 
   <ng-template
-    *ngIf="hasBodySlot() && hasResults()"
+    *ngIf="hasBodySlot && hasResults"
     [ngTemplateOutlet]="renderBodySlot()"
     [ngTemplateOutletContext]="{
-      fields: fields$,
-      result: result$
+      fields: fields$ | async,
+      result: result$ | async,
+      formStore: formStoreChange
     }"
   ></ng-template>
 
-  <div *ngIf="!isFetching && !hasResults()">
+  <ng-container *ngIf="useActions">
+    <div class="container d-flex justify-content-end">
+      <button mat-flat-button color="accent" class="me-3" (click)="onCancel()">
+        Cancelar
+      </button>
+      <button mat-flat-button (click)="onSaveChanges()">Salvar</button>
+    </div>
+  </ng-container>
+
+  <div *ngIf="!isLoading$ && !hasResults">
     <div>
       <h6>Nenhum item encontrado.</h6>
     </div>

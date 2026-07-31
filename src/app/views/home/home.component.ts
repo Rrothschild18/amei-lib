@@ -1,12 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  Output,
+} from '@angular/core';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
+  state = { counter: 0 };
   isOpen = false;
+
+  userSearch$!: Observable<string>;
 
   links = [
     {
@@ -66,9 +76,23 @@ export class HomeComponent implements OnInit {
     },
   ];
 
+  user: any = {
+    firstName: 'Alice',
+    lastName: 'Smith',
+  };
+
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    setInterval(() => {
+      this.state = { ...this.state, counter: this.state.counter + 1 };
+    }, 100);
+  }
+
+  get render() {
+    console.log('re-render');
+    return '';
+  }
 
   toggleDrawer() {
     this.isOpen = !this.isOpen;
@@ -86,7 +110,13 @@ export class HomeComponent implements OnInit {
     return 'https://pokeapi.co/api/v2/pokemon/ditto';
   }
 
-  handleFetchSuccess(payload: any) {
-    console.log(payload);
+  increment() {
+    // this.state.counter++;
+    // debugger;
+    // console.log(this.state.counter);
+  }
+
+  changeUserName() {
+    this.user = { firstName: 'Raul', lastNam: 'Rothschild' };
   }
 }

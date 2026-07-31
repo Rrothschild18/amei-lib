@@ -1,83 +1,108 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.scss']
+  styleUrls: ['./layout.component.scss'],
 })
 export class LayoutComponent implements OnInit {
   isOpen = false;
-  
+
   links = [
-    { linkTo: '/home',
+    {
+      linkTo: '/professionals/new',
       pathName: 'Cadastro do profissional',
-      iconName: 'monetization_on'  
+      iconName: 'monetization_on',
     },
-    { linkTo: '/home',
-      pathName: 'Procedimento de agenda',
-      iconName: 'monetization_on'  
+    {
+      linkTo: '/patients/new',
+      pathName: 'Cadastro pacientes',
+      iconName: 'monetization_on',
     },
-    { linkTo: '/home',
-      pathName: 'Horários de atendimento',
-      iconName: 'monetization_on'  
+    {
+      linkTo: '/employees/new',
+      pathName: 'Cadastro funcionarios',
+      iconName: 'monetization_on',
     },
-    { linkTo: '/home',
-      pathName: 'Splits recebidos',
-      iconName: 'monetization_on'  
+    // {
+    //   linkTo: '/calendar',
+    //   pathName: 'Calendario',
+    //   iconName: 'monetization_on',
+    // },
+    {
+      linkTo: '/calendar-month',
+      pathName: 'Calendario Mes',
+      iconName: 'monetization_on',
     },
-  ]
+    {
+      linkTo: '/financial-accounts/new',
+      pathName: 'Contas financeiras',
+      iconName: 'monetization_on',
+    },
+    {
+      linkTo: '/financial-accounts-two/new',
+      pathName: 'Contas financeiras 2',
+      iconName: 'monetization_on',
+    },
+  ];
 
   menuItens = [
     {
       name: 'Agenda',
-      iconName: 'event_available'  
+      linkTo: '/',
+      iconName: 'event_available',
     },
     {
       name: 'Sala de espera',
-      iconName: 'timelapse'  
+      linkTo: '/',
+      iconName: 'timelapse',
     },
     {
       name: 'Pacientes',
-      iconName: 'people_alt'  
+      linkTo: '/patients',
+      iconName: 'people_alt',
     },
     {
       name: 'Financeiro',
-      iconName: 'monetization_on'  
+      linkTo: '/',
+      iconName: 'monetization_on',
     },
     {
       name: 'Convênios',
-      iconName: 'medical_services'  
+      linkTo: '/',
+      iconName: 'medical_services',
     },
     {
       name: 'Laboratórios',
-      iconName: 'monetization_on'  
+      linkTo: '/',
+      iconName: 'monetization_on',
     },
     {
       name: 'Cadastros',
-      iconName: 'lightbulbn'  
+      linkTo: '/',
+      iconName: 'lightbulbn',
     },
     {
       name: 'Relatórios',
-      iconName: 'description'  
+      linkTo: '/',
+      iconName: 'description',
     },
-  ]
+  ];
 
-  constructor() { }
+  constructor(private router: Router) {}
 
-  ngOnInit(): void {
+  ngOnInit(): void {}
 
+  toggleDrawer() {
+    this.isOpen = !this.isOpen;
   }
 
-
-  toggleDrawer(){
-    this.isOpen = !this.isOpen
+  handleClosed() {
+    console.log('IsClosing');
   }
 
-  handleClosed(){
-    console.log('IsClosing')
-  }
-
-  changeSideNavLinks(){
-    console.log('change')
+  changeSideNavLinks() {
+    console.log('change');
   }
 }
